@@ -2,9 +2,7 @@
 
 class Board:
 
-
-
-
-    __init__(self):
-        pass
+    def __init__(self):
+        self.tokenSpots = None
+        self.placementSquares = None
 
