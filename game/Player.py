@@ -1,0 +1,1 @@
+# { hand: MapCard[3], isActive: bool }
