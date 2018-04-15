@@ -1,0 +1,1 @@
+# { startPosn: uint < 8, endPosn: uint < 8, rotate(isClockwise: bool) }

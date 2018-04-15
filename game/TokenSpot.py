@@ -1,0 +1,1 @@
+# { next: TokenSpot, previous: TokenSpot, occupant: Token }

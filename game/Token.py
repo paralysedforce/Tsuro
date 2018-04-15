@@ -1,0 +1,1 @@
+# { position:TokenSpot, associatedPlayer: Player }
