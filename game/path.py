@@ -10,8 +10,19 @@ class Path:
         self._end_posn = path_desc[1]
 
     def rotate(self, isClockwise):
-        self._start_posn += 2
-        self._end_posn += 2
+        if isClockwise:
+            self._start_posn = (self._start_posn + 2) % 8
+            self._end_posn += (self._end_posn + 2) % 8
+        else:
+            # Add 8 to ensure positive number and proper wrapping around
+            self._start_posn = (self._start_posn + 8 - 2) % 8
+            self._end_posn += (self._end_posn + 8 - 2) % 8
+
+
+    def inverse(self):
+        tmp = self._start_posn
+        self._start_posn = self._end_posn
+        self._end_posn = tmp
 
     """ Compares two Paths
 
