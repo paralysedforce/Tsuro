@@ -5,9 +5,9 @@ class Path:
     """ Creates a Path from a tuple of points.
 
     """
-    def __init__(self, path_desc):
-        self._start_posn = path_desc[0]
-        self._end_posn = path_desc[1]
+    def __init__(self, start, end):
+        self._start_posn = start
+        self._end_posn = end
 
     def rotate(self, isClockwise):
         if isClockwise:
@@ -41,14 +41,8 @@ class Path:
             (self._start_posn == other._end_posn
                 and
                 self._end_posn == other._start_posn))
-
-            if output == False:
-                print("Output is false.")
-                print(self)
-                print(other)
             return output
         else:
-            print("Other is not a path")
             return NotImplemented
 
     def __str__(self):

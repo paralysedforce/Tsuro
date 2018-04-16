@@ -10,7 +10,12 @@ class MapCard:
     def __init__(self, card_desc):
         self._paths = []
         for path_desc in card_desc:
-            self._paths.append(Path(path_desc))
+            self._paths.append(Path(*path_desc))
 
     def rotate(self, is_clockwise):
-        pass
+        for path in self._paths:
+            path.rotate(is_clockwise)
+        
+
+    def __str__(self):
+        return str([str(path) for path in self._paths])
