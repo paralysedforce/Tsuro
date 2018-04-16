@@ -1,4 +1,4 @@
-from .Administrator import Administrator
+from .admin import Administrator
 
 
 def test_one():
