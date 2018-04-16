@@ -1,4 +1,4 @@
-
+from .deck import Deck
 
 #{ board: Board, players: Player[?], dragon: DragonCard, deck: DrawPile }
 
@@ -12,7 +12,7 @@ class Administrator:
         self.board = None
         self.players = None
         self.dragon = None
-        self.deck = None
+        self.deck = Deck()
 
     """ Determines whether it is legal for a given player to place a given tile on a given board.
 
