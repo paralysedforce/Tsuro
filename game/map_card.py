@@ -17,5 +17,17 @@ class MapCard:
             path.rotate(is_clockwise)
         
 
+    def __eq__(self, other):
+        if isinstance(other, MapCard):
+            # Check that paths are the same
+            for path in self._paths:
+                if path not in other._paths:
+                    return False
+            
+            # Only return true if paths are the same length
+            return len(self._paths) == len(other._paths)
+        else:
+            return NotImplemented
+
     def __str__(self):
         return str([str(path) for path in self._paths])
