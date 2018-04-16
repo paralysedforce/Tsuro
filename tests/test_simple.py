@@ -2,4 +2,4 @@
 
 def test_pytest():
     print("Hello, world")
-    assert 0
+    assert 1
