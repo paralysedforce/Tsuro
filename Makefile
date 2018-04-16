@@ -3,8 +3,11 @@ TEST_PATH = .
 init :
 	pip install -r requirements.txt
 
+init-pytest :
+	pip install -U pytest
+
 test :
-	python -m pytest --verbose --color=yes --rootdir=. $(TEST_PATH)
+	pytest --verbose --color=yes --rootdir=. $(TEST_PATH)
 
 default :
 	python game

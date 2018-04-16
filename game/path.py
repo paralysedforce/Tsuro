@@ -12,11 +12,11 @@ class Path:
     def rotate(self, isClockwise):
         if isClockwise:
             self._start_posn = (self._start_posn + 2) % 8
-            self._end_posn += (self._end_posn + 2) % 8
+            self._end_posn = (self._end_posn + 2) % 8
         else:
             # Add 8 to ensure positive number and proper wrapping around
             self._start_posn = (self._start_posn + 8 - 2) % 8
-            self._end_posn += (self._end_posn + 8 - 2) % 8
+            self._end_posn = (self._end_posn + 8 - 2) % 8
 
 
     def inverse(self):
@@ -50,3 +50,6 @@ class Path:
         else:
             print("Other is not a path")
             return NotImplemented
+
+    def __str__(self):
+        return "Path: (start: " + str(self._start_posn) + " end: " + str(self._end_posn) + ")"

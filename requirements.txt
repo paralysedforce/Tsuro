@@ -3,4 +3,4 @@
 # must have at least one requirement. Delete it
 # when adding a real requirement.
 
-docopt
+pytest
