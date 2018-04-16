@@ -7,7 +7,35 @@ class Path:
     """
     def __init__(self, path_desc):
         self._start_posn = path_desc[0]
-        self.end_posn = path_desc[1]
+        self._end_posn = path_desc[1]
 
     def rotate(self, isClockwise):
-        pass
+        self._start_posn += 2
+        self._end_posn += 2
+
+    """ Compares two Paths
+
+        Two paths are considered equivalent if both the start points and
+        end points are the same or both the start point of one and
+        the end point of the other are the same and the end point of one
+        and the start point of the other are the same.
+    """
+    def __eq__(self, other):
+        if isinstance(other, Path):
+            output = (
+            (self._start_posn == other._start_posn
+                and
+                self._end_posn == other._end_posn)
+            or
+            (self._start_posn == other._end_posn
+                and
+                self._end_posn == other._start_posn))
+
+            if output == False:
+                print("Output is false.")
+                print(self)
+                print(other)
+            return output
+        else:
+            print("Other is not a path")
+            return NotImplemented
