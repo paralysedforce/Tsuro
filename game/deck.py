@@ -1,5 +1,6 @@
 from .map_card import MapCard
 from random import shuffle
+from collections import deque
 
 DEFAULT_CARDS = [
     [(0, 1), (2, 3), (4, 5), (6, 7)],
@@ -45,13 +46,29 @@ class Deck:
 
     """ Creates a deck from the list of known paths """
     def __init__(self, possible_cards=DEFAULT_CARDS):
-        self._cards = []
+        self._cards = deque()
         for card_desc in possible_cards:
             self._cards.append(MapCard(card_desc))
 
     """ Re-orders the cards in the deck """
     def shuffle(self):
         shuffle(self._cards)
+
+    """ Gets the top card from the deck and returns it 
+    
+        returns an instance of MapCard or None
+    """
+    def draw(self):
+        return self._cards.popleft()
+
+    """ Returns the cards in the list do the bottom of the deck 
+
+        Args:
+            cards -- a collection of MapCards
+    """
+    def replace_cards(self, cards):
+        for card in cards:
+            self._cards.append(card)
 
     def __eq__(self, other):
         if isinstance(other, Deck):
