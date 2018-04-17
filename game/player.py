@@ -22,7 +22,7 @@ class Player:
         for _ in range(HAND_SIZE):
             self.draw_card()
 
-    def is_active(self): 
+    def is_active(self):
         return self._is_active
 
     def draw_card(self):
@@ -34,6 +34,25 @@ class Player:
             if not self._dragon_card.is_held():
                 # Claim the dragon card
                 self._dragon_card.set_holder(self)
+
+    """ Chooses a card from the hand and returns it as it's turn
+
+        Args:
+            placement_square -- where the chosen card will end up going
+
+        return -- a MapCard oriented in the way that it should be placed
+    """
+    def take_turn(self, placement_square):
+        pass # TODO
+
+    """ Deactivates the player, returns tiles to deck """
+    def eliminate(self):
+        self._is_active = False
+        self._deck.replace_cards(self._hand)
+
+        if self == self._dragon_card.get_holder():
+            # Relinquish the dragon card
+            self._dragon_card.relinquish()
 
 
     # __eq__ is not necessary because no players are equivalent unless

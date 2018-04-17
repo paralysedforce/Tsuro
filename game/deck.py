@@ -54,8 +54,8 @@ class Deck:
     def shuffle(self):
         shuffle(self._cards)
 
-    """ Gets the top card from the deck and returns it 
-    
+    """ Gets the top card from the deck and returns it
+
         returns an instance of MapCard or None
     """
     def draw(self):
@@ -64,7 +64,7 @@ class Deck:
         except IndexError:
             return None
 
-    """ Returns the cards in the list do the bottom of the deck 
+    """ Returns the cards in the list do the bottom of the deck
 
         Args:
             cards -- a collection of MapCards
@@ -73,12 +73,16 @@ class Deck:
         for card in cards:
             self._cards.append(card)
 
+    """ Returns the number of cards currently in the deck """
+    def get_size(self):
+        return len(self._cards)
+
     def __eq__(self, other):
         if isinstance(other, Deck):
             for card in self._cards:
                 if card not in other._cards:
                     return False
-            
+
             return len(self._cards) == len(other._cards)
         else:
             return NotImplemented

@@ -44,3 +44,7 @@ def test_none_after_exhausted():
     result = deck.draw()
 
     assert result is None
+
+def test_default_size():
+    deck = Deck()
+    assert deck.get_size() == len(DEFAULT_CARDS)
