@@ -14,6 +14,7 @@ public class Tile {
 
     private final int ROTATIONS_PER_CYCLE = 4;
     /* Helper Classes */
+
     private class TileConnection {
 
         private Set<Integer> endpoints;
@@ -23,6 +24,26 @@ public class Tile {
 
             this.endpoints.add(endpointA);
             this.endpoints.add(endpointB);
+        }
+
+        public boolean isValid(){
+            for (int endpoint: endpoints){
+                if (endpoint > 7 || endpoint < 0)
+                    return false;
+            }
+            return true;
+        }
+
+        public boolean contains(int endpoint){
+            return endpoints.contains(endpoint);
+        }
+
+        public int otherEndpoint(int endpoint){
+            for (int cur: endpoints){
+                if (endpoint != cur)
+                    return cur;
+            }
+            throw new IllegalArgumentException("Invalid TileConnection");
         }
 
         @Override
@@ -58,6 +79,24 @@ public class Tile {
             for (int i = 0; i < endpoints.length; i+=2) {
                 tileConnections.add(new TileConnection(endpoints[i], endpoints[i + 1]));
             }
+        }
+
+        public boolean isValid(){
+            for (TileConnection connection: tileConnections){
+                if (!connection.isValid())
+                    return false;
+            }
+            return true;
+        }
+
+        public int findMatch(int endpoint){
+            for (TileConnection connection: tileConnections){
+                if (connection.contains(endpoint)){
+                    return connection.otherEndpoint(endpoint);
+                }
+            }
+
+            throw new IllegalArgumentException("Endpoint not found");
         }
 
         @Override
@@ -100,6 +139,10 @@ public class Tile {
 
     public void rotateClockwise(){
         connections.rotateClockwise();
+    }
+
+    public int findMatch(int endpoint){
+        return connections.findMatch(endpoint);
     }
 
     @Override

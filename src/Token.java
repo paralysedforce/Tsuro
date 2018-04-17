@@ -2,6 +2,35 @@
  * Created by vyasalwar on 4/16/18.
  */
 public class Token {
-    public Token(){
+
+    private BoardSpace space;
+    private int tokenSpace;
+    private Player player;
+
+    public Token(BoardSpace startingLocation, int startingTokenSpace, Player player){
+        space = startingLocation;
+        tokenSpace = startingTokenSpace;
+        this.player = player;
+    }
+
+    public void setBoardSpace(BoardSpace location, int tokenSpace){
+        space = location;
+        this.tokenSpace = tokenSpace;
+    }
+
+    public void setTokenSpace(int tokenSpace){
+        this.tokenSpace = tokenSpace;
+    }
+
+    public BoardSpace getBoardSpace(){
+        return space;
+    }
+
+    public int getTokenSpace(){
+        return tokenSpace;
+    }
+
+    public Player getPlayer(){
+        return player;
     }
 }

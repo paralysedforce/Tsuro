@@ -1,4 +1,13 @@
+import com.intellij.openapi.vcs.history.VcsRevisionNumber;
+import javafx.util.Pair;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+
 /**
+ *
+ * TODO: Handle two tokens running into each other
+ *
  * Represents a Tsuro Board
  *
  * Created by vyasalwar on 4/16/18.
@@ -24,14 +33,141 @@ public class Board {
                 spaces[row][col].hasTile();
     }
 
-    public boolean placeTile(Tile tile, Player player){
-        BoardSpace space = player.getNextSpace();
-        spaces[space.getRow()][space.getCol()] = space;
-        // this.advance();
-    }
-
     public boolean isLegalMove(Tile tile, Player player){
+        BoardSpace curSpace = player.getBoardSpace();
+        int tokenSpace = player.getTokenSpace();
+
+        BoardSpace nextBoardSpace = getNextSpace(curSpace, tokenSpace);
+        if (nextBoardSpace.hasTile())
+            return false;
+
+        int nextTokenSpace = tile.findMatch(findNextTokenSpace(tokenSpace));
+        nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+        while (nextBoardSpace != null){
+
+            if (!nextBoardSpace.hasTile())
+                return true;
+
+            Tile curTile = nextBoardSpace.getTile();
+            nextTokenSpace = curTile.findMatch(findNextTokenSpace(nextTokenSpace));
+            nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+        }
+        return false;
+    }
+
+    public List<Player> placeTile(Tile tile, Player player){
+        BoardSpace space = getNextSpace(player.getBoardSpace(), player.getTokenSpace());
+        space.setTile(tile);
+
+        Deque<BoardSpace> spaces = new LinkedList<>();
+        List<Player> eliminatedPlayers = new ArrayList<>();
+        spaces.add(space);
+
+        for (BoardSpace curSpace = spaces.removeFirst(); spaces.size() > 0; curSpace = spaces.removeFirst()){
+            if (space.hasTile()){
+                // transfer tokens if possible
+                // if not possible, determine if token will be transferred off edge
+                //      if so, this is a failed player
+                // if it is possible, add boardspaces that all tokens have been transferred onto to the queue
+
+                space.advanceTokens();
+
+                for(int i = 0; i < 8; i++) {
+                    Token token = curSpace.removeToken(i);
+                    if (token != null) {
+                        BoardSpace nextSpace = getNextSpace(token.getBoardSpace(), i);
+                        if (nextSpace != null) {
+                            transferToken(nextSpace, i, token);
+                            spaces.add(nextSpace);
+                        } else {
+                            eliminatedPlayers.add(token.getPlayer());
+                        }
+                    }
+                }
+
+            }
+        }
+        return eliminatedPlayers;
+    }
+
+    @Nullable
+    private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace){
+        int row = boardSpace.getRow();
+        int col = boardSpace.getCol();
+
+        Pair<Integer, Integer> newCoordinates = nextSpace(row, col, tokenSpace);
+        row = newCoordinates.getKey();
+        col = newCoordinates.getValue();
+
+        try {
+            return spaces[row][col];
+        }
+        catch (IndexOutOfBoundsException e){
+            return null;
+        }
+    }
+
+    private void transferToken(BoardSpace nextSpace, int tokenSpace, Token token){
+        int nextTokenSpace = findNextTokenSpace(tokenSpace);
+        nextSpace.addToken(token, nextTokenSpace);
+        token.setBoardSpace(nextSpace, nextTokenSpace);
+    }
+
+    private static boolean willTransferOffBoard(BoardSpace boardSpace, int tokenSpace){
+        Pair<Integer, Integer> nextLocationPair = nextSpace(boardSpace.getRow(), boardSpace.getCol(), tokenSpace);
+
+        int nextRow = nextLocationPair.getKey();
+        int nextCol = nextLocationPair.getValue();
+
+        return (nextRow > 5 || nextCol > 5 || nextRow < 0 || nextCol < 0);
+    }
+
+    private static Pair<Integer, Integer> nextSpace(int row, int col, int tokenSpace){
+        int nextRow = row;
+        int nextCol = col;
+
+        switch (tokenSpace){
+            case 0:
+            case 1:
+                nextRow--;
+                break;
+            case 2:
+            case 3:
+                nextCol++;
+                break;
+            case 4:
+            case 5:
+                nextRow++;
+                break;
+            case 6:
+            case 7:
+                nextCol--;
+                break;
+        }
+
+        return new Pair(nextRow, nextCol);
+    }
+
+    private static int findNextTokenSpace(int tokenSpace){
+        int nextTokenSpace = 0;
+
+        switch (tokenSpace){
+            case 0:
+            case 1:
+            case 4:
+            case 5:
+                nextTokenSpace = 5 - tokenSpace;
+                break;
+            case 2:
+            case 3:
+            case 6:
+            case 7:
+                nextTokenSpace = 9 - tokenSpace;
+                break;
+        }
+        return nextTokenSpace;
 
     }
+
 
 }
