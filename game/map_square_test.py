@@ -163,3 +163,73 @@ def test_bind_left():
     assert tsp12._next_card == tsp07
     assert tsp13._next_card == tsp06
 
+def test_terminate_top():
+    
+    tsp00 = TokenSpot()
+    tsp01 = TokenSpot()
+    spots0 = [tsp00,tsp01]
+    for _ in range(6):
+        spots0.append(TokenSpot())
+
+    square0 = MapSquare(spots0)
+    
+    square0.set_terminal(Side.TOP)
+
+    assert tsp00._is_terminal_spot
+    assert tsp01._is_terminal_spot
+
+def test_terminate_right():
+    
+    tsp02 = TokenSpot()
+    tsp03 = TokenSpot()
+    spots0 = []
+    for _ in range(2):
+        spots0.append(TokenSpot())
+    spots0.append(tsp02)
+    spots0.append(tsp03)
+    for _ in range(4):
+        spots0.append(TokenSpot())
+
+    square0 = MapSquare(spots0)
+
+    square0.set_terminal( Side.RIGHT)
+
+    assert tsp02._is_terminal_spot
+    assert tsp03._is_terminal_spot
+
+def test_terminate_bottom():
+    
+    tsp04 = TokenSpot()
+    tsp05 = TokenSpot()
+    spots0 = []
+    for _ in range(4):
+        spots0.append(TokenSpot())
+    spots0.append(tsp04)
+    spots0.append(tsp05)
+    for _ in range(2):
+        spots0.append(TokenSpot())
+
+    square0 = MapSquare(spots0)
+    
+    square0.set_terminal(Side.BOTTOM)
+
+    assert tsp04._is_terminal_spot
+    assert tsp05._is_terminal_spot
+
+def test_terminate_left():
+    
+    tsp06 = TokenSpot()
+    tsp07 = TokenSpot()
+    spots0 = []
+    for _ in range(6):
+        spots0.append(TokenSpot())
+    spots0.append(tsp06)
+    spots0.append(tsp07)
+
+    square0 = MapSquare(spots0)
+    
+    square0.set_terminal(Side.LEFT)
+
+    assert tsp06._is_terminal_spot
+    assert tsp07._is_terminal_spot
+

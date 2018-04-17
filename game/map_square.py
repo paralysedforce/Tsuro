@@ -72,7 +72,32 @@ class MapSquare:
             print("In MapSquare.set_adjacent(): encountered invalid side argument: " 
                 + str(side), stderr)
 
-        
+    """ Sets all TokenSpots on the indicated side as terminal
+
+        Args:
+            side -- Side indicating where the TokenSpots should terminate.
+    """
+    def set_terminal(self, side):
+        if side == Side.TOP:
+             # Set 0 and 1 to terminal
+             self._spots[0].set_terminal(True)
+             self._spots[1].set_terminal(True)
+        elif side == Side.RIGHT:
+             # Set 2 and 3 to terminal
+             self._spots[2].set_terminal(True)
+             self._spots[3].set_terminal(True)
+        elif side == Side.BOTTOM:
+             # Set 4 and 5 to terminal
+             self._spots[4].set_terminal(True)
+             self._spots[5].set_terminal(True)
+        elif side == Side.LEFT:
+             # Set 6 and 7 to terminal
+             self._spots[6].set_terminal(True)
+             self._spots[7].set_terminal(True)
+        else:
+            # Improper imput, don't mess anything up by doing anything
+            print("In MapSquare.set_terminal(): encountered invalid side argument: " 
+                + str(side), stderr)
 
     
 
