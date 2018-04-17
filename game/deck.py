@@ -59,7 +59,10 @@ class Deck:
         returns an instance of MapCard or None
     """
     def draw(self):
-        return self._cards.popleft()
+        try:
+            return self._cards.popleft()
+        except IndexError:
+            return None
 
     """ Returns the cards in the list do the bottom of the deck 
 

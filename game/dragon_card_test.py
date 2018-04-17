@@ -18,7 +18,7 @@ def test_get_holder_held():
     player = Player(Deck(), m_card)
 
     m_card.set_holder(player)
-    assert m_card.get_holder == player
+    assert m_card.get_holder() == player
     
 def test_get_holder_not_held():
     assert DragonCard().get_holder() is None

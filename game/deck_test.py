@@ -37,4 +37,10 @@ def test_not_equal_lengths():
     deck2 = Deck(DEFAULT_CARDS[1:])
     assert not deck1 == deck2
 
+def test_none_after_exhausted():
+    deck = Deck([DEFAULT_CARDS[0]]) # init deck with one card
 
+    result = deck.draw()
+    result = deck.draw()
+
+    assert result is None
