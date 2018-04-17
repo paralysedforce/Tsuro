@@ -38,6 +38,13 @@ class TokenSpot:
         
         return False
 
+    """ Changes whether this TokenSpot is considered terminal
+
+        Args:
+            is_terminal -- boolean indicating whether this spot is terminal.
+    """
+    def set_terminal(self, is_terminal):
+        self._is_terminal_spot = is_terminal
 
     """ Called to notify of a token's arrival via a path on the same card
 
