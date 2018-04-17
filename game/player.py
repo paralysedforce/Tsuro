@@ -22,7 +22,7 @@ class Player:
         for _ in range(HAND_SIZE):
             self.draw_card()
 
-    def is_active(self):
+    def is_active(self): 
         return self._is_active
 
     def draw_card(self):
