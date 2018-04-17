@@ -1,4 +1,5 @@
 from .path import Path
+from copy import deepcopy
 
 # { paths: Path[4], rotate(isClockwise: bool) }
 
@@ -26,12 +27,12 @@ class MapCard:
             path.rotate(is_clockwise)
         
 
-    """ Gets the list of paths on this card.
+    """ Gets a copy of the list of paths on this card.
 
         returns -- list of Path 
     """
     def get_paths(self):
-        return self._paths
+        return deepcopy(self._paths)
 
     def __eq__(self, other):
         if isinstance(other, MapCard):
