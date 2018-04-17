@@ -64,7 +64,7 @@ class MapSquare:
             TokenSpot.pair_adjacent(self._spots[5], other._spots[0])
             pass
         elif side == Side.LEFT:
-            # Set the 7th and 8th nodes of self to 3rd and 2nd nodes of other, respectively
+            # Set the 6th and 7th nodes of self to 3rd and 2nd nodes of other, respectively
             TokenSpot.pair_adjacent(self._spots[6], other._spots[3])
             TokenSpot.pair_adjacent(self._spots[7], other._spots[2])
         else:
