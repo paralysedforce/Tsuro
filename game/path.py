@@ -18,6 +18,11 @@ class Path:
             self._start_posn = (self._start_posn + 8 - 2) % 8
             self._end_posn = (self._end_posn + 8 - 2) % 8
 
+    def get_start(self):
+        return self._start_posn
+
+    def get_end(self):
+        return self._end_posn
 
     def inverse(self):
         tmp = self._start_posn
