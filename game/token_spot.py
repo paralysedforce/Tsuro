@@ -97,3 +97,25 @@ class TokenSpot:
     """
     def get_occupant(self):
         return self._occupant
+
+    """ Static function for pairing two adjacent spots in one go
+
+        Args:
+            spot1 -- TokenSpot adjacent to spot2
+            spot2 -- TokenSpot adjacent to spot1
+    """
+    @staticmethod
+    def pair_adjacent(spot1, spot2):
+        spot1.pair_via_adjacency(spot2)
+        spot2.pair_via_adjacency(spot1)
+
+    """ Static function for pairing two path connected spots in one go
+
+        Args:
+            spot1 -- TokenSpot connected via a path to spot2
+            spot2 -- TokenSpot connected via a path to spot1
+    """
+    @staticmethod
+    def pair_path(spot1, spot2):
+        spot1.pair_via_path(spot2)
+        spot2.pair_via_path(spot1)

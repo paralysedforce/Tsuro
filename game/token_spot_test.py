@@ -27,14 +27,28 @@ def test_token_occupant_arrival_path():
     token_spot.arrive_via_path(token)
     assert token == token_spot.get_occupant()
 
+def test_adjacent_static_pair():
+    token_spot1 = TokenSpot()
+    token_spot2 = TokenSpot()
+    TokenSpot.pair_adjacent(token_spot1, token_spot2)
+    assert token_spot1._next_card == token_spot2
+    assert token_spot2._next_card == token_spot1
+    
+def test_path_static_pair():
+    token_spot1 = TokenSpot()
+    token_spot2 = TokenSpot()
+    TokenSpot.pair_path(token_spot1, token_spot2)
+    assert token_spot1._next_spot == token_spot2
+    assert token_spot2._next_spot == token_spot1
+
+
 def test_token_passed_adjacent():
     token = create_token()
 
     token_spot1 = TokenSpot()
     token_spot2 = TokenSpot()
 
-    token_spot1.pair_via_adjacency(token_spot2)
-    token_spot2.pair_via_adjacency(token_spot1)
+    TokenSpot.pair_adjacent(token_spot1, token_spot2)
 
     token_spot1.arrive_via_path(token)
 
@@ -47,8 +61,7 @@ def test_token_passed_path():
     token_spot1 = TokenSpot()
     token_spot2 = TokenSpot()
 
-    token_spot1.pair_via_path(token_spot2)
-    token_spot2.pair_via_path(token_spot1)
+    TokenSpot.pair_path(token_spot1, token_spot2)
 
     token_spot1.arrive_via_adjacent(token)
 
