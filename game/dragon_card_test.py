@@ -12,13 +12,22 @@ def test_set_holder_held():
     m_card.set_holder(player)
     assert m_card.is_held()
 
-    
+
 def test_get_holder_held():
     m_card = DragonCard()
     player = Player(Deck(), m_card)
 
     m_card.set_holder(player)
     assert m_card.get_holder() == player
-    
+
 def test_get_holder_not_held():
     assert DragonCard().get_holder() is None
+
+def test_not_held_after_relinquish():
+    m_card = DragonCard()
+    player = Player(Deck(), m_card)
+
+    m_card.set_holder(player)
+    m_card.relinquish()
+    assert not m_card.is_held()
+    assert m_card.get_holder() is None

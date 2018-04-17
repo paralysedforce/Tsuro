@@ -8,7 +8,7 @@ class DragonCard:
     def __init__(self):
        self._holding_player = None
 
-    """ Indicates whether this card is held 
+    """ Indicates whether this card is held
 
         returns -- True if held, False otherwise.
     """
@@ -29,6 +29,10 @@ class DragonCard:
     """
     def get_holder(self):
         return self._holding_player
+
+    """ Removes the player holding the card """
+    def relinquish(self):
+        self._holding_player = None
 
     def __str__(self):
         return "Dragon card held by " + str(self._holding_player)
