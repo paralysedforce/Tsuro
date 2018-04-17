@@ -1,5 +1,5 @@
-from .Board import Board
-from .Board import BOARD_HEIGHT, BOARD_WIDTH
+from .board import Board
+from .board import BOARD_HEIGHT, BOARD_WIDTH
 
 def test_top_border_terminal():
     board = Board()
