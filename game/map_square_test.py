@@ -233,3 +233,10 @@ def test_terminate_left():
     assert tsp06._is_terminal_spot
     assert tsp07._is_terminal_spot
 
+def test_different_spots():
+    square = MapSquare()
+    equal_count = 0
+    for spot in square._spots:
+        equal_count += len([x for x in square._spots if x==spot])
+    assert equal_count == 8
+

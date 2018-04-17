@@ -19,7 +19,16 @@ class MapSquare:
     """
     def __init__(self, token_spots=None):
         if token_spots is None:
-            self._spots = [TokenSpot()] * 8
+            self._spots = [
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                TokenSpot(),
+                ]
         else:
             self._spots = token_spots
         self._map_card = None
