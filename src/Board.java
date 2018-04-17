@@ -1,6 +1,4 @@
-import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import javafx.util.Pair;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -33,7 +31,7 @@ public class Board {
                 spaces[row][col].hasTile();
     }
 
-    public boolean isLegalMove(Tile tile, Player player){
+    public boolean isLegalMove(Tile tile, SPlayer player){
         BoardSpace curSpace = player.getBoardSpace();
         int tokenSpace = player.getTokenSpace();
 
@@ -55,12 +53,12 @@ public class Board {
         return false;
     }
 
-    public List<Player> placeTile(Tile tile, Player player){
+    public List<SPlayer> placeTile(Tile tile, SPlayer player){
         BoardSpace space = getNextSpace(player.getBoardSpace(), player.getTokenSpace());
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
-        List<Player> eliminatedPlayers = new ArrayList<>();
+        List<SPlayer> eliminatedPlayers = new ArrayList<>();
         spaces.add(space);
 
         for (BoardSpace curSpace = spaces.removeFirst(); spaces.size() > 0; curSpace = spaces.removeFirst()){
@@ -90,7 +88,6 @@ public class Board {
         return eliminatedPlayers;
     }
 
-    @Nullable
     private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace){
         int row = boardSpace.getRow();
         int col = boardSpace.getCol();

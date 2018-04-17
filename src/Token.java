@@ -5,9 +5,9 @@ public class Token {
 
     private BoardSpace space;
     private int tokenSpace;
-    private Player player;
+    private SPlayer player;
 
-    public Token(BoardSpace startingLocation, int startingTokenSpace, Player player){
+    public Token(BoardSpace startingLocation, int startingTokenSpace, SPlayer player){
         space = startingLocation;
         tokenSpace = startingTokenSpace;
         this.player = player;
@@ -30,7 +30,7 @@ public class Token {
         return tokenSpace;
     }
 
-    public Player getPlayer(){
+    public SPlayer getPlayer(){
         return player;
     }
 }

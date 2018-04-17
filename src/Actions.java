@@ -10,13 +10,13 @@ public class Actions {
 
     static private class PlayReturn {
         private TilePile tilePile;
-        private List<Player> remainingPlayers;
-        private List<Player> eliminatedPlayers;
+        private List<SPlayer> remainingPlayers;
+        private List<SPlayer> eliminatedPlayers;
         private Board board;
-        private List<Player> winningPlayers;
+        private List<SPlayer> winningPlayers;
 
-        public PlayReturn(TilePile tilePile, List<Player> remainingPlayers, List<Player> eliminatedPlayers,
-                          Board board, List<Player> winningPlayers){
+        public PlayReturn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
+                          Board board, List<SPlayer> winningPlayers){
             this.tilePile = tilePile;
             this.remainingPlayers = remainingPlayers;
             this.eliminatedPlayers = eliminatedPlayers;
@@ -25,12 +25,12 @@ public class Actions {
         }
     }
 
-    public static PlayReturn PlayATurn(TilePile tilePile, List<Player> remainingPlayers, List<Player> eliminatedPlayers,
+    public static PlayReturn PlayATurn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                                        Board board, Tile tile) {
         Game game = new Game(board, remainingPlayers, eliminatedPlayers, tilePile);
 
-        Player player = remainingPlayers.remove(0);
-        List<Player> playersLosingOnTurn = game.playTurn(tile, player);
+        SPlayer player = remainingPlayers.remove(0);
+        List<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
 
         remainingPlayers.removeAll(playersLosingOnTurn);
         eliminatedPlayers.addAll(playersLosingOnTurn);
@@ -43,7 +43,13 @@ public class Actions {
         }
     }
 
+    public static boolean isLegalMove(SPlayer player, Board board, Tile tile){
+        return board.isLegalMove(tile, player);
+    }
+
     public static void Main(String[] args){
+
+        Board board = new Board();
         //Actions.PlayATurn();
     }
 

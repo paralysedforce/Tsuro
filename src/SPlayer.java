@@ -1,13 +1,13 @@
 /**
  * Created by vyasalwar on 4/16/18.
  */
-public class Player {
+public class SPlayer {
 
     private Token token;
     private Tile[] tileBank;
     private String name;
 
-    public Player(String name, BoardSpace startingLocation, int startingTokenSpace){
+    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
         tileBank = new Tile[3];

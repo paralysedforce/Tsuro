@@ -6,8 +6,8 @@ import java.util.List;
  */
 public class Game {
     private Board board;
-    private List<Player> remainingPlayers;
-    private List<Player> eliminatedPlayers;
+    private List<SPlayer> remainingPlayers;
+    private List<SPlayer> eliminatedPlayers;
     private TilePile tilePile;
 
     public Game(String filename){
@@ -17,7 +17,7 @@ public class Game {
         tilePile = new TilePile(filename);
     }
 
-    public Game(Board board, List<Player> remainingPlayers, List<Player> eliminatedPlayers, TilePile tilePile){
+    public Game(Board board, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
         this.board = board;
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
@@ -25,15 +25,11 @@ public class Game {
     }
 
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        Player player = new Player(name, startingLocation, startingTokenSpace);
+        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
         remainingPlayers.add(player);
     }
 
-    public List<Player> playTurn(Tile tile, Player player){
+    public List<SPlayer> playTurn(Tile tile, SPlayer player){
         return board.placeTile(tile, player);
-    }
-
-    public static void PlayATurn(){
-
     }
 }
