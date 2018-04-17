@@ -1,4 +1,8 @@
 from .deck import Deck
+from .player import Player
+from .dragon_card import DragonCard
+
+from collections import deque
 
 #{ board: Board, players: Player[?], dragon: DragonCard, deck: DrawPile }
 
@@ -6,13 +10,19 @@ from .deck import Deck
 class Administrator:
 
     """ Default constructor
-    Sets all fields to None
+
+        Args:
+            num_players=3 -- number of players to instantiate the Admin with
     """
-    def __init__(self):
-        self.board = None
-        self.players = None
-        self.dragon = None
-        self.deck = Deck()
+    def __init__(self, num_players=3):
+        self._board = None
+        self._dragon = DragonCard()
+        self._deck = Deck()
+        self._players = deque()
+        for _ in range(num_players):
+            self._players.append(Player(self._deck, self._dragon))
+
+
 
     """ Determines whether it is legal for a given player to place a given tile on a given board.
 
