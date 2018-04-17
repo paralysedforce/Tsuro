@@ -16,6 +16,8 @@ class MapCard:
         for path in self._paths:
             path.rotate(is_clockwise)
         
+    def get_paths(self):
+        return self._paths
 
     def __eq__(self, other):
         if isinstance(other, MapCard):
@@ -28,6 +30,7 @@ class MapCard:
             return len(self._paths) == len(other._paths)
         else:
             return NotImplemented
+
 
     def __str__(self):
         return str([str(path) for path in self._paths])
