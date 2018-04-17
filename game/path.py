@@ -4,13 +4,24 @@ class Path:
 
     """ Creates a Path from a tuple of points.
 
+        Args:
+            start -- number representing one end point of the path
+            end -- number representing the other end point of the path
     """
     def __init__(self, start, end):
         self._start_posn = start
         self._end_posn = end
 
-    def rotate(self, isClockwise):
-        if isClockwise:
+    """ Rotates the path as if it were on the card.
+        Adds 2, mod 8 to start and end position if clockwise,
+        subtracts 2, mod 8 if counterclockwise.
+
+        Args:
+            is_clockwise -- True to rotate the card clockwise, 
+                False to rotate the card counterclockwise
+    """
+    def rotate(self, is_clockwise):
+        if is_clockwise:
             self._start_posn = (self._start_posn + 2) % 8
             self._end_posn = (self._end_posn + 2) % 8
         else:
@@ -18,12 +29,22 @@ class Path:
             self._start_posn = (self._start_posn + 8 - 2) % 8
             self._end_posn = (self._end_posn + 8 - 2) % 8
 
+
+    """ Gets the end position of this path 
+    
+        return -- number representing the start position of this path
+    """
     def get_start(self):
         return self._start_posn
 
+    """ Gets the end position of this path 
+    
+        return -- number representing the end position of this path
+    """
     def get_end(self):
         return self._end_posn
 
+    """ Reverses the direction of this path """
     def inverse(self):
         tmp = self._start_posn
         self._start_posn = self._end_posn
