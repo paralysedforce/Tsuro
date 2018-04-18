@@ -16,3 +16,14 @@ def test_legal_move():
 
     assert Administrator.isLegalPlay(board, player._hand[0], player)
 
+def test_illegal_move():
+
+    player = Player(Deck([[(0,1),(2,3),(4,5),(6,7),]]), DragonCard())
+    token = Token(player)
+
+    board = Board()
+ 
+    board.place_token_start(0, token)
+
+    assert not (Administrator.isLegalPlay(board, player._hand[0], player))
+
