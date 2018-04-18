@@ -34,8 +34,10 @@ public class Board {
     public boolean isLegalMove(Tile tile, SPlayer player){
         BoardSpace curSpace = player.getBoardSpace();
         int tokenSpace = player.getTokenSpace();
+        BoardSpace nextBoardSpace = curSpace;
 
-        BoardSpace nextBoardSpace = getNextSpace(curSpace, tokenSpace);
+        if (!player.hasTile(tile))
+            return false;
         if (nextBoardSpace.hasTile())
             return false;
 

@@ -65,6 +65,15 @@ public class Actions {
 
         Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, listOfPlayers.get(0).getRandomTileFromBank()); //need to change how we get the tile
 
+        Tile trueTile  = listOfPlayers.get(0).getRandomTileFromBank();
+        Tile falseTile = listOfPlayers.get(1).getRandomTileFromBank();
+
+        if (Actions.isLegalMove(listOfPlayers.get(0), board, trueTile) != true)
+            throw new AssertionError();
+        if (Actions.isLegalMove(listOfPlayers.get(0), board, falseTile) != false)
+            throw new AssertionError();
+
+
         //Actions.PlayATurn();
     }
 

@@ -31,6 +31,15 @@ public class SPlayer {
         return token.getTokenSpace();
     }
 
+    public boolean hasTile(Tile tile){
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            if (tileBank[i].equals(tile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getName(){
         return name;
     }
