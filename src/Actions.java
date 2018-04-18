@@ -12,11 +12,11 @@ public class Actions {
 
 
     static private class PlayReturn {
-        private TilePile tilePile;
-        private List<SPlayer> remainingPlayers;
-        private List<SPlayer> eliminatedPlayers;
-        private Board board;
-        private List<SPlayer> winningPlayers;
+        public  TilePile tilePile;
+        public  List<SPlayer> remainingPlayers;
+        public  List<SPlayer> eliminatedPlayers;
+        public  Board board;
+        public  List<SPlayer> winningPlayers;
 
         public PlayReturn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                           Board board, List<SPlayer> winningPlayers){
@@ -63,7 +63,18 @@ public class Actions {
             listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue(), tilePile));
         }
 
-        Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, listOfPlayers.get(0).getRandomTileFromBank()); //need to change how we get the tile
+        PlayReturn ret = Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, listOfPlayers.get(0).getRandomTileFromBank()); //need to change how we get the tile
+        if (ret.tilePile != tilePile)
+            throw new AssertionError();
+        if (ret.winningPlayers != null)
+            throw new AssertionError();
+        if (ret.board != board)
+            throw new AssertionError();
+        if (!ret.eliminatedPlayers.isEmpty())
+            throw new AssertionError();
+        if (!ret.remainingPlayers.equals(listOfPlayers))
+            throw new AssertionError();
+
 
         Tile trueTile  = listOfPlayers.get(0).getRandomTileFromBank();
         Tile falseTile = listOfPlayers.get(1).getRandomTileFromBank();
