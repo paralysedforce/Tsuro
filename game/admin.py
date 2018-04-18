@@ -34,13 +34,51 @@ class Administrator:
     """
     @staticmethod
     def isLegalPlay(board, tile, player):
-        pass
+        # Check that tile is one of the tiles of the player
+        if tile not in player._hand:
+            return False
+
+        # Check that placement does not eliminate the player
+        (draw_pile, active_players, eliminated_players, board, game_over_or_winners ) = Administrator.playATurn(Deck([]), [player], [], board, tile)
+        if len(active_players) > 0:
+            # Player still active, valid move
+            return True
+        else:
+            return False
+
 
 
     """ Computes the state of the game after the completion of a turn given the
          state of the game before the turn.
     """
-    def playATurn(draw_pile, active_players, eliminated_players2, board, placement_tile):
+    @staticmethod
+    def playATurn(draw_pile, active_players, eliminated_players, board, placement_tile):
         moving_player = active_players[0]
 
-        moving_player
+        square = moving_player.get_token().get_location().get_square()
+
+        # Place tile in the square
+        square.place_card(placement_tile)
+        moving_player.draw_card()
+
+        # Remove inactive players
+        for player in active_players:
+            if not player.is_active():
+                active_players.remove(player)
+
+        # Still need to move to the end of the list
+        if moving_player.is_active():
+            active_players.remove(moving_player)
+            active_players.append(moving_player)
+
+        sum_hands = 0
+        for player in active_players:
+            sum_hands += len(player._hand)
+
+        game_over = len(active_players) < 2 or sum_hands == 0
+
+
+        if game_over:
+            return (draw_pile, active_players, eliminated_players, board, active_players )
+        else:
+            return (draw_pile, active_players, eliminated_players, board, False )
