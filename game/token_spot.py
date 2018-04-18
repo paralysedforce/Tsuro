@@ -69,6 +69,7 @@ class TokenSpot:
             self._next_spot.arrive_via_path(token)
         else:
             self._occupant = token
+            token.set_location(self)
 
     """ Called to notify of a token's arrival via adjacence from a different card
 
@@ -88,6 +89,7 @@ class TokenSpot:
         # Make token occupant
         else:
             self._occupant = token
+            token.set_location(self)
 
     """ Pairs this TokenSpot to another via a path
 

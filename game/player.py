@@ -11,8 +11,9 @@ class Player:
         Args:
             deck -- instance of Deck for drawing and replacing cards
             dragon_card -- instance of the dragon_card for picking up when the deck is empty
+            token=None -- Token that corresponds to this player
     """
-    def __init__(self, deck, dragon_card):
+    def __init__(self, deck, dragon_card, token=None):
         self._deck = deck
 
         self._is_active = True
@@ -21,6 +22,14 @@ class Player:
         self._hand = []
         for _ in range(HAND_SIZE):
             self.draw_card()
+
+        self._token = token
+
+    def get_token(self):
+        return self._token
+
+    def set_token(self, token):
+        self._token = token
 
     def is_active(self):
         return self._is_active

@@ -9,6 +9,13 @@ class Token:
     """
     def __init__(self, player):
         self._player = player
+        self._location = None
+
+    def set_location(self, spot):
+        self._location = spot
+    
+    def get_location(self):
+        return self._location
 
     """ Eliminates the token from the board,
         which also triggers elimination of the associated player.
