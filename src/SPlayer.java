@@ -3,14 +3,20 @@
  */
 public class SPlayer {
 
+    private final int MAX_TILES_IN_BANK = 3;
+
     private Token token;
     private Tile[] tileBank;
     private String name;
 
-    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
+    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace, TilePile tilePile){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
-        tileBank = new Tile[3];
+        tileBank = new Tile[MAX_TILES_IN_BANK];
+
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            tileBank[i] = tilePile.drawFromDeck();
+        }
     }
 
     public BoardSpace getBoardSpace(){

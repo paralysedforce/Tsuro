@@ -1,3 +1,6 @@
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,6 +53,17 @@ public class Actions {
     public static void Main(String[] args){
 
         Board board = new Board();
+        int numberOfPlayers = 3;
+        List<SPlayer> listOfPlayers = new ArrayList<>();
+        TilePile tilePile = new TilePile(); //need to add tile stuff here
+
+        for(int i = 0; i < numberOfPlayers; i++){
+            Pair<BoardSpace, Integer> position = board.getRandomStartingLocation();
+            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue(), tilePile));
+        }
+
+        Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, new Tile()); //need to change how we get the tile
+
         //Actions.PlayATurn();
     }
 

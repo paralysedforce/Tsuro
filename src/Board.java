@@ -163,7 +163,46 @@ public class Board {
                 break;
         }
         return nextTokenSpace;
+    }
 
+    public Pair<BoardSpace, Integer> getRandomStartingLocation(){
+        Random random = new Random();
+        int row = random.nextInt(6);
+        int col = random.nextInt(6);
+
+        while(row != 0 && row != 5 && col != 0 && col != 5){
+            row = random.nextInt(6);
+            col = random.nextInt(6);
+        }
+
+        List<Integer> possibleTokenLocations  = new ArrayList<>();
+        if (row == 0 ){
+            possibleTokenLocations.add(0);
+            possibleTokenLocations.add(1);
+        }
+        else if (row == 5){
+            possibleTokenLocations.add(4);
+            possibleTokenLocations.add(5);
+        }
+
+        if (col == 0){
+            possibleTokenLocations.add(6);
+            possibleTokenLocations.add(7);
+        }
+        else if (col == 5){
+            possibleTokenLocations.add(2);
+            possibleTokenLocations.add(3);
+        }
+
+        int tokenLocation = possibleTokenLocations.get(random.nextInt(possibleTokenLocations.size()));
+        return new Pair(spaces[row][col], tokenLocation);
+
+    }
+
+
+
+    public static void Main(String[] args){
+        //add tests for random number generation
     }
 
 
