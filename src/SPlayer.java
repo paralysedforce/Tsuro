@@ -8,11 +8,13 @@ public class SPlayer {
     private Token token;
     private Tile[] tileBank;
     private String name;
+    private TilePile tilePile;
 
     public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace, TilePile tilePile){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
         tileBank = new Tile[MAX_TILES_IN_BANK];
+        this.tilePile = tilePile;
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
             tileBank[i] = tilePile.drawFromDeck();
@@ -29,5 +31,23 @@ public class SPlayer {
 
     public String getName(){
         return name;
+    }
+
+    public void drawFromPile() {
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            if (tileBank[i] == null) {
+                tileBank[i] = tilePile.drawFromDeck();
+                break;
+            }
+        }
+    }
+
+    public void removeTileFromBank(Tile tile){
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            if (tileBank[i] == tile) {
+                tileBank[i] = null;
+                break;
+            }
+        }
     }
 }

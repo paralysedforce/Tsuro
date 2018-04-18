@@ -85,6 +85,7 @@ public class Board {
 
             }
         }
+        player.removeTileFromBank(tile);
         return eliminatedPlayers;
     }
 

@@ -24,12 +24,15 @@ public class Game {
         this.tilePile = tilePile;
     }
 
+    //to be used later in some way
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
+        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace, tilePile);
         remainingPlayers.add(player);
     }
 
     public List<SPlayer> playTurn(Tile tile, SPlayer player){
-        return board.placeTile(tile, player);
+        List<SPlayer> failedPlayers = board.placeTile(tile, player);
+        player.drawFromPile();
+        return failedPlayers;
     }
 }
