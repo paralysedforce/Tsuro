@@ -47,3 +47,12 @@ class Board:
 
             prev_row = row
 
+    """ Places a token in one of the 2x6x4 starting spots
+
+        Args:
+            loc -- [0,2x6x4) location around the edge clockwise
+    """
+    def place_token_start(self, loc, token):
+        # TODO: make this actually work. Currently only works for loc=0
+        self._squares[0][0]._spots[1].arrive_via_adjacent(token)
+

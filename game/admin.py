@@ -55,7 +55,7 @@ class Administrator:
     def playATurn(draw_pile, active_players, eliminated_players, board, placement_tile):
         moving_player = active_players[0]
 
-        square = moving_player.get_token().get_location().get_square()
+        square = moving_player.get_token().get_location().get_parent()
 
         # Place tile in the square
         square.place_card(placement_tile)
