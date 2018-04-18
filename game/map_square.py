@@ -52,8 +52,15 @@ class MapSquare:
             start = self._spots[path.get_start()]
             end = self._spots[path.get_end()]
 
-            start.pair_via_path(end)
-            end.pair_via_path(start)
+            TokenSpot.pair_path(start, end)
+
+            # If either have a token, send it along
+            occupant_start = start.get_occupant()
+            occupant_end = end.get_occupant()
+            if occupant_start is not None:
+                end.arrive_via_path(occupant_start)
+            if occupant_end is not None:
+                start.arrive_via_path(occupant_end)
 
     """ Binds the TokenSpots on the borders of adjacent MapSquares
         

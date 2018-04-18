@@ -41,6 +41,25 @@ def test_place_card():
 
     assert tsp1.get_occupant() == token
 
+def test_place_card_token_present():
+    card = MapCard(paths)
+
+    tsp0 = TokenSpot()
+    tsp1 = TokenSpot()
+    
+    token = create_token()
+    tsp0.arrive_via_adjacent(token)
+
+    spots = [tsp0,tsp1]
+    for _ in range(6):
+        spots.append(TokenSpot())
+
+    square = MapSquare(spots)
+
+    square.place_card(card)
+
+    assert tsp1.get_occupant() == token
+
 def test_bind_top():
     
     tsp00 = TokenSpot()
