@@ -34,23 +34,24 @@ public class Board {
     public boolean isLegalMove(Tile tile, SPlayer player){
         BoardSpace curSpace = player.getBoardSpace();
         int tokenSpace = player.getTokenSpace();
-        BoardSpace nextBoardSpace = curSpace;
 
         if (!player.hasTile(tile))
             return false;
-        if (nextBoardSpace.hasTile())
+        if (curSpace.hasTile())
             return false;
 
-        int nextTokenSpace = tile.findMatch(findNextTokenSpace(tokenSpace));
-        nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+        int nextTokenSpace = tile.findMatch(tokenSpace);
+        BoardSpace nextBoardSpace = getNextSpace(curSpace, nextTokenSpace);
+        nextTokenSpace = findNextTokenSpace(nextTokenSpace);
         while (nextBoardSpace != null){
 
             if (!nextBoardSpace.hasTile())
                 return true;
 
             Tile curTile = nextBoardSpace.getTile();
-            nextTokenSpace = curTile.findMatch(findNextTokenSpace(nextTokenSpace));
+            nextTokenSpace = curTile.findMatch(nextTokenSpace);
             nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+            nextTokenSpace = findNextTokenSpace(nextTokenSpace);
         }
         return false;
     }
