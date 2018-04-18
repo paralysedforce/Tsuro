@@ -9,6 +9,7 @@ class Token:
     """
     def __init__(self, player):
         self._player = player
+        player.set_token(self)
         self._location = None
 
     def set_location(self, spot):
