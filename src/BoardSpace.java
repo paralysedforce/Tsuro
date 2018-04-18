@@ -47,7 +47,7 @@ public class BoardSpace {
         List<Token> tokensAdvanced = new ArrayList<>();
         for (int i = 0; i < NUM_SPACES; i++){
             Token token = tokenSpaces[i];
-            if (token != null){
+            if (token != null && !tokensAdvanced.contains(token)){
                 int nextTokenLocation = tile.findMatch(i);
 
                 tokensAdvanced.add(token);

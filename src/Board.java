@@ -54,21 +54,22 @@ public class Board {
     }
 
     public List<SPlayer> placeTile(Tile tile, SPlayer player){
-        BoardSpace space = getNextSpace(player.getBoardSpace(), player.getTokenSpace());
+        BoardSpace space = player.getBoardSpace();
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
         List<SPlayer> eliminatedPlayers = new ArrayList<>();
         spaces.add(space);
 
-        for (BoardSpace curSpace = spaces.removeFirst(); spaces.size() > 0; curSpace = spaces.removeFirst()){
-            if (space.hasTile()){
+        while (spaces.size() > 0){
+            BoardSpace curSpace = spaces.removeFirst();
+            if (curSpace.hasTile()){
                 // transfer tokens if possible
                 // if not possible, determine if token will be transferred off edge
                 //      if so, this is a failed player
                 // if it is possible, add boardspaces that all tokens have been transferred onto to the queue
 
-                space.advanceTokens();
+                curSpace.advanceTokens();
 
                 for(int i = 0; i < 8; i++) {
                     Token token = curSpace.removeToken(i);
@@ -200,11 +201,6 @@ public class Board {
 
     }
 
-
-
-    public static void Main(String[] args){
-        //add tests for random number generation
-    }
 
 
 }

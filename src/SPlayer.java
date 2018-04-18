@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * Created by vyasalwar on 4/16/18.
  */
@@ -31,6 +33,11 @@ public class SPlayer {
 
     public String getName(){
         return name;
+    }
+
+    public Tile getRandomTileFromBank(){
+        Random random = new Random();
+        return tileBank[random.nextInt(MAX_TILES_IN_BANK)];
     }
 
     public void drawFromPile() {

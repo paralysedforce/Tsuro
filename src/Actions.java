@@ -34,6 +34,7 @@ public class Actions {
 
         SPlayer player = remainingPlayers.remove(0);
         List<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
+        remainingPlayers.add(player);
 
         remainingPlayers.removeAll(playersLosingOnTurn);
         eliminatedPlayers.addAll(playersLosingOnTurn);
@@ -50,7 +51,7 @@ public class Actions {
         return board.isLegalMove(tile, player);
     }
 
-    public static void Main(String[] args){
+    public static void main(String[] args){
 
         Board board = new Board();
         int numberOfPlayers = 3;
@@ -62,7 +63,7 @@ public class Actions {
             listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue(), tilePile));
         }
 
-        Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, new Tile()); //need to change how we get the tile
+        Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, listOfPlayers.get(0).getRandomTileFromBank()); //need to change how we get the tile
 
         //Actions.PlayATurn();
     }
