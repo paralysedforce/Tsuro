@@ -23,28 +23,6 @@ class TokenSpot:
     def set_parent(self, parent):
         self._parent = parent
 
-    """ Eliminates any tokens as necessary
-
-        Args:
-            token -- that is arriving to trigger this check
-
-        return -- True if elimination occurred, False otherwis.
-    """
-    def _did_eliminate(self, token):
-        # Eliminate player if terminal
-        if self._is_terminal_spot:
-            token._player.eliminate()
-            return True
-
-        # If another occupant, eliminate both
-        elif self._occupant is not None:
-            token._player.eliminate()
-            self._occupant._player.eliminate()
-            self._occupant = None
-            return True
-        
-        return False
-
     """ Changes whether this TokenSpot is considered terminal
 
         Args:
@@ -59,16 +37,14 @@ class TokenSpot:
             token -- that is arriving to this TokenSpot
     """
     def arrive_via_adjacent(self, token):
-        # Check if need to eliminate
-        if self._did_eliminate(token):
-            # Token eliminated, nothing else to do.
-            pass
+        # No need to check if need eliminate because not arrived via card placement
 
         # Pass along if possible
-        elif self._next_spot is not None:
+        if self._next_spot is not None:
             self._next_spot.arrive_via_path(token)
         else:
             self._occupant = token
+            print("Setting location of token")
             token.set_location(self)
 
     """ Called to notify of a token's arrival via adjacence from a different card
@@ -78,9 +54,8 @@ class TokenSpot:
     """
     def arrive_via_path(self,token):
         # Check if need to eliminate
-        if self._did_eliminate(token):
-            # Token eliminated, nothing else to do.
-            pass
+        if self._is_terminal_spot:
+            token.eliminate()
 
         # Pass along if possible
         elif self._next_card is not None:

@@ -76,34 +76,6 @@ def test_terminal_elimination():
     token = Token(player)
 
     token_spot = TokenSpot(True)
+    token_spot.arrive_via_path(token)
 
-    assert token_spot._did_eliminate(token)
-
-def test_occupant_elimination():
-    deck = Deck()
-    dragon = DragonCard()
-
-    player = Player(deck, dragon)
-    player2 = Player(deck, dragon)
-    token = Token(player)
-    token2 = Token(player2)
-
-    token_spot = TokenSpot()
-    token_spot.arrive_via_adjacent(token)
-
-    assert token_spot._did_eliminate(token2)
-
-def test_both_elimination():
-    deck = Deck()
-    dragon = DragonCard()
-
-    player = Player(deck, dragon)
-    player2 = Player(deck, dragon)
-    token = Token(player)
-    token2 = Token(player2)
-
-    token_spot = TokenSpot()
-    token_spot.arrive_via_adjacent(token)
-    token_spot.arrive_via_path(token2)
-    
-    assert (not player.is_active()) and (not player2.is_active())
+    assert not player.is_active()
