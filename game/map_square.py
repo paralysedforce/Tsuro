@@ -31,6 +31,11 @@ class MapSquare:
                 ]
         else:
             self._spots = token_spots
+
+        # Set token parents as self
+        for token_spot in self._spots:
+            token_spot.set_parent(self)
+        
         self._map_card = None
 
     """ Places a card in the MapSquare, connecting TokenSpots as appropriate.

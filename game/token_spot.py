@@ -10,11 +10,18 @@ class TokenSpot:
             next_card=None -- The TokenSpot adjacent to this one.
             next_spot=None -- The TokenSpot connected to this one via a path.
     """
-    def __init__(self, is_terminal_spot=False, next_card=None, next_spot=None):
+    def __init__(self, is_terminal_spot=False, next_card=None, next_spot=None, parent_square=None):
+        self._parent = parent_square
         self._next_spot = next_spot
         self._next_card = next_card
         self._is_terminal_spot = is_terminal_spot
         self._occupant = None
+
+    def get_parent(self):
+        return self._parent
+
+    def set_parent(self, parent):
+        self._parent = parent
 
     """ Eliminates any tokens as necessary
 
