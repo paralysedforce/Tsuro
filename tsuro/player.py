@@ -1,3 +1,4 @@
+from board import Token
 
 HAND_SIZE = 3
 
@@ -32,12 +33,15 @@ class Player:
         self._token = token
 
     def get_token(self):
+        # type: () -> Token
         return self._token
 
     def set_token(self, token):
+        # type: (Token) -> None
         self._token = token
 
     def is_active(self):
+        # type: () -> bool
         return self._is_active
 
     def draw_card(self):

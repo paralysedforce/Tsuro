@@ -1,5 +1,6 @@
 from collections import deque
 from random import shuffle
+from typing import List
 
 from map_card import MapCard
 
@@ -54,6 +55,7 @@ class Deck:
         shuffle(self._cards)
 
     def draw(self):
+        # type: () -> MapCard
         """Return the top card from the deck.
 
         Returns:
@@ -65,6 +67,7 @@ class Deck:
             return None
 
     def replace_cards(self, cards):
+        # type: (List[MapCard]) -> None
         """Return cards to the bottom of the deck.
 
         Args:
@@ -74,6 +77,7 @@ class Deck:
             self._cards.append(card)
 
     def get_size(self):
+        # type: () -> int
         """Return the number of cards currently in the deck."""
         return len(self._cards)
 

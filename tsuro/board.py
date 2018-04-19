@@ -1,5 +1,7 @@
 from enum import Enum
 
+from map_card import MapCard
+
 BOARD_HEIGHT = 6
 BOARD_WIDTH = 6
 
@@ -103,6 +105,7 @@ class TokenSpot:
         self._parent = parent
 
     def set_terminal(self, is_terminal):
+        # type: (bool) -> None
         """ Changes whether this TokenSpot is considered terminal
 
                 Args:
@@ -232,6 +235,7 @@ class MapSquare:
         self._map_card = None
 
     def place_card(self, map_card):
+        # type: (MapCard) -> None
         """Place a card in the MapSquare, connecting TokenSpots as appropriate.
 
         Args:
