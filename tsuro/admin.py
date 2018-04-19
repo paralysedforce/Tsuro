@@ -1,5 +1,5 @@
 from collections import deque
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from board import Board
 from deck import Deck
@@ -50,7 +50,7 @@ class Administrator:
                   eliminated_players: List,
                   board: Board,
                   placement_tile: MapCard,
-                  ) -> Tuple[Deck, List[Player], List, Board, List[Player]]:
+                  ) -> Tuple[Deck, List[Player], List, Board, Union[List[Player], bool]]:
         """Compute the state of the game."""
         moving_player = active_players[0]
 
