@@ -1,6 +1,6 @@
-from .dragon_card import DragonCard
-from .deck import Deck
-from .player import Player
+from dragon_card import DragonCard
+from deck import Deck
+from player import Player
 
 def test_not_held_initial():
     assert not DragonCard().is_held()

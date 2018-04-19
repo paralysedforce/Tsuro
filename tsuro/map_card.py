@@ -1,4 +1,4 @@
-from .path import Path
+from path import Path
 from copy import deepcopy
 
 # { paths: Path[4], rotate(isClockwise: bool) }
@@ -8,7 +8,7 @@ class MapCard:
     """ Creates a MapCard from a list of tuples
 
         Args:
-            card_desc -- List of tuples that each represents a path 
+            card_desc -- List of tuples that each represents a path
                 on this card.
     """
     def __init__(self, card_desc):
@@ -25,11 +25,11 @@ class MapCard:
     def rotate(self, is_clockwise):
         for path in self._paths:
             path.rotate(is_clockwise)
-        
+
 
     """ Gets a copy of the list of paths on this card.
 
-        returns -- list of Path 
+        returns -- list of Path
     """
     def get_paths(self):
         return deepcopy(self._paths)
@@ -40,7 +40,7 @@ class MapCard:
             for path in self._paths:
                 if path not in other._paths:
                     return False
-            
+
             # Only return true if paths are the same length
             return len(self._paths) == len(other._paths)
         else:

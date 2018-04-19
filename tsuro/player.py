@@ -1,4 +1,4 @@
-from .dragon_card import DragonCard
+from dragon_card import DragonCard
 
 # { hand: MapCard[3], isActive: bool }
 

@@ -1,4 +1,4 @@
-from .token_spot import TokenSpot
+from token_spot import TokenSpot
 from enum import Enum
 from sys import stderr
 
@@ -35,7 +35,7 @@ class MapSquare:
         # Set token parents as self
         for token_spot in self._spots:
             token_spot.set_parent(self)
-        
+
         self._map_card = None
 
     """ Places a card in the MapSquare, connecting TokenSpots as appropriate.
@@ -63,14 +63,14 @@ class MapSquare:
                 start.arrive_via_path(occupant_end)
 
     """ Binds the TokenSpots on the borders of adjacent MapSquares
-        
+
         Args:
             other -- MapSquare that is adjacent to self
             side -- Side showing on which side of self other lies
     """
     def set_adjacent(self, other, side):
         # Sadly, switch doesn't exist :(
-        
+
         if side == Side.TOP:
             # Set the 0th and 1st nodes of self to 5th and 4th nodes of other, respectively
             TokenSpot.pair_adjacent(self._spots[0], other._spots[5])
@@ -90,7 +90,7 @@ class MapSquare:
             TokenSpot.pair_adjacent(self._spots[7], other._spots[2])
         else:
             # Improper imput, don't mess anything up by doing anything
-            print("In MapSquare.set_adjacent(): encountered invalid side argument: " 
+            print("In MapSquare.set_adjacent(): encountered invalid side argument: "
                 + str(side), stderr)
 
     """ Sets all TokenSpots on the indicated side as terminal
@@ -117,9 +117,8 @@ class MapSquare:
              self._spots[7].set_terminal(True)
         else:
             # Improper imput, don't mess anything up by doing anything
-            print("In MapSquare.set_terminal(): encountered invalid side argument: " 
+            print("In MapSquare.set_terminal(): encountered invalid side argument: "
                 + str(side), stderr)
 
-    
 
-    
+

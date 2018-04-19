@@ -1,5 +1,5 @@
-from .map_square import MapSquare
-from .map_square import Side
+from map_square import MapSquare
+from map_square import Side
 
 # { tokenSpots:TokenSpot[8][8], placementSquares: Dim2(4,4) }
 
@@ -27,8 +27,8 @@ class Board:
         for squares in self._squares:
             squares[0].set_terminal(Side.LEFT)
             squares[BOARD_WIDTH-1].set_terminal(Side.RIGHT)
-        
-        # Bind adjacent squares            
+
+        # Bind adjacent squares
         prev_row = []
         for row in self._squares:
             prev_square = None

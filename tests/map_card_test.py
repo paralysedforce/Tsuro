@@ -1,10 +1,10 @@
-from .map_card import MapCard
-from .path import Path
+from map_card import MapCard
+from path import Path
 
 PATH_DESCS = [
                 (0,1),
                 (3,7),
-             ]       
+             ]
 
 def test_init():
     map_card = MapCard([
@@ -22,10 +22,10 @@ def test_rotate_clockwise():
         path.rotate(True)
         print(path)
         print(map_card)
-        assert path in map_card._paths 
+        assert path in map_card._paths
 
 
-def test_rotate_counterclockwise():    
+def test_rotate_counterclockwise():
     map_card = MapCard(PATH_DESCS)
     map_card.rotate(False)
 
@@ -34,7 +34,7 @@ def test_rotate_counterclockwise():
         path.rotate(False)
         print(path)
         print(map_card)
-        assert path in map_card._paths 
+        assert path in map_card._paths
 
 def test_equal():
     card1 = MapCard(PATH_DESCS)

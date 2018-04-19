@@ -1,9 +1,9 @@
-from .admin import Administrator
-from .player import Player
-from .dragon_card import DragonCard
-from .deck import Deck
-from .token import Token
-from .board import Board
+from admin import Administrator
+from player import Player
+from dragon_card import DragonCard
+from deck import Deck
+from player_token import Token
+from board import Board
 
 def test_legal_move():
 
@@ -11,7 +11,7 @@ def test_legal_move():
     token = Token(player)
 
     board = Board()
- 
+
     board.place_token_start(0, token)
 
     assert Administrator.isLegalPlay(board, player._hand[0], player)
@@ -22,7 +22,7 @@ def test_illegal_move():
     token = Token(player)
 
     board = Board()
- 
+
     board.place_token_start(0, token)
 
     assert not (Administrator.isLegalPlay(board, player._hand[0], player))
