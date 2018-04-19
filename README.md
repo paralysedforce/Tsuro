@@ -9,8 +9,10 @@
 
 #### Setup
 
+`Tsuro` is written using type hints, which is a language feature available in Python 3.5 and onwards. We're supporting Python 3.6.
+
 ```
-virtualenv env
+virtualenv env  # --python=/path/to/python3.6/interpreter
 source env/bin/activate
 pip install -r requirements.txt
 ```
