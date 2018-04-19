@@ -54,8 +54,7 @@ class Deck:
         """Re-order the cards in the deck."""
         shuffle(self._cards)
 
-    def draw(self):
-        # type: () -> MapCard
+    def draw(self) -> MapCard:
         """Return the top card from the deck.
 
         Returns:
@@ -66,8 +65,7 @@ class Deck:
         except IndexError:
             return None
 
-    def replace_cards(self, cards):
-        # type: (List[MapCard]) -> None
+    def replace_cards(self, cards: List[MapCard]):
         """Return cards to the bottom of the deck.
 
         Args:
@@ -76,8 +74,7 @@ class Deck:
         for card in cards:
             self._cards.append(card)
 
-    def get_size(self):
-        # type: () -> int
+    def get_size(self) -> int:
         """Return the number of cards currently in the deck."""
         return len(self._cards)
 

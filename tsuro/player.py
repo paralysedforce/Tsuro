@@ -32,16 +32,13 @@ class Player:
 
         self._token = token
 
-    def get_token(self):
-        # type: () -> Token
+    def get_token(self) -> Token:
         return self._token
 
-    def set_token(self, token):
-        # type: (Token) -> None
+    def set_token(self, token: Token):
         self._token = token
 
-    def is_active(self):
-        # type: () -> bool
+    def is_active(self) -> bool:
         return self._is_active
 
     def draw_card(self):

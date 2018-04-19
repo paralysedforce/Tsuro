@@ -23,8 +23,7 @@ class Administrator:
             self._players.append(Player(self._deck, self._dragon))
 
     @staticmethod
-    def isLegalPlay(board, tile, player):
-        # type: (Board, MapCard, Player) -> bool
+    def isLegalPlay(board: Board, tile: MapCard, player: Player) -> bool:
         """Return a bool indicating the legality of a tile placement.
 
         There are two ways a tile placement can be illegal:
@@ -46,13 +45,12 @@ class Administrator:
             return False
 
     @staticmethod
-    def playATurn(draw_pile,  # type: Deck
-                  active_players,  # type: List[Player]
-                  eliminated_players,  # type: List
-                  board,  # type: Board
-                  placement_tile,  # type: MapCard
-                  ):
-        # type: (...) -> Tuple[Deck, List[Player], List, Board, List[Player]]
+    def playATurn(draw_pile: Deck,
+                  active_players: List[Player],
+                  eliminated_players: List,
+                  board: Board,
+                  placement_tile: MapCard,
+                  ) -> Tuple[Deck, List[Player], List, Board, List[Player]]:
         """Compute the state of the game."""
         moving_player = active_players[0]
 

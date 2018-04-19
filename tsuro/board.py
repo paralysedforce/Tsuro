@@ -104,8 +104,7 @@ class TokenSpot:
         """
         self._parent = parent
 
-    def set_terminal(self, is_terminal):
-        # type: (bool) -> None
+    def set_terminal(self, is_terminal: bool):
         """ Changes whether this TokenSpot is considered terminal
 
                 Args:
@@ -234,8 +233,7 @@ class MapSquare:
 
         self._map_card = None
 
-    def place_card(self, map_card):
-        # type: (MapCard) -> None
+    def place_card(self, map_card: MapCard):
         """Place a card in the MapSquare, connecting TokenSpots as appropriate.
 
         Args:
