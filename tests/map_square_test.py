@@ -1,9 +1,8 @@
-from board import MapSquare, Side, TokenSpot
+from board import MapSquare, Side, Token, TokenSpot
 from deck import Deck
 from dragon_card import DragonCard
 from map_card import MapCard
 from player import Player
-from player_token import Token
 
 
 def create_token():

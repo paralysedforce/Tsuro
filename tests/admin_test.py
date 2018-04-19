@@ -1,9 +1,8 @@
 from admin import Administrator
-from board import Board
+from board import Board, Token
 from deck import Deck
 from dragon_card import DragonCard
 from player import Player
-from player_token import Token
 
 
 def test_legal_move():
