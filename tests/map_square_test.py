@@ -40,7 +40,7 @@ def test_place_card():
     square.place_card(card)
 
     token = create_token()
-    tsp0.arrive_via_adjacent(token)
+    tsp0.receive_token_via_adjacent(token)
 
     assert tsp1.get_occupant() == token
 
@@ -52,7 +52,7 @@ def test_place_card_token_present():
     tsp1 = TokenSpot()
 
     token = create_token()
-    tsp0.arrive_via_adjacent(token)
+    tsp0.receive_token_via_adjacent(token)
 
     spots = [tsp0, tsp1]
     for _ in range(6):

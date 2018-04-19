@@ -56,7 +56,7 @@ class TokenSpot:
         """
         self._is_terminal_spot = is_terminal
 
-    def arrive_via_adjacent(self, token):
+    def receive_token_via_adjacent(self, token):
         """ Receive a token that arrived via an adjacent spot.
 
             Args:
@@ -67,12 +67,12 @@ class TokenSpot:
 
         # Pass the token along if possible.
         if self._next_spot is not None:
-            self._next_spot.arrive_via_path(token)
+            self._next_spot.receive_token_via_path(token)
         else:
             self._occupant = token
             token.set_location(self)
 
-    def arrive_via_path(self, token):
+    def receive_token_via_path(self, token):
         """ Receive a token that arrived via a path.
 
                 Args:
@@ -84,7 +84,7 @@ class TokenSpot:
 
         # Pass the token along if possible.
         elif self._next_card is not None:
-            self._next_card.arrive_via_adjacent(token)
+            self._next_card.receive_token_via_adjacent(token)
 
         # Make token the occupant.
         else:
