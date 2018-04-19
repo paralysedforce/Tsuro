@@ -1,6 +1,17 @@
-
-# Below requirement included because requirements.txt
-# must have at least one requirement. Delete it
-# when adding a real requirement.
-
-pytest
+attrs==17.4.0
+autopep8==1.3.5
+certifi==2018.4.16
+chardet==3.0.4
+codecov==2.0.15
+coverage==4.5.1
+idna==2.6
+isort==4.3.4
+more-itertools==4.1.0
+pluggy==0.6.0
+py==1.5.3
+pycodestyle==2.4.0
+pytest==3.5.0
+pytest-cov==2.5.1
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
