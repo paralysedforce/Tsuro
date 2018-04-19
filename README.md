@@ -37,7 +37,7 @@ add_typed(1, 0.5)  # example.py:8: error: Argument 2 to "add_typed" has incompat
 To perform type checking:
 
 ```bash
-mypy tsuro tests
+MYPYPATH=tsuro mypy tsuro
 ```
 
 To generate type annotations:
