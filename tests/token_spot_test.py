@@ -1,8 +1,8 @@
+from board import TokenSpot
 from deck import Deck
 from dragon_card import DragonCard
 from player import Player
 from player_token import Token
-from token_spot import TokenSpot
 
 
 def create_token():
