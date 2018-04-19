@@ -1,0 +1,18 @@
+language: python
+
+python:
+- '3.6'
+- 3.7-dev
+
+install:
+- pip install -r requirements.txt
+
+script:
+- pytest --cov=tsuro
+
+after_success:
+- codecov --token=$CODECOV_KEY
+
+env:
+  global:
+  - secure: QvKDyj72ZeKhb7brIYhxb8cojN2Z0vVmBr86l72kq7anSuhujSmaVuadqEuonPnEZL0KGZx+xeCFxs7Y8VXh8qfma5vPV95pOlgrpHwmCBbsNmn7qbUSXeJW8BOoS/v1nA+tE7G2XETlDu3j3qM3tuplAwXzT1RouGnhMAARuJ7RseM1XYWB0sylqyqzuiIk3lw34ucSBr8mpHzd8kaFGx78yA6BTtuWF7GEhLKFxNAdgI8J+8aD8pKYdt4qDhxbzV06ZNMrMgTvOzEY9wQelorM/rsRDTeQhTgEyOgerVNbHvk8q9aYbEwo/27L9m7mlwQjQ65E7IBQPXgkRwoHUmQtsyBSnRRwFRYnRtSDX59NplF5dlFqsgcggOCLJB776o/Cbnbs74FPg15yAPlhRCST4nLLGy3PWAR/UdePXlhO21woA8JCLHlj8GrGT/XpgbcxNwO3PQPWwHTGHyguCOFydex/eGgrza5CT8oK8heyk7BWHbLXKiAiEvmuJLvvmy09edy601uFmpzpoVW8Y+RNZUEhRqRtOGKgGTp1fayqe33SPbSOl2BLrfJtm7WuxfWyNvpNfbIka4OxizWEgViUCAbgttaZdbsMP6rkA3uJZq5hmNOiJWKIjXaYp8lMnscpRTzq8HfczZ2O9nd19TWkWJMWPRvKgq9+i1ZT/Kw=
