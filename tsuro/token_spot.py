@@ -1,16 +1,31 @@
 
-# { next: TokenSpot, previous: TokenSpot, occupant: Token }
-
 class TokenSpot:
+    """ Spot on the board where a Token may be.
 
-    """ Initializes a TokenSpot.
-
-        Args:
-            is_terminal_spot=False -- whether this TokenSpot is terminal (edge of the board)
-            next_card=None -- The TokenSpot adjacent to this one.
-            next_spot=None -- The TokenSpot connected to this one via a path.
+        Attributes:
+            _parent (MapSquare): The MapSquare that contains this TokensSpot.
+            _next_spot (TokenSpot): The spot connected to this one via a path.
+            _next_card (TokenSpot): The spotconnected to this one
+                via parent adjacency.
+            _is_terminal_spot: Whether this spot is on the edge of the board.
+            _occupant (Token): The token located on this TokenSpot.
     """
-    def __init__(self, is_terminal_spot=False, next_card=None, next_spot=None, parent_square=None):
+
+    def __init__(self,
+                 is_terminal_spot=False,
+                 next_card=None,
+                 next_spot=None,
+                 parent_square=None):
+        """ Initializes a TokenSpot.
+
+            Args:
+                is_terminal_spot=False: whether this TokenSpot is terminal
+                    (on edge of the board).
+                next_card (TokenSpot): The spot in the MapSquare adjacent
+                    to the one that holds this Tokespot.
+                next_spot: The TokenSpot connected to this one
+                    via a path through the paret's square.
+        """
         self._parent = parent_square
         self._next_spot = next_spot
         self._next_card = next_card
@@ -18,95 +33,106 @@ class TokenSpot:
         self._occupant = None
 
     def get_parent(self):
+        """ Retrieve the parent MapSquare.
+
+            Returns:
+                MapSquare: The square that holds this spot.
+        """
         return self._parent
 
     def set_parent(self, parent):
+        """ Update the parent MapSquare.
+
+            Args:
+                paret (MapSquare): The square that contains this spot.
+        """
         self._parent = parent
 
-    """ Changes whether this TokenSpot is considered terminal
-
-        Args:
-            is_terminal -- boolean indicating whether this spot is terminal.
-    """
     def set_terminal(self, is_terminal):
+        """ Changes whether this TokenSpot is considered terminal
+
+                Args:
+                    is_terminal: Whether this spot is terminal.
+        """
         self._is_terminal_spot = is_terminal
 
-    """ Called to notify of a token's arrival via a path on the same card
-
-        Args:
-            token -- that is arriving to this TokenSpot
-    """
     def arrive_via_adjacent(self, token):
-        # No need to check if need eliminate because not arrived via card placement
+        """ Receive a token that arrived via an adjacent spot.
 
-        # Pass along if possible
+            Args:
+                token: The token that is arriving to this TokenSpot.
+        """
+        # No need to check if it is necessary to eliminate the token
+        # because it did not arrive via card placement.
+
+        # Pass the token along if possible.
         if self._next_spot is not None:
             self._next_spot.arrive_via_path(token)
         else:
             self._occupant = token
-            print("Setting location of token")
             token.set_location(self)
 
-    """ Called to notify of a token's arrival via adjacence from a different card
+    def arrive_via_path(self, token):
+        """ Receive a token that arrived via a path.
 
-        Args:
-            token -- that is arriving to this TokenSpot
-    """
-    def arrive_via_path(self,token):
-        # Check if need to eliminate
+                Args:
+                    token: The toke that is arriving to this TokenSpot.
+        """
+        # Check if the token should be eliminated.
         if self._is_terminal_spot:
             token.eliminate()
 
-        # Pass along if possible
+        # Pass the token along if possible.
         elif self._next_card is not None:
             self._next_card.arrive_via_adjacent(token)
 
-        # Make token occupant
+        # Make token the occupant.
         else:
             self._occupant = token
             token.set_location(self)
 
-    """ Pairs this TokenSpot to another via a path
-
-        Args:
-            other -- a TokenSpot connected via a path
-    """
     def pair_via_path(self, other):
-        self._next_spot = other
-    
-    """ Pairs this TokenSpot to another via adjacency from a different card 
+        """ Pair this TokenSpot to another via a path.
 
-        Args:
-            other -- a TokenSpot representing the same space on the board
-    """
+            Args:
+                other (TokenSpot): The spot to be connected to self via a path.
+        """
+        self._next_spot = other
+
     def pair_via_adjacency(self, other):
+        """ Pairs this TokenSpot to another via adjacency from a different card
+
+            Args:
+                other (TokenSpot): Representing the same space on the board.
+        """
         self._next_card = other
 
-    """ Retrieves the occupying token from this TokenSpot
-
-        returns -- Token occupant of this TokenSpot
-    """
     def get_occupant(self):
+        """ Retrieves the occupying token from this TokenSpot
+
+            Return:
+                The Token occupant of this TokenSpot
+        """
         return self._occupant
 
-    """ Static function for pairing two adjacent spots in one go
-
-        Args:
-            spot1 -- TokenSpot adjacent to spot2
-            spot2 -- TokenSpot adjacent to spot1
-    """
     @staticmethod
     def pair_adjacent(spot1, spot2):
+        """ Static function for pairing two adjacent spots in one go
+
+            Args:
+                spot1 (TokenSpot): adjacent to spot2
+                spot2 (TokenSpot): adjacent to spot1
+        """
         spot1.pair_via_adjacency(spot2)
         spot2.pair_via_adjacency(spot1)
 
-    """ Static function for pairing two path connected spots in one go
-
-        Args:
-            spot1 -- TokenSpot connected via a path to spot2
-            spot2 -- TokenSpot connected via a path to spot1
-    """
     @staticmethod
     def pair_path(spot1, spot2):
+        """ Static function for pairing two path connected spots in one go
+
+            Args:
+                spot1 (TokenSpot): connected via a path to spot2
+                spot2 (TokenSpot): connected via a path to spot1
+        """
         spot1.pair_via_path(spot2)
         spot2.pair_via_path(spot1)
