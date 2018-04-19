@@ -180,6 +180,7 @@ public class Board {
             col = random.nextInt(6);
         }
 
+
         List<Integer> possibleTokenLocations  = new ArrayList<>();
         if (row == 0 ){
             possibleTokenLocations.add(0);
@@ -200,7 +201,8 @@ public class Board {
         }
 
         int tokenLocation = possibleTokenLocations.get(random.nextInt(possibleTokenLocations.size()));
-        return new Pair(spaces[row][col], tokenLocation);
+        //intellij cant make up its mind about whether we need the types on this pair
+        return new Pair<BoardSpace, Integer>(spaces[row][col], tokenLocation);
 
     }
 
