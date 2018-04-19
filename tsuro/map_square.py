@@ -45,7 +45,7 @@ class MapSquare:
         """Place a card in the MapSquare, connecting TokenSpots as appropriate.
 
         Args:
-            map_card -- a MapCard representing the paths to be connected.
+            map_card (MapCard)
         """
         assert self._map_card is None
 
