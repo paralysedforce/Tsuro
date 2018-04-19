@@ -3,6 +3,7 @@ from player import Player
 from dragon_card import DragonCard
 from deck import Deck
 
+
 def test_eliminate_player():
     deck = Deck()
     dragon = DragonCard()

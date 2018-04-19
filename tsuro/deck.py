@@ -42,39 +42,38 @@ DEFAULT_CARDS = [
 
 
 class Deck:
-
-
-    """ Creates a deck from the list of known paths """
     def __init__(self, possible_cards=DEFAULT_CARDS):
+        """Creates a deck from the list of known paths."""
         self._cards = deque()
         for card_desc in possible_cards:
             self._cards.append(MapCard(card_desc))
 
-    """ Re-orders the cards in the deck """
     def shuffle(self):
+        """Re-order the cards in the deck."""
         shuffle(self._cards)
 
-    """ Gets the top card from the deck and returns it
-
-        returns an instance of MapCard or None
-    """
     def draw(self):
+        """Return the top card from the deck.
+
+        Returns:
+            MapCard | None
+        """
         try:
             return self._cards.popleft()
         except IndexError:
             return None
 
-    """ Returns the cards in the list do the bottom of the deck
+    def replace_cards(self, cards):
+        """Return cards to the bottom of the deck.
 
         Args:
-            cards -- a collection of MapCards
-    """
-    def replace_cards(self, cards):
+            cards: (list of MapCard)
+        """
         for card in cards:
             self._cards.append(card)
 
-    """ Returns the number of cards currently in the deck """
     def get_size(self):
+        """Return the number of cards currently in the deck."""
         return len(self._cards)
 
     def __eq__(self, other):
@@ -89,4 +88,3 @@ class Deck:
 
     def __str__(self):
         return str([str(card) for card in self._cards])
-

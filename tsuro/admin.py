@@ -1,20 +1,17 @@
-from deck import Deck
-from player import Player
-from dragon_card import DragonCard
-
 from collections import deque
 
-#{ board: Board, players: Player[?], dragon: DragonCard, deck: DrawPile }
+from deck import Deck
+from dragon_card import DragonCard
+from player import Player
 
 
 class Administrator:
-
-    """ Default constructor
+    def __init__(self, num_players=3):
+        """Default constructor.
 
         Args:
-            num_players=3 -- number of players to instantiate the Admin with
-    """
-    def __init__(self, num_players=3):
+            num_players (int): Count players to instantiate the Admin with.
+        """
         self._board = None
         self._dragon = DragonCard()
         self._deck = Deck()
@@ -22,37 +19,31 @@ class Administrator:
         for _ in range(num_players):
             self._players.append(Player(self._deck, self._dragon))
 
-
-
-    """ Determines whether it is legal for a given player to place a given tile on a given board.
+    @staticmethod
+    def isLegalPlay(board, tile, player):
+        """Return a bool indicating the legality of a tile placement.
 
         There are two ways a tile placement can be illegal:
 
         1. The placement of the tile is an elimination move for the player
             (unless all of the possible moves are elimination moves).
         2. The tile is not (a possibly rotated version of) one of the tiles of the player.
-    """
-    @staticmethod
-    def isLegalPlay(board, tile, player):
+        """
         # Check that tile is one of the tiles of the player
         if tile not in player._hand:
             return False
 
         # Check that placement does not eliminate the player
-        (draw_pile, active_players, eliminated_players, board, game_over_or_winners ) = Administrator.playATurn(Deck([]), [player], [], board, tile)
+        (draw_pile, active_players, eliminated_players, board, game_over_or_winners) = Administrator.playATurn(Deck([]), [player], [], board, tile)
         if len(active_players) > 0:
             # Player still active, valid move
             return True
         else:
             return False
 
-
-
-    """ Computes the state of the game after the completion of a turn given the
-         state of the game before the turn.
-    """
     @staticmethod
     def playATurn(draw_pile, active_players, eliminated_players, board, placement_tile):
+        """Compute the state of the game."""
         moving_player = active_players[0]
 
         square = moving_player.get_token().get_location().get_parent()
@@ -79,6 +70,6 @@ class Administrator:
 
 
         if game_over:
-            return (draw_pile, active_players, eliminated_players, board, active_players )
+            return (draw_pile, active_players, eliminated_players, board, active_players)
         else:
-            return (draw_pile, active_players, eliminated_players, board, False )
+            return (draw_pile, active_players, eliminated_players, board, False)

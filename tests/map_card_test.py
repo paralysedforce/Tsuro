@@ -2,16 +2,16 @@ from map_card import MapCard
 from path import Path
 
 PATH_DESCS = [
-                (0,1),
-                (3,7),
-             ]
+    (0, 1),
+    (3, 7),
+]
+
 
 def test_init():
-    map_card = MapCard([
-        (0,1)
-        ])
+    map_card = MapCard([(0, 1)])
     print(map_card)
-    assert Path(0,1) in map_card._paths
+    assert Path(0, 1) in map_card._paths
+
 
 def test_rotate_clockwise():
     map_card = MapCard(PATH_DESCS)
@@ -36,10 +36,12 @@ def test_rotate_counterclockwise():
         print(map_card)
         assert path in map_card._paths
 
+
 def test_equal():
     card1 = MapCard(PATH_DESCS)
     card2 = MapCard(PATH_DESCS)
     assert card1 == card2
+
 
 def test_equal_after_rotate():
     card1 = MapCard(PATH_DESCS)
@@ -48,11 +50,13 @@ def test_equal_after_rotate():
     card2.rotate(True)
     assert card1 == card2
 
+
 def test_not_equal():
     card1 = MapCard(PATH_DESCS)
     card2 = MapCard(PATH_DESCS)
     card2.rotate(True)
     assert not card1 == card2
+
 
 def test_not_equal_lengths():
     card1 = MapCard(PATH_DESCS)
