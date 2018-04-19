@@ -35,40 +35,44 @@ public class Board {
         BoardSpace curSpace = player.getBoardSpace();
         int tokenSpace = player.getTokenSpace();
 
-        BoardSpace nextBoardSpace = getNextSpace(curSpace, tokenSpace);
-        if (nextBoardSpace.hasTile())
+        if (!player.hasTile(tile))
+            return false;
+        if (curSpace.hasTile())
             return false;
 
-        int nextTokenSpace = tile.findMatch(findNextTokenSpace(tokenSpace));
-        nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+        int nextTokenSpace = tile.findMatch(tokenSpace);
+        BoardSpace nextBoardSpace = getNextSpace(curSpace, nextTokenSpace);
+        nextTokenSpace = findNextTokenSpace(nextTokenSpace);
         while (nextBoardSpace != null){
 
             if (!nextBoardSpace.hasTile())
                 return true;
 
             Tile curTile = nextBoardSpace.getTile();
-            nextTokenSpace = curTile.findMatch(findNextTokenSpace(nextTokenSpace));
+            nextTokenSpace = curTile.findMatch(nextTokenSpace);
             nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
+            nextTokenSpace = findNextTokenSpace(nextTokenSpace);
         }
         return false;
     }
 
     public List<SPlayer> placeTile(Tile tile, SPlayer player){
-        BoardSpace space = getNextSpace(player.getBoardSpace(), player.getTokenSpace());
+        BoardSpace space = player.getBoardSpace();
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
         List<SPlayer> eliminatedPlayers = new ArrayList<>();
         spaces.add(space);
 
-        for (BoardSpace curSpace = spaces.removeFirst(); spaces.size() > 0; curSpace = spaces.removeFirst()){
-            if (space.hasTile()){
+        while (spaces.size() > 0){
+            BoardSpace curSpace = spaces.removeFirst();
+            if (curSpace.hasTile()){
                 // transfer tokens if possible
                 // if not possible, determine if token will be transferred off edge
                 //      if so, this is a failed player
                 // if it is possible, add boardspaces that all tokens have been transferred onto to the queue
 
-                space.advanceTokens();
+                curSpace.advanceTokens();
 
                 for(int i = 0; i < 8; i++) {
                     Token token = curSpace.removeToken(i);
@@ -85,6 +89,7 @@ public class Board {
 
             }
         }
+        player.removeTileFromBank(tile);
         return eliminatedPlayers;
     }
 
@@ -163,8 +168,44 @@ public class Board {
                 break;
         }
         return nextTokenSpace;
+    }
+
+    public Pair<BoardSpace, Integer> getRandomStartingLocation(){
+        Random random = new Random();
+        int row = random.nextInt(6);
+        int col = random.nextInt(6);
+
+        while(row != 0 && row != 5 && col != 0 && col != 5){
+            row = random.nextInt(6);
+            col = random.nextInt(6);
+        }
+
+
+        List<Integer> possibleTokenLocations  = new ArrayList<>();
+        if (row == 0 ){
+            possibleTokenLocations.add(0);
+            possibleTokenLocations.add(1);
+        }
+        else if (row == 5){
+            possibleTokenLocations.add(4);
+            possibleTokenLocations.add(5);
+        }
+
+        if (col == 0){
+            possibleTokenLocations.add(6);
+            possibleTokenLocations.add(7);
+        }
+        else if (col == 5){
+            possibleTokenLocations.add(2);
+            possibleTokenLocations.add(3);
+        }
+
+        int tokenLocation = possibleTokenLocations.get(random.nextInt(possibleTokenLocations.size()));
+        //intellij cant make up its mind about whether we need the types on this pair
+        return new Pair<BoardSpace, Integer>(spaces[row][col], tokenLocation);
 
     }
+
 
 
 }

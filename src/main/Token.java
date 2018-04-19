@@ -13,6 +13,8 @@ public class Token {
         space = startingLocation;
         tokenSpace = startingTokenSpace;
         this.player = player;
+
+        space.addToken(this, startingTokenSpace);
     }
 
     public void setBoardSpace(BoardSpace location, int tokenSpace){

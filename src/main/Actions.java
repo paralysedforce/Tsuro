@@ -1,5 +1,11 @@
+<<<<<<< HEAD:src/main/Actions.java
 package main;
 
+=======
+import javafx.util.Pair;
+
+import java.util.ArrayList;
+>>>>>>> f9e2c1ce2c1050aa3dc7ab635ada47de5b696689:src/Actions.java
 import java.util.List;
 
 /**
@@ -11,11 +17,11 @@ public class Actions {
 
 
     static private class PlayReturn {
-        private TilePile tilePile;
-        private List<SPlayer> remainingPlayers;
-        private List<SPlayer> eliminatedPlayers;
-        private Board board;
-        private List<SPlayer> winningPlayers;
+        public  TilePile tilePile;
+        public  List<SPlayer> remainingPlayers;
+        public  List<SPlayer> eliminatedPlayers;
+        public  Board board;
+        public  List<SPlayer> winningPlayers;
 
         public PlayReturn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                           Board board, List<SPlayer> winningPlayers){
@@ -33,6 +39,7 @@ public class Actions {
 
         SPlayer player = remainingPlayers.remove(0);
         List<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
+        remainingPlayers.add(player);
 
         remainingPlayers.removeAll(playersLosingOnTurn);
         eliminatedPlayers.addAll(playersLosingOnTurn);
@@ -52,7 +59,46 @@ public class Actions {
     public static void main(String[] args){
 
         Board board = new Board();
+<<<<<<< HEAD:src/main/Actions.java
         //main.Actions.PlayATurn();
+=======
+        int numberOfPlayers = 3;
+        List<SPlayer> listOfPlayers = new ArrayList<>();
+        TilePile tilePile = new TilePile(); //need to add tile stuff here
+
+        for(int i = 0; i < numberOfPlayers; i++){
+            Pair<BoardSpace, Integer> position = board.getRandomStartingLocation();
+            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue(), tilePile));
+        }
+
+        Tile testTile = listOfPlayers.get(0).getRandomTileFromBank();
+        boolean isMoveValid = isLegalMove(listOfPlayers.get(0), board, testTile);
+        PlayReturn ret = Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, testTile);
+        if (ret.tilePile != tilePile)
+            throw new AssertionError();
+        if (ret.winningPlayers != null)
+            throw new AssertionError();
+        if (ret.board != board)
+            throw new AssertionError();
+        if (!ret.eliminatedPlayers.isEmpty() && isMoveValid)
+            throw new AssertionError();
+        if (ret.eliminatedPlayers.isEmpty() && !isMoveValid)
+            throw new AssertionError();
+        if (!ret.remainingPlayers.equals(listOfPlayers))
+            throw new AssertionError();
+
+
+//        Tile trueTile  = listOfPlayers.get(0).getRandomTileFromBank();
+        Tile falseTile = listOfPlayers.get(1).getRandomTileFromBank();
+
+//        if (Actions.isLegalMove(listOfPlayers.get(0), board, trueTile) != true)
+//            throw new AssertionError(); -- test doesn't work right now
+        if (Actions.isLegalMove(listOfPlayers.get(0), board, falseTile) != false)
+            throw new AssertionError();
+
+
+        //Actions.PlayATurn();
+>>>>>>> f9e2c1ce2c1050aa3dc7ab635ada47de5b696689:src/Actions.java
     }
 
 }

@@ -139,6 +139,19 @@ public class Tile {
                 startD, endD);
     }
 
+    public Tile(String fileLine){
+        connections = new TileConnections(
+                Integer.parseInt(Character.toString(fileLine.charAt(0))),
+                Integer.parseInt(Character.toString(fileLine.charAt(2))),
+                Integer.parseInt(Character.toString(fileLine.charAt(4))),
+                Integer.parseInt(Character.toString(fileLine.charAt(6))),
+                Integer.parseInt(Character.toString(fileLine.charAt(8))),
+                Integer.parseInt(Character.toString(fileLine.charAt(10))),
+                Integer.parseInt(Character.toString(fileLine.charAt(12))),
+                Integer.parseInt(Character.toString(fileLine.charAt(14)))
+        );
+    }
+
     public void rotateClockwise(){
         connections.rotateClockwise();
     }
@@ -184,7 +197,7 @@ public class Tile {
 
     public static void main(String[] args){
         Tile t1 = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
-        Tile t2 = new Tile(1, 0, 2, 3, 4, 5, 6, 7);
+        Tile t2 = new Tile(1, 0, 2, 3, 4, 5,  6, 7);
         Tile t3 = new Tile(4,5,6,7,0,1,2,3);
         Tile t4 = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
 
