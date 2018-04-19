@@ -1,4 +1,4 @@
-from .map_card import MapCard
+from map_card import MapCard
 from random import shuffle
 from collections import deque
 

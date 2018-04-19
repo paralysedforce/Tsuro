@@ -1,8 +1,8 @@
-from .token_spot import TokenSpot
-from .player import Player
-from .deck import Deck
-from .dragon_card import DragonCard
-from .token import Token
+from token_spot import TokenSpot
+from player import Player
+from deck import Deck
+from dragon_card import DragonCard
+from player_token import Token
 
 def create_token():
     deck = Deck()
@@ -33,7 +33,7 @@ def test_adjacent_static_pair():
     TokenSpot.pair_adjacent(token_spot1, token_spot2)
     assert token_spot1._next_card == token_spot2
     assert token_spot2._next_card == token_spot1
-    
+
 def test_path_static_pair():
     token_spot1 = TokenSpot()
     token_spot2 = TokenSpot()

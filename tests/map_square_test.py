@@ -1,11 +1,11 @@
-from .map_square import MapSquare
-from .map_square import Side
-from .map_card import MapCard
-from .token_spot import TokenSpot
-from .player import Player
-from .deck import Deck
-from .dragon_card import DragonCard
-from .token import Token
+from map_square import MapSquare
+from map_square import Side
+from map_card import MapCard
+from token_spot import TokenSpot
+from player import Player
+from deck import Deck
+from dragon_card import DragonCard
+from player_token import Token
 
 def create_token():
     deck = Deck()
@@ -46,7 +46,7 @@ def test_place_card_token_present():
 
     tsp0 = TokenSpot()
     tsp1 = TokenSpot()
-    
+
     token = create_token()
     tsp0.arrive_via_adjacent(token)
 
@@ -61,7 +61,7 @@ def test_place_card_token_present():
     assert tsp1.get_occupant() == token
 
 def test_bind_top():
-    
+
     tsp00 = TokenSpot()
     tsp01 = TokenSpot()
     spots0 = [tsp00,tsp01]
@@ -69,7 +69,7 @@ def test_bind_top():
         spots0.append(TokenSpot())
 
     square0 = MapSquare(spots0)
-    
+
     tsp15 = TokenSpot()
     tsp14 = TokenSpot()
     spots1 = []
@@ -90,7 +90,7 @@ def test_bind_top():
     assert tsp15._next_card == tsp00
 
 def test_bind_right():
-    
+
     tsp02 = TokenSpot()
     tsp03 = TokenSpot()
     spots0 = []
@@ -102,7 +102,7 @@ def test_bind_right():
         spots0.append(TokenSpot())
 
     square0 = MapSquare(spots0)
-    
+
     tsp16 = TokenSpot()
     tsp17 = TokenSpot()
     spots1 = []
@@ -121,7 +121,7 @@ def test_bind_right():
     assert tsp17._next_card == tsp02
 
 def test_bind_bottom():
-    
+
     tsp04 = TokenSpot()
     tsp05 = TokenSpot()
     spots0 = []
@@ -133,7 +133,7 @@ def test_bind_bottom():
         spots0.append(TokenSpot())
 
     square0 = MapSquare(spots0)
-    
+
     tsp10 = TokenSpot()
     tsp11 = TokenSpot()
     spots1 = []
@@ -152,7 +152,7 @@ def test_bind_bottom():
     assert tsp11._next_card == tsp04
 
 def test_bind_left():
-    
+
     tsp06 = TokenSpot()
     tsp07 = TokenSpot()
     spots0 = []
@@ -162,7 +162,7 @@ def test_bind_left():
     spots0.append(tsp07)
 
     square0 = MapSquare(spots0)
-    
+
     tsp12 = TokenSpot()
     tsp13 = TokenSpot()
     spots1 = []
@@ -183,7 +183,7 @@ def test_bind_left():
     assert tsp13._next_card == tsp06
 
 def test_terminate_top():
-    
+
     tsp00 = TokenSpot()
     tsp01 = TokenSpot()
     spots0 = [tsp00,tsp01]
@@ -191,14 +191,14 @@ def test_terminate_top():
         spots0.append(TokenSpot())
 
     square0 = MapSquare(spots0)
-    
+
     square0.set_terminal(Side.TOP)
 
     assert tsp00._is_terminal_spot
     assert tsp01._is_terminal_spot
 
 def test_terminate_right():
-    
+
     tsp02 = TokenSpot()
     tsp03 = TokenSpot()
     spots0 = []
@@ -217,7 +217,7 @@ def test_terminate_right():
     assert tsp03._is_terminal_spot
 
 def test_terminate_bottom():
-    
+
     tsp04 = TokenSpot()
     tsp05 = TokenSpot()
     spots0 = []
@@ -229,14 +229,14 @@ def test_terminate_bottom():
         spots0.append(TokenSpot())
 
     square0 = MapSquare(spots0)
-    
+
     square0.set_terminal(Side.BOTTOM)
 
     assert tsp04._is_terminal_spot
     assert tsp05._is_terminal_spot
 
 def test_terminate_left():
-    
+
     tsp06 = TokenSpot()
     tsp07 = TokenSpot()
     spots0 = []
@@ -246,7 +246,7 @@ def test_terminate_left():
     spots0.append(tsp07)
 
     square0 = MapSquare(spots0)
-    
+
     square0.set_terminal(Side.LEFT)
 
     assert tsp06._is_terminal_spot

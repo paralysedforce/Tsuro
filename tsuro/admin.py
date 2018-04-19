@@ -1,6 +1,6 @@
-from .deck import Deck
-from .player import Player
-from .dragon_card import DragonCard
+from deck import Deck
+from player import Player
+from dragon_card import DragonCard
 
 from collections import deque
 

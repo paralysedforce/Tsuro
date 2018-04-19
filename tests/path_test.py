@@ -1,4 +1,4 @@
-from .path import Path
+from path import Path
 
 def test_creation():
     path = Path(0,1)

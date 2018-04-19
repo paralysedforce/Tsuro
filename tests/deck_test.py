@@ -1,6 +1,6 @@
-from .deck import Deck
-from .deck import DEFAULT_CARDS
-from .map_card import MapCard
+from deck import Deck
+from deck import DEFAULT_CARDS
+from map_card import MapCard
 
 def test_init():
     card_desc = [(0,1)]

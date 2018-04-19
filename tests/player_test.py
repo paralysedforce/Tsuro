@@ -1,8 +1,8 @@
-from .player import Player
-from .player import HAND_SIZE
-from .deck import Deck
-from .deck import DEFAULT_CARDS
-from .dragon_card import DragonCard
+from player import Player
+from player import HAND_SIZE
+from deck import Deck
+from deck import DEFAULT_CARDS
+from dragon_card import DragonCard
 
 def test_player_inactive_inital():
     assert Player(Deck(), DragonCard()).is_active()
