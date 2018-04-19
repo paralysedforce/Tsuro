@@ -1,3 +1,5 @@
+package main;
+
 import java.util.List;
 
 /**
@@ -47,10 +49,10 @@ public class Actions {
         return board.isLegalMove(tile, player);
     }
 
-    public static void Main(String[] args){
+    public static void main(String[] args){
 
         Board board = new Board();
-        //Actions.PlayATurn();
+        //main.Actions.PlayATurn();
     }
 
 }

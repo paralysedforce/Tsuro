@@ -1,13 +1,15 @@
+package main;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  *
- * Represents a Single Tile in Tsuro
+ * Represents a Single main.Tile in Tsuro
  *
  * Created by vyasalwar on 4/15/18.
  *
- * TODO: isValid methods for all Tile classes
+ * TODO: isValid methods for all main.Tile classes
  *
  */
 public class Tile {
@@ -162,10 +164,10 @@ public class Tile {
             return false;
 
         /*
-        if (obj instanceof Tile){
-            Tile other = (Tile) obj;
-            Set<Tile> rotations = Tile.generateRotations(this);
-            for (Tile t : rotations){
+        if (obj instanceof main.Tile){
+            main.Tile other = (main.Tile) obj;
+            Set<main.Tile> rotations = main.Tile.generateRotations(this);
+            for (main.Tile t : rotations){
                 if (t.(other))
                     return true;
             }

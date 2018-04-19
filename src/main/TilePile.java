@@ -1,3 +1,5 @@
+package main;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -19,7 +21,7 @@ public class TilePile {
         tiles = new LinkedList<>();
         /*
         for line in file:
-            Tile tile = Tile.generateFromFile(line);
+            main.Tile tile = main.Tile.generateFromFile(line);
             tiles.addLast(tile);
          */
     }
@@ -29,7 +31,7 @@ public class TilePile {
             return tiles.removeFirst();
         }
         catch (NoSuchElementException e) {
-            throw new NoSuchElementException("TilePile is empty");
+            throw new NoSuchElementException("main.TilePile is empty");
         }
     }
 
