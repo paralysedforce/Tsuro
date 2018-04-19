@@ -1,8 +1,6 @@
-from player import Player
-from player import HAND_SIZE
-from deck import Deck
-from deck import DEFAULT_CARDS
+from deck import DEFAULT_CARDS, Deck
 from dragon_card import DragonCard
+from player import HAND_SIZE, Player
 
 
 def test_player_inactive_inital():

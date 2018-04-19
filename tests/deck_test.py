@@ -1,5 +1,4 @@
-from deck import Deck
-from deck import DEFAULT_CARDS
+from deck import DEFAULT_CARDS, Deck
 from map_card import MapCard
 
 

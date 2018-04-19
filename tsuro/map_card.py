@@ -1,5 +1,6 @@
-from path import Path
 from copy import deepcopy
+
+from path import Path
 
 
 class MapCard:

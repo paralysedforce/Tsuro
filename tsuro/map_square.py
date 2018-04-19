@@ -1,5 +1,6 @@
-from token_spot import TokenSpot
 from enum import Enum
+
+from token_spot import TokenSpot
 
 
 class Side(Enum):

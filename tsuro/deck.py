@@ -1,6 +1,7 @@
-from map_card import MapCard
-from random import shuffle
 from collections import deque
+from random import shuffle
+
+from map_card import MapCard
 
 DEFAULT_CARDS = [
     [(0, 1), (2, 3), (4, 5), (6, 7)],
