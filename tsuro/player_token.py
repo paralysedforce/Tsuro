@@ -1,4 +1,11 @@
 class Token:
+    """Marks a player's location on the board.
+
+    Attributes:
+        _player (Player)
+        _location (TokenSpot)
+    """
+
     def __init__(self, player):
         """Initialize a token for the given player.
 
