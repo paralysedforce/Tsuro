@@ -61,9 +61,9 @@ class MapSquare:
             occupant_start = start.get_occupant()
             occupant_end = end.get_occupant()
             if occupant_start is not None:
-                end.arrive_via_path(occupant_start)
+                end.receive_token_via_path(occupant_start)
             if occupant_end is not None:
-                start.arrive_via_path(occupant_end)
+                start.receive_token_via_path(occupant_end)
 
     def set_adjacent(self, other, side):
         """Binds the TokenSpots on the borders of adjacent MapSquares.

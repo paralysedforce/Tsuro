@@ -18,7 +18,7 @@ def test_token_occupant_arrival_adjacent():
     token = create_token()
 
     token_spot = TokenSpot()
-    token_spot.arrive_via_adjacent(token)
+    token_spot.receive_token_via_adjacent(token)
     assert token == token_spot.get_occupant()
 
 
@@ -26,7 +26,7 @@ def test_token_occupant_arrival_path():
     token = create_token()
 
     token_spot = TokenSpot()
-    token_spot.arrive_via_path(token)
+    token_spot.receive_token_via_path(token)
     assert token == token_spot.get_occupant()
 
 
@@ -54,7 +54,7 @@ def test_token_passed_adjacent():
 
     TokenSpot.pair_adjacent(token_spot1, token_spot2)
 
-    token_spot1.arrive_via_path(token)
+    token_spot1.receive_token_via_path(token)
 
     assert token_spot1.get_occupant() is None
     assert token_spot2.get_occupant() == token
@@ -68,7 +68,7 @@ def test_token_passed_path():
 
     TokenSpot.pair_path(token_spot1, token_spot2)
 
-    token_spot1.arrive_via_adjacent(token)
+    token_spot1.receive_token_via_adjacent(token)
 
     assert token_spot1.get_occupant() is None
     assert token_spot2.get_occupant() == token
@@ -82,6 +82,6 @@ def test_terminal_elimination():
     token = Token(player)
 
     token_spot = TokenSpot(True)
-    token_spot.arrive_via_path(token)
+    token_spot.receive_token_via_path(token)
 
     assert not player.is_active()

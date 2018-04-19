@@ -50,4 +50,4 @@ class Board:
             loc (int): The location around the edge clockwise. [0,2x6x4)
         """
         # TODO: make this actually work. Currently only works for loc=0
-        self._squares[0][0]._spots[1].arrive_via_adjacent(token)
+        self._squares[0][0]._spots[1].receive_token_via_adjacent(token)
