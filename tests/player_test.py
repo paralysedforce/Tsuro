@@ -4,8 +4,10 @@ from deck import Deck
 from deck import DEFAULT_CARDS
 from dragon_card import DragonCard
 
+
 def test_player_inactive_inital():
     assert Player(Deck(), DragonCard()).is_active()
+
 
 def test_player_has_dragon_after_draw():
     dragon = DragonCard()
@@ -14,6 +16,7 @@ def test_player_has_dragon_after_draw():
     player = Player(deck, dragon)
 
     assert dragon.get_holder() == player
+
 
 def test_player_cannot_steal_dragon():
     dragon = DragonCard()
@@ -24,6 +27,7 @@ def test_player_cannot_steal_dragon():
 
     assert dragon.get_holder() == player and dragon.get_holder != player2
 
+
 def test_eliminated_not_active():
     dragon = DragonCard()
     deck = Deck([])
@@ -32,6 +36,7 @@ def test_eliminated_not_active():
     player.eliminate()
     assert not player.is_active()
 
+
 def test_eliminated_relinquishes_dragon():
     dragon = DragonCard()
     deck = Deck([])
@@ -39,6 +44,7 @@ def test_eliminated_relinquishes_dragon():
     player = Player(deck, dragon)
     player.eliminate()
     assert not dragon.is_held()
+
 
 def test_eliminated_returns_cards():
     dragon = DragonCard()
@@ -49,4 +55,3 @@ def test_eliminated_returns_cards():
 
     player.eliminate()
     assert deck.get_size() == len(DEFAULT_CARDS)
-
