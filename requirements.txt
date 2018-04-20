@@ -6,12 +6,16 @@ codecov==2.0.15
 coverage==4.5.1
 idna==2.6
 isort==4.3.4
+lxml==4.2.1
 more-itertools==4.1.0
 mypy==0.590
+mypy-extensions==0.3.0
 pluggy==0.6.0
 py==1.5.3
+pyannotate==1.0.5
 pycodestyle==2.4.0
 pytest==3.5.0
+pytest-annotate==1.0.2
 pytest-cov==2.5.1
 requests==2.18.4
 six==1.11.0
