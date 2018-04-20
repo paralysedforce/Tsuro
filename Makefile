@@ -8,6 +8,9 @@ init-pytest :
 
 test :
 	pytest --verbose --color=yes --rootdir=. $(TEST_PATH)
+	MYPYPATH=tsuro mypy tsuro       # Static type checking
+	isort -c tsuro/*.py tests/*.py  # Import order checking
+
 
 default :
 	python game
