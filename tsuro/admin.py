@@ -1,7 +1,10 @@
 from collections import deque
+from typing import List, Tuple, Union
 
+from board import Board
 from deck import Deck
 from dragon_card import DragonCard
+from map_card import MapCard
 from player import Player
 
 
@@ -20,7 +23,7 @@ class Administrator:
             self._players.append(Player(self._deck, self._dragon))
 
     @staticmethod
-    def isLegalPlay(board, tile, player):
+    def isLegalPlay(board: Board, tile: MapCard, player: Player) -> bool:
         """Return a bool indicating the legality of a tile placement.
 
         There are two ways a tile placement can be illegal:
@@ -42,7 +45,12 @@ class Administrator:
             return False
 
     @staticmethod
-    def playATurn(draw_pile, active_players, eliminated_players, board, placement_tile):
+    def playATurn(draw_pile: Deck,
+                  active_players: List[Player],
+                  eliminated_players: List,
+                  board: Board,
+                  placement_tile: MapCard,
+                  ) -> Tuple[Deck, List[Player], List, Board, Union[List[Player], bool]]:
         """Compute the state of the game."""
         moving_player = active_players[0]
 

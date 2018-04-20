@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import List
 
 from path import Path
 
@@ -14,7 +15,7 @@ class MapCard:
         for path_desc in card_desc:
             self._paths.append(Path(*path_desc))
 
-    def rotate(self, is_clockwise):
+    def rotate(self, is_clockwise: bool):
         """Rotates the MapCard by rotating each of the paths.
 
         Args:
@@ -23,7 +24,7 @@ class MapCard:
         for path in self._paths:
             path.rotate(is_clockwise)
 
-    def get_paths(self):
+    def get_paths(self) -> List[Path]:
         """Gets a copy of the list of paths on this card.
 
         Returns:

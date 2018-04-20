@@ -1,3 +1,6 @@
+from player import Player
+
+
 class DragonCard:
     """The Dragon Card.
 
@@ -7,11 +10,11 @@ class DragonCard:
     def __init__(self):
         self._holding_player = None
 
-    def is_held(self):
+    def is_held(self) -> bool:
         """Return a boolean indicating if the card is held."""
         return self._holding_player is not None
 
-    def set_holder(self, player):
+    def set_holder(self, player: Player):
         """Set the current holder of the card.
 
         Args:
@@ -19,7 +22,7 @@ class DragonCard:
         """
         self._holding_player = player
 
-    def get_holder(self):
+    def get_holder(self) -> Player:
         """Return a reference to the card's holder.
 
         Returns:

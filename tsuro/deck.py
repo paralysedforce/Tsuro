@@ -1,5 +1,6 @@
 from collections import deque
 from random import shuffle
+from typing import List
 
 from map_card import MapCard
 
@@ -53,7 +54,7 @@ class Deck:
         """Re-order the cards in the deck."""
         shuffle(self._cards)
 
-    def draw(self):
+    def draw(self) -> MapCard:
         """Return the top card from the deck.
 
         Returns:
@@ -64,7 +65,7 @@ class Deck:
         except IndexError:
             return None
 
-    def replace_cards(self, cards):
+    def replace_cards(self, cards: List[MapCard]):
         """Return cards to the bottom of the deck.
 
         Args:
@@ -73,7 +74,7 @@ class Deck:
         for card in cards:
             self._cards.append(card)
 
-    def get_size(self):
+    def get_size(self) -> int:
         """Return the number of cards currently in the deck."""
         return len(self._cards)
 

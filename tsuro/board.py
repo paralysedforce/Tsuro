@@ -1,5 +1,7 @@
 from enum import Enum
 
+from map_card import MapCard
+
 BOARD_HEIGHT = 6
 BOARD_WIDTH = 6
 
@@ -102,7 +104,7 @@ class TokenSpot:
         """
         self._parent = parent
 
-    def set_terminal(self, is_terminal):
+    def set_terminal(self, is_terminal: bool):
         """ Changes whether this TokenSpot is considered terminal
 
                 Args:
@@ -231,7 +233,7 @@ class MapSquare:
 
         self._map_card = None
 
-    def place_card(self, map_card):
+    def place_card(self, map_card: MapCard):
         """Place a card in the MapSquare, connecting TokenSpots as appropriate.
 
         Args:
@@ -310,3 +312,32 @@ class MapSquare:
         else:
             # Improper imput, don't mess anything up by doing anything
             raise ValueError("Invalid side argument: {}".format(side))
+
+
+class Token:
+    """Marks a player's location on the board.
+
+    Attributes:
+        _player (Player)
+        _location (TokenSpot)
+    """
+
+    def __init__(self, player):
+        """Initialize a token for the given player.
+
+        Args:
+            player (Player)
+        """
+        self._player = player
+        player.set_token(self)
+        self._location = None
+
+    def set_location(self, spot):
+        self._location = spot
+
+    def get_location(self):
+        return self._location
+
+    def eliminate(self):
+        """Eliminate the token and its associated player from the board."""
+        self._player.eliminate()
