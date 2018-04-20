@@ -1,3 +1,5 @@
+package main;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class BoardSpace {
         if (!hasTile())
             this.tile = tile;
         else
-            throw new IllegalArgumentException("BoardSpace already occupied");
+            throw new IllegalArgumentException("main.BoardSpace already occupied");
     }
 
     public List<Token> advanceTokens(){
@@ -82,6 +84,6 @@ public class BoardSpace {
 
     @Override
     public int hashCode(){
-        return tile.hashCode() * row * col;
+        return tile.hashCode();
     }
 }

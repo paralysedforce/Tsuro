@@ -1,7 +1,12 @@
+<<<<<<< HEAD:src/main/TilePile.java
+package main;
+
+=======
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+>>>>>>> f9e2c1ce2c1050aa3dc7ab635ada47de5b696689:src/TilePile.java
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -24,6 +29,13 @@ public class TilePile {
 
     public TilePile(String filename){
         tiles = new LinkedList<>();
+<<<<<<< HEAD:src/main/TilePile.java
+        /*
+        for line in file:
+            main.Tile tile = main.Tile.generateFromFile(line);
+            tiles.addLast(tile);
+         */
+=======
         fillTiles(filename);
 
     }
@@ -44,6 +56,7 @@ public class TilePile {
         catch (IOException e){
             e.printStackTrace();
         }
+>>>>>>> f9e2c1ce2c1050aa3dc7ab635ada47de5b696689:src/TilePile.java
     }
 
 
@@ -52,7 +65,7 @@ public class TilePile {
             return tiles.removeFirst();
         }
         catch (NoSuchElementException e) {
-            throw new NoSuchElementException("TilePile is empty");
+            throw new NoSuchElementException("main.TilePile is empty");
         }
     }
 

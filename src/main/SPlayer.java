@@ -1,4 +1,8 @@
+<<<<<<< HEAD:src/main/SPlayer.java
+package main;
+=======
 import java.util.Random;
+>>>>>>> f9e2c1ce2c1050aa3dc7ab635ada47de5b696689:src/SPlayer.java
 
 /**
  * Created by vyasalwar on 4/16/18.

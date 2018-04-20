@@ -1,3 +1,5 @@
+package main;
+
 import javafx.util.Pair;
 
 import java.util.*;
@@ -6,18 +8,16 @@ import java.util.*;
  *
  * TODO: Handle two tokens running into each other
  *
- * Represents a Tsuro Board
+ * Represents a Tsuro main.Board
  *
  * Created by vyasalwar on 4/16/18.
  */
 public class Board {
     final int BOARD_LENGTH = 6;
-
     private BoardSpace[][] spaces;
 
     public Board() {
         this.spaces = new BoardSpace[BOARD_LENGTH][BOARD_LENGTH];
-
         for (int i = 0; i < BOARD_LENGTH; i++){
             for (int j = 0; j < BOARD_LENGTH; j++){
                 spaces[i][j] = new BoardSpace(i, j);
@@ -180,7 +180,6 @@ public class Board {
             col = random.nextInt(6);
         }
 
-
         List<Integer> possibleTokenLocations  = new ArrayList<>();
         if (row == 0 ){
             possibleTokenLocations.add(0);
@@ -201,8 +200,7 @@ public class Board {
         }
 
         int tokenLocation = possibleTokenLocations.get(random.nextInt(possibleTokenLocations.size()));
-        //intellij cant make up its mind about whether we need the types on this pair
-        return new Pair<BoardSpace, Integer>(spaces[row][col], tokenLocation);
+        return new Pair(spaces[row][col], tokenLocation);
 
     }
 
