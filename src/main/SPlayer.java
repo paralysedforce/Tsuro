@@ -24,12 +24,8 @@ public class SPlayer {
         }
     }
 
-    public BoardSpace getBoardSpace(){
-        return token.getBoardSpace();
-    }
-
-    public int getTokenSpace(){
-        return token.getTokenSpace();
+    public Token getToken(){
+        return token;
     }
 
     public boolean hasTile(Tile tile){

@@ -1,23 +1,22 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
+ * TODO: Decide what to return in advance if !hasTile()
  * Created by vyasalwar on 4/16/18.
  */
 public class BoardSpace {
     private final int NUM_SPACES = 8;
 
     private Tile tile;
-    private Token[] tokenSpaces;
-    public int row;
+    private Map<Token, Integer> tokenSpaces;
+    private int row;
     private int col;
 
     public BoardSpace(int row, int col){
         tile = null;
-        tokenSpaces = new Token[NUM_SPACES];
+        tokenSpaces = new HashMap<>();
         this.row = row;
         this.col = col;
     }
@@ -45,45 +44,34 @@ public class BoardSpace {
             throw new IllegalArgumentException("main.BoardSpace already occupied");
     }
 
-    public List<Token> advanceTokens(){
-        List<Token> tokensAdvanced = new ArrayList<>();
-        for (int i = 0; i < NUM_SPACES; i++){
-            Token token = tokenSpaces[i];
-            if (token != null && !tokensAdvanced.contains(token)){
-                int nextTokenLocation = tile.findMatch(i);
+    public Set<Token> advanceTokens(){
+        Set<Token> tokensAdvanced = new HashSet<>();
 
-                tokensAdvanced.add(token);
-                tokenSpaces[nextTokenLocation] = token;
-                token.setTokenSpace(nextTokenLocation);
-                tokenSpaces[i] = null;
-            }
+        Map <Token, Integer> advancedTokenSpaces = new HashMap<>();
+        for (Map.Entry<Token, Integer> pair: tokenSpaces.entrySet()){
+            Token token = pair.getKey();
+            int newTokenSpace = tile.findMatch(pair.getValue());
+
+            tokensAdvanced.add(token);
+            advancedTokenSpaces.put(token, newTokenSpace);
         }
+        this.tokenSpaces = advancedTokenSpaces;
         return tokensAdvanced;
     }
 
-    public Token removeToken(int tokenSpace){
-        Token token = tokenSpaces[tokenSpace];
-        if (token != null){
-            tokenSpaces[tokenSpace] = null;
-        }
-        return token;
+    public int findToken(Token token){
+        return tokenSpaces.get(token);
+    }
+
+    public int removeToken(Token token){
+        return tokenSpaces.remove(token);
     }
 
     public void addToken(Token token, int tokenSpace){
-        tokenSpaces[tokenSpace] = token;
+        tokenSpaces.put(token, tokenSpace);
     }
 
-    public List<Token> getTokensOnSpace(){
-        List<Token> tokensOnSpace = new LinkedList<>();
-        for (int i = 0; i < NUM_SPACES; i++){
-            if (tokenSpaces[i] != null)
-                tokensOnSpace.add(tokenSpaces[i]);
-        }
-        return tokensOnSpace;
-    }
-
-    @Override
-    public int hashCode(){
-        return tile.hashCode();
+    public Set<Token> getTokensOnSpace(){
+        return tokenSpaces.keySet();
     }
 }

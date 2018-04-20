@@ -1,7 +1,5 @@
 package main;
 
-import javafx.util.Pair;
-
 import java.util.*;
 
 /**
@@ -13,10 +11,21 @@ import java.util.*;
  * Created by vyasalwar on 4/16/18.
  */
 public class Board {
-    final int BOARD_LENGTH = 6;
+
+    /* Singleton pattern */
+    private static Board board;
+    final static int BOARD_LENGTH = 6;
+
+    public Board getBoard(){
+        if (board == null) board = new Board();
+        return board;
+    }
+
+    /* Instance variables */
     private BoardSpace[][] spaces;
 
-    public Board() {
+    /* Constructor */
+    private Board() {
         this.spaces = new BoardSpace[BOARD_LENGTH][BOARD_LENGTH];
         for (int i = 0; i < BOARD_LENGTH; i++){
             for (int j = 0; j < BOARD_LENGTH; j++){
@@ -25,19 +34,20 @@ public class Board {
         }
     }
 
+    /* Methods */
+
     public boolean isOccupied(int row, int col){
-        return  (0 <= row && row < BOARD_LENGTH) &&
-                (0 <= col && col < BOARD_LENGTH) &&
-                spaces[row][col].hasTile();
+        return isValidCoordinate(row, col) && spaces[row][col].hasTile();
     }
 
-    public boolean isLegalMove(Tile tile, SPlayer player){
-        BoardSpace curSpace = player.getBoardSpace();
-        int tokenSpace = player.getTokenSpace();
+    // TODO: Fix isLegalMove without modifying the state of the board
+    public static boolean isLegalMove(Tile tile, SPlayer player){
+        Token token = player.getToken();
 
-        if (!player.hasTile(tile))
-            return false;
-        if (curSpace.hasTile())
+        BoardSpace curSpace = token.getBoardSpace();
+        int tokenSpace = token.getTokenSpace();
+
+        if (!player.hasTile(tile) || curSpace.hasTile())
             return false;
 
         int nextTokenSpace = tile.findMatch(tokenSpace);
@@ -56,119 +66,66 @@ public class Board {
         return false;
     }
 
-    public List<SPlayer> placeTile(Tile tile, SPlayer player){
-        BoardSpace space = player.getBoardSpace();
+    public Set<SPlayer> placeTile(Tile tile, SPlayer player){
+
+        BoardSpace space = player.getToken().getBoardSpace();
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
-        List<SPlayer> eliminatedPlayers = new ArrayList<>();
+        Set<SPlayer> eliminatedPlayers = new HashSet<>();
         spaces.add(space);
 
         while (spaces.size() > 0){
             BoardSpace curSpace = spaces.removeFirst();
             if (curSpace.hasTile()){
-                // transfer tokens if possible
-                // if not possible, determine if token will be transferred off edge
-                //      if so, this is a failed player
-                // if it is possible, add boardspaces that all tokens have been transferred onto to the queue
+                Set<Token> advancedTokens = curSpace.advanceTokens();
 
-                curSpace.advanceTokens();
-
-                for(int i = 0; i < 8; i++) {
-                    Token token = curSpace.removeToken(i);
-                    if (token != null) {
-                        BoardSpace nextSpace = getNextSpace(token.getBoardSpace(), i);
-                        if (nextSpace != null) {
-                            transferToken(nextSpace, i, token);
-                            spaces.add(nextSpace);
-                        } else {
-                            eliminatedPlayers.add(token.getPlayer());
-                        }
+                for (Token token : advancedTokens){
+                    if (!token.isOnEdge()) {
+                        transferToken(token);
+                        spaces.add(token.getBoardSpace());
+                    }
+                    else {
+                        curSpace.removeToken(token);
+                        eliminatedPlayers.add(token.getPlayer());
                     }
                 }
-
             }
         }
+
         player.removeTileFromBank(tile);
         return eliminatedPlayers;
     }
 
-    private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace){
-        int row = boardSpace.getRow();
-        int col = boardSpace.getCol();
 
-        Pair<Integer, Integer> newCoordinates = nextSpace(row, col, tokenSpace);
-        row = newCoordinates.getKey();
-        col = newCoordinates.getValue();
-
-        try {
-            return spaces[row][col];
-        }
-        catch (IndexOutOfBoundsException e){
+    private BoardSpace getNextSpace(Token token){
+        if (token.isOnEdge())
             return null;
-        }
+
+        Pair<Integer, Integer> newCoordinates = token.nextCoordinate();
+        int row = newCoordinates.getKey();
+        int col = newCoordinates.getValue();
+
+        return spaces[row][col];
     }
 
-    private void transferToken(BoardSpace nextSpace, int tokenSpace, Token token){
-        int nextTokenSpace = findNextTokenSpace(tokenSpace);
+    private void transferToken(Token token) {
+
+        int nextTokenSpace = token.findNextTokenSpace();
+        BoardSpace nextSpace = getNextSpace(token);
+        BoardSpace oldSpace = token.getBoardSpace();
+
+        // TODO: Refactor to remove this redundancy
         nextSpace.addToken(token, nextTokenSpace);
+        oldSpace.removeToken(token);
         token.setBoardSpace(nextSpace, nextTokenSpace);
     }
 
-    private static boolean willTransferOffBoard(BoardSpace boardSpace, int tokenSpace){
-        Pair<Integer, Integer> nextLocationPair = nextSpace(boardSpace.getRow(), boardSpace.getCol(), tokenSpace);
 
-        int nextRow = nextLocationPair.getKey();
-        int nextCol = nextLocationPair.getValue();
-
-        return (nextRow > 5 || nextCol > 5 || nextRow < 0 || nextCol < 0);
+    private static boolean isValidCoordinate(int row, int col){
+        return (0 <= row && row < BOARD_LENGTH) && (0 <= col && col < BOARD_LENGTH);
     }
 
-    private static Pair<Integer, Integer> nextSpace(int row, int col, int tokenSpace){
-        int nextRow = row;
-        int nextCol = col;
-
-        switch (tokenSpace){
-            case 0:
-            case 1:
-                nextRow--;
-                break;
-            case 2:
-            case 3:
-                nextCol++;
-                break;
-            case 4:
-            case 5:
-                nextRow++;
-                break;
-            case 6:
-            case 7:
-                nextCol--;
-                break;
-        }
-
-        return new Pair(nextRow, nextCol);
-    }
-
-    private static int findNextTokenSpace(int tokenSpace){
-        int nextTokenSpace = 0;
-
-        switch (tokenSpace){
-            case 0:
-            case 1:
-            case 4:
-            case 5:
-                nextTokenSpace = 5 - tokenSpace;
-                break;
-            case 2:
-            case 3:
-            case 6:
-            case 7:
-                nextTokenSpace = 9 - tokenSpace;
-                break;
-        }
-        return nextTokenSpace;
-    }
 
     public Pair<BoardSpace, Integer> getRandomStartingLocation(){
         Random random = new Random();
