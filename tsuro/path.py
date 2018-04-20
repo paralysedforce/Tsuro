@@ -9,7 +9,7 @@ class Path:
         self._start_posn = start
         self._end_posn = end
 
-    def rotate(self, is_clockwise):
+    def rotate(self, is_clockwise: bool):
         """Rotate the path as if it were on the card.
 
         If clockwise, add 2, mod 8 to start and end position.
@@ -26,10 +26,10 @@ class Path:
             self._start_posn = (self._start_posn + 8 - 2) % 8
             self._end_posn = (self._end_posn + 8 - 2) % 8
 
-    def get_start(self):
+    def get_start(self) -> int:
         return self._start_posn
 
-    def get_end(self):
+    def get_end(self) -> int:
         return self._end_posn
 
     def inverse(self):

@@ -7,7 +7,8 @@ install:
 - pip install -r requirements.txt
 
 script:
-- isort -c tsuro/*.py tests/*.py
+- isort -c tsuro/*.py tests/*.py  # Import order checking
+- MYPYPATH=tsuro mypy tsuro       # Static type checking
 - pytest --cov=tsuro
 
 after_success:
