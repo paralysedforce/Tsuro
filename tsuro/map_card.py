@@ -28,21 +28,15 @@ class MapCard:
         """Gets a copy of the list of paths on this card.
 
         Returns:
-            list of Path
+            List[Path]
         """
+        # TODO: Is this deepcopy necessary? Do we mutate Paths?
         return deepcopy(self._paths)
 
     def __eq__(self, other):
-        if isinstance(other, MapCard):
-            # Check that paths are the same
-            for path in self._paths:
-                if path not in other._paths:
-                    return False
-
-            # Only return true if paths are the same length
-            return len(self._paths) == len(other._paths)
-        else:
-            return NotImplemented
+        same_cards = all([p in other._paths for p in self._paths])
+        same_length = len(self._paths) == len(other._paths)
+        return same_cards and same_length
 
     def __str__(self):
         return str([str(path) for path in self._paths])

@@ -6,8 +6,8 @@ class Path:
             start (int): number representing one end point of the path
             end (int): number representing the other end point of the path
         """
-        self._start_posn = start
-        self._end_posn = end
+        self.start = start
+        self.end = end
 
     def rotate(self, is_clockwise: bool):
         """Rotate the path as if it were on the card.
@@ -19,36 +19,26 @@ class Path:
             is_clockwise (bool)
         """
         if is_clockwise:
-            self._start_posn = (self._start_posn + 2) % 8
-            self._end_posn = (self._end_posn + 2) % 8
+            self.start = (self.start + 2) % 8
+            self.end = (self.end + 2) % 8
         else:
             # Add 8 to ensure positive number and proper wrapping around
-            self._start_posn = (self._start_posn + 8 - 2) % 8
-            self._end_posn = (self._end_posn + 8 - 2) % 8
-
-    def get_start(self) -> int:
-        return self._start_posn
-
-    def get_end(self) -> int:
-        return self._end_posn
+            self.start = (self.start + 8 - 2) % 8
+            self.end = (self.end + 8 - 2) % 8
 
     def inverse(self):
         """Reverse the direction of the path."""
-        tmp = self._start_posn
-        self._start_posn = self._end_posn
-        self._end_posn = tmp
+        self.start, self.end = self.end, self.start
 
     def __eq__(self, other):
         # Two paths are considered equivalent if both the start points and
         # end points are the same or both the start point of one and
         # the end point of the other are the same and the end point of one
         # and the start point of the other are the same.
-        if isinstance(other, Path):
-            output = ((self._start_posn == other._start_posn and self._end_posn == other._end_posn) or
-                      (self._start_posn == other._end_posn and self._end_posn == other._start_posn))
-            return output
-        else:
-            return NotImplemented
+        if not isinstance(other, Path):
+            raise ValueError('Cannot compare Path with type: {}'.format(type(other)))
+        return (self.start == other.start and self.end == other.end) or \
+               (self.start == other.end and self.end == other.start)
 
     def __str__(self):
-        return "Path: (start: " + str(self._start_posn) + " end: " + str(self._end_posn) + ")"
+        return "Path: (start: " + str(self.start) + " end: " + str(self.end) + ")"

@@ -13,7 +13,7 @@ def test_player_has_dragon_after_draw():
 
     player = Player(deck, dragon)
 
-    assert dragon.get_holder() == player
+    assert dragon.holder == player
 
 
 def test_player_cannot_steal_dragon():
@@ -23,7 +23,7 @@ def test_player_cannot_steal_dragon():
     player = Player(deck, dragon)
     player2 = Player(deck, dragon)
 
-    assert dragon.get_holder() == player and dragon.get_holder != player2
+    assert dragon.holder == player and dragon.holder != player2
 
 
 def test_eliminated_not_active():
@@ -49,7 +49,7 @@ def test_eliminated_returns_cards():
     deck = Deck()
 
     player = Player(deck, dragon)
-    assert deck.get_size() == (len(DEFAULT_CARDS) - HAND_SIZE)
+    assert len(deck) == (len(DEFAULT_CARDS) - HAND_SIZE)
 
     player.eliminate()
-    assert deck.get_size() == len(DEFAULT_CARDS)
+    assert len(deck) == len(DEFAULT_CARDS)

@@ -3,7 +3,7 @@ from path import Path
 
 def test_creation():
     path = Path(0, 1)
-    assert path._start_posn == 0 and path._end_posn == 1
+    assert path.start == 0 and path.end == 1
 
 
 def test_comparison_same():
@@ -27,7 +27,7 @@ def test_comparison_reversed():
 def test_rotate_clockwise():
     path = Path(0, 1)
     path.rotate(True)
-    assert path._start_posn == 2 and path._end_posn == 3
+    assert path.start == 2 and path.end == 3
 
 
 def test_rotate_clockwise_reversed():
@@ -40,7 +40,7 @@ def test_rotate_clockwise_reversed():
 def test_rotate_counterclockwise():
     path = Path(0, 1)
     path.rotate(False)
-    assert path._start_posn == 6 and path._end_posn == 7
+    assert path.start == 6 and path.end == 7
 
 
 def test_rotate_counterclockwise_reversed():

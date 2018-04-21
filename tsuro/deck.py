@@ -46,9 +46,7 @@ DEFAULT_CARDS = [
 class Deck:
     def __init__(self, possible_cards=DEFAULT_CARDS):
         """Creates a deck from the list of known paths."""
-        self._cards = deque()
-        for card_desc in possible_cards:
-            self._cards.append(MapCard(card_desc))
+        self._cards = deque([MapCard(c) for c in possible_cards])
 
     def shuffle(self):
         """Re-order the cards in the deck."""
@@ -58,35 +56,29 @@ class Deck:
         """Return the top card from the deck.
 
         Returns:
-            MapCard | None
+            Optional[MapCard]
         """
-        try:
-            return self._cards.popleft()
-        except IndexError:
+        if not self._cards:
             return None
+        else:
+            return self._cards.popleft()
 
     def replace_cards(self, cards: List[MapCard]):
         """Return cards to the bottom of the deck.
 
         Args:
-            cards: (list of MapCard)
+            cards: (List[MapCard])
         """
         for card in cards:
             self._cards.append(card)
 
-    def get_size(self) -> int:
-        """Return the number of cards currently in the deck."""
+    def __len__(self):
         return len(self._cards)
 
     def __eq__(self, other):
-        if isinstance(other, Deck):
-            for card in self._cards:
-                if card not in other._cards:
-                    return False
-
-            return len(self._cards) == len(other._cards)
-        else:
-            return NotImplemented
+        same_cards = all([c in other._cards for c in self._cards])
+        same_len = len(self._cards) == len(other._cards)
+        return same_cards and same_len
 
     def __str__(self):
         return str([str(card) for card in self._cards])

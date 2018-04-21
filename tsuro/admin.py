@@ -18,12 +18,10 @@ class Administrator:
         self._board = None
         self._dragon = DragonCard()
         self._deck = Deck()
-        self._players = deque()
-        for _ in range(num_players):
-            self._players.append(Player(self._deck, self._dragon))
+        self._players = deque([Player(self._deck, self._dragon) for _ in range(num_players)])
 
     @staticmethod
-    def isLegalPlay(board: Board, tile: MapCard, player: Player) -> bool:
+    def is_legal_play(board: Board, tile: MapCard, player: Player) -> bool:
         """Return a bool indicating the legality of a tile placement.
 
         There are two ways a tile placement can be illegal:
@@ -37,15 +35,17 @@ class Administrator:
             return False
 
         # Check that placement does not eliminate the player
-        (draw_pile, active_players, eliminated_players, board, game_over_or_winners) = Administrator.playATurn(Deck([]), [player], [], board, tile)
-        if len(active_players) > 0:
+        (draw_pile, active_players, eliminated_players, board, game_over_or_winners) = \
+            Administrator.play_turn(Deck([]), [player], [], board, tile)
+
+        if active_players:
             # Player still active, valid move
             return True
         else:
             return False
 
     @staticmethod
-    def playATurn(draw_pile: Deck,
+    def play_turn(draw_pile: Deck,
                   active_players: List[Player],
                   eliminated_players: List,
                   board: Board,
@@ -75,7 +75,6 @@ class Administrator:
             sum_hands += len(player._hand)
 
         game_over = len(active_players) < 2 or sum_hands == 0
-
 
         if game_over:
             return (draw_pile, active_players, eliminated_players, board, active_players)

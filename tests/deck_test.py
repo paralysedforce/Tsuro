@@ -53,4 +53,4 @@ def test_none_after_exhausted():
 
 def test_default_size():
     deck = Deck()
-    assert deck.get_size() == len(DEFAULT_CARDS)
+    assert len(deck) == len(DEFAULT_CARDS)

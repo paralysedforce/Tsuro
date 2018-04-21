@@ -9,13 +9,7 @@ BOARD_WIDTH = 6
 class Board:
     def __init__(self):
         # init squares
-        self._squares = []
-        for _ in range(BOARD_HEIGHT):
-            row = []
-            for _ in range(BOARD_WIDTH):
-                square = MapSquare()
-                row.append(square)
-            self._squares.append(row)
+        self._squares = [[MapSquare() for _ in range(BOARD_WIDTH)] for _ in range(BOARD_HEIGHT)]
 
         # terminate boundary squares
         for square in self._squares[0]:
@@ -244,8 +238,8 @@ class MapSquare:
         self._map_card = map_card
 
         for path in map_card.get_paths():
-            start = self._spots[path.get_start()]
-            end = self._spots[path.get_end()]
+            start = self._spots[path.start]
+            end = self._spots[path.end]
 
             TokenSpot.pair_path(start, end)
 
