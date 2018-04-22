@@ -1,6 +1,5 @@
 from typing import Optional
 
-from board import Token
 from deck import Deck
 from map_card import MapCard
 
@@ -15,7 +14,7 @@ class Player:
         _is_active (bool): Whether this player is currently in the game (not eliminated).
         _dragon_card (DragonCard): The dragon card that the player may pick up.
     """
-    def __init__(self, deck: Deck, dragon_card, token=None) -> None:
+    def __init__(self, deck: Deck, dragon_card) -> None:
         """Initialize an active player with a hand of HAND_SIZE cards
 
         Args:
@@ -27,13 +26,6 @@ class Player:
         self._is_active = True
         self._dragon_card = dragon_card
         self._hand = [self.draw_card() for _ in range(HAND_SIZE)]
-        self._token = token
-
-    def get_token(self) -> Token:
-        return self._token
-
-    def set_token(self, token: Token):
-        self._token = token
 
     def is_active(self) -> bool:
         return self._is_active
