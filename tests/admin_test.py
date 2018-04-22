@@ -1,5 +1,5 @@
 from admin import Administrator
-from board import Board, Token
+from board import Board
 from deck import Deck
 from dragon_card import DragonCard
 from player import Player

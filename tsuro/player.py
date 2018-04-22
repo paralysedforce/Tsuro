@@ -16,7 +16,6 @@ class Player:
         Args:
             deck (Deck): Used for drawing and replacing cards.
             dragon_card: Picked up when the deck is empty.
-                token: The Token that corresponds to this player.
         """
         self._is_active = True
         self._dragon_card = dragon_card
