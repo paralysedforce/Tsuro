@@ -1,10 +1,9 @@
 from collections import deque
 from typing import List, Tuple, Union
 
-from board import Board
 from deck import Deck
+from board import Board, PathTile
 from dragon_card import DragonCard
-from map_card import MapCard
 from player import Player
 
 
@@ -21,7 +20,7 @@ class Administrator:
         self._players = deque([Player(self._deck, self._dragon) for _ in range(num_players)])
 
     @staticmethod
-    def is_legal_play(board: Board, tile: MapCard, player: Player) -> bool:
+    def is_legal_play(board: Board, tile: PathTile, player: Player) -> bool:
         """Return a bool indicating the legality of a tile placement.
 
         There are two ways a tile placement can be illegal:
@@ -49,7 +48,7 @@ class Administrator:
                   active_players: List[Player],
                   eliminated_players: List,
                   board: Board,
-                  placement_tile: MapCard,
+                  placement_tile: PathTile,
                   ) -> Tuple[Deck, List[Player], List, Board, Union[List[Player], bool]]:
         """Compute the state of the game."""
         moving_player = active_players[0]

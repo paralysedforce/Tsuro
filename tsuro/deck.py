@@ -2,7 +2,8 @@ from collections import deque
 from random import shuffle
 from typing import List
 
-from map_card import MapCard
+from board import PathTile
+
 
 DEFAULT_CARDS = [
     [(0, 1), (2, 3), (4, 5), (6, 7)],
@@ -46,28 +47,28 @@ DEFAULT_CARDS = [
 class Deck:
     def __init__(self, possible_cards=DEFAULT_CARDS):
         """Creates a deck from the list of known paths."""
-        self._cards = deque([MapCard(c) for c in possible_cards])
+        self._cards = deque([PathTile(c) for c in possible_cards])
 
     def shuffle(self):
         """Re-order the cards in the deck."""
         shuffle(self._cards)
 
-    def draw(self) -> MapCard:
+    def draw(self) -> PathTile:
         """Return the top card from the deck.
 
         Returns:
-            Optional[MapCard]
+            Optional[PathTile]
         """
         if not self._cards:
             return None
         else:
             return self._cards.popleft()
 
-    def replace_cards(self, cards: List[MapCard]):
+    def replace_cards(self, cards: List[PathTile]):
         """Return cards to the bottom of the deck.
 
         Args:
-            cards: (List[MapCard])
+            cards: (List[PathTile])
         """
         for card in cards:
             self._cards.append(card)

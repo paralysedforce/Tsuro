@@ -1,6 +1,6 @@
 import pytest
 
-from board import Board, MapSquare, NoPathTileError, PathTile
+from board import MapSquare, NoPathTileError, PathTile
 
 
 def test_map_square():
@@ -29,9 +29,11 @@ def test_map_square():
 
 
 def test_pathtile():
+    # Throw upon invalid path specification.
     with pytest.raises(ValueError):
         PathTile([(9, 10)])
 
+    # Indexing
     tile = PathTile([(0, 1)])
     assert tile[0] == 1
     assert tile[1] == 0
