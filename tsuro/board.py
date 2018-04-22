@@ -195,117 +195,101 @@ class Side(Enum):
     LEFT = 3
 
 
+# TODO: Use an enum to represent the 8 possible TileSpots?
+# TODO: Use an enum to represent the 4 possible Rotations?
+
+
+class NoPathTileError(Exception):
+    """Raised when indexing into a MapSquare missing a path tile."""
+    pass
+
+
 class MapSquare:
     """A square on the map.
 
     Attributes:
-        _spots (None | TokenSpot[])
+        _path_tile: Optional[PathTile]
+        _rotation: int
     """
-    def __init__(self, token_spots=None):
-        """Create a MapSquare that contains TokenSpots and can receive a MapCard.
+    def __init__(self):
+        # This is an example of the Strategy pattern.
+        self._path_tile = None
+        self._rotation = 0
+
+    def place_tile(self, path_tile: 'PathTile') -> None:
+        self._path_tile = path_tile
+
+    def get_player(self) -> Optional[Tuple[Player, int]]:
+        """Return the players on the square as a list of (player, position)."""
+        return None
+
+    def get_offset(self, key: int) -> Tuple[int, int]:
+        """Return a tuple indicating the side of MapSquare.
 
         Args:
-            token_spots (None | TokenSpot[])
+            key: int
+
+        Returns:
+            Tuple[int, int]
+                This approach is like an offset matrix in physics applications.
         """
-        if token_spots is None:
-            self._spots = [
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-            ]
-        else:
-            self._spots = token_spots
+        if not self._path_tile:
+            raise NoPathTileError
 
-        # Set token parents as self
-        for token_spot in self._spots:
-            token_spot.set_parent(self)
+        # This isn't the cleanest, but type hints require a return statement that
+        # is guaranteed to be reached.
+        key = self._path_tile[key]
 
-        self._map_card = None
+        # Top
+        if key in (0, 1):
+            offset = (0, 1)
+        # Right
+        elif key in (2, 3):
+            offset = (1, 0)
+        # Bottom
+        elif key in (4, 5):
+            offset = (0, -1)
+        # Left
+        elif key in (6, 7):
+            offset = (-1, 0)
 
-    def place_card(self, map_card: MapCard):
-        """Place a card in the MapSquare, connecting TokenSpots as appropriate.
+        return offset
 
-        Args:
-            map_card (MapCard)
-        """
-        assert self._map_card is None
 
-        self._map_card = map_card
+class PathTile:
+    """A tile with path connections.
 
-        for path in map_card.get_paths():
-            start = self._spots[path.start]
-            end = self._spots[path.end]
+           0   1
+        +---------+
+    7   |         |  2
+        |         |
+    6   |         |  3
+        +---------+
+           5   4
+    """
+    def __init__(self, connections: List[Tuple[int, int]]) -> None:
+        # TODO: Assert that PathTile must be created with 4 tuples? This should be asserted by type.
+        if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
+            raise ValueError('Path spots must be values in the range 0-7.')
 
-            TokenSpot.pair_path(start, end)
+        self._paths = PathTile.create_paths_dict(connections)  # type: Dict[int, int]
+        self._connections = connections
 
-            # If either have a token, send it along
-            occupant_start = start.get_occupant()
-            occupant_end = end.get_occupant()
-            if occupant_start is not None:
-                end.receive_token_via_path(occupant_start)
-            if occupant_end is not None:
-                start.receive_token_via_path(occupant_end)
+    @staticmethod
+    def create_paths_dict(connections: List[Tuple[int, int]]) -> Dict[int, int]:
+        paths = {}
+        for c0, c1 in connections:
+            paths[c0] = c1
+            paths[c1] = c0
+        return paths
 
-    def set_adjacent(self, other, side):
-        """Binds the TokenSpots on the borders of adjacent MapSquares.
+    # TODO: Create a type that constrains this to 0 - 7.
+    def __getitem__(self, key: int) -> int:
+        """Given an key, return the connecting path."""
+        return self._paths[key]
 
-        Args:
-            other (MapSquare): MapSquare that is adjacent to self.
-            side (Side): Side showing on which side of self other lies.
-        """
-        # Sadly, switch doesn't exist :(
-
-        if side == Side.TOP:
-            # Set the 0th and 1st nodes of self to 5th and 4th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[0], other._spots[5])
-            TokenSpot.pair_adjacent(self._spots[1], other._spots[4])
-        elif side == Side.RIGHT:
-            # Set the 2nd and 3rd nodes of self to 8th and 7th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[2], other._spots[7])
-            TokenSpot.pair_adjacent(self._spots[3], other._spots[6])
-        elif side == Side.BOTTOM:
-            # Set the 4th and 5th nodes of self to 1st and 0th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[4], other._spots[1])
-            TokenSpot.pair_adjacent(self._spots[5], other._spots[0])
-            pass
-        elif side == Side.LEFT:
-            # Set the 6th and 7th nodes of self to 3rd and 2nd nodes of other.
-            TokenSpot.pair_adjacent(self._spots[6], other._spots[3])
-            TokenSpot.pair_adjacent(self._spots[7], other._spots[2])
-        else:
-            # Improper imput, don't mess anything up by doing anything
-            raise ValueError("Invalid side argument: {0}".format(side))
-
-    def set_terminal(self, side):
-        """Set all TokenSpots on the indicated side as terminal.
-
-        Args:
-            side (Side): The side on which the TokenSpot terminates.
-        """
-        if side == Side.TOP:
-            # Set 0 and 1 to terminal
-            self._spots[0].set_terminal(True)
-            self._spots[1].set_terminal(True)
-        elif side == Side.RIGHT:
-            # Set 2 and 3 to terminal
-            self._spots[2].set_terminal(True)
-            self._spots[3].set_terminal(True)
-        elif side == Side.BOTTOM:
-            # Set 4 and 5 to terminal
-            self._spots[4].set_terminal(True)
-            self._spots[5].set_terminal(True)
-        elif side == Side.LEFT:
-            # Set 6 and 7 to terminal
-            self._spots[6].set_terminal(True)
-            self._spots[7].set_terminal(True)
-        else:
-            # Improper imput, don't mess anything up by doing anything
-            raise ValueError("Invalid side argument: {}".format(side))
+    def __str__(self):
+        return "\n".join("{} <-> {}".format(c0, c1) for c0, c1 in self._connections)
 
 
 class Token:
