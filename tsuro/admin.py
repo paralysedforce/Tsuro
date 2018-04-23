@@ -3,11 +3,22 @@ from typing import List, Tuple, Union
 
 from deck import Deck
 from board import Board, PathTile
-from dragon_card import DragonCard
-from player import Player
+
+
+class Player:
+    name: str
+    cards: List[PathTile]
 
 
 class Administrator:
+    """Controller / administrator for Tsuro.
+
+    Attributes:
+        players: Deque[Players]
+        dragon_tile_holder: Optional[Player]
+        deck: Deck
+        board: Board
+    """
     def __init__(self, num_players=3):
         """Default constructor.
 
@@ -15,7 +26,7 @@ class Administrator:
             num_players (int): Count players to instantiate the Admin with.
         """
         self._board = None
-        self._dragon = DragonCard()
+        self.dragon_tile_holder = None
         self._deck = Deck()
         self._players = deque([Player(self._deck, self._dragon) for _ in range(num_players)])
 
@@ -79,3 +90,5 @@ class Administrator:
             return (draw_pile, active_players, eliminated_players, board, active_players)
         else:
             return (draw_pile, active_players, eliminated_players, board, False)
+
+    # TODO: Use the factory pattern to create flexible game configurations.
