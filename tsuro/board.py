@@ -19,7 +19,7 @@ class Position(NamedTuple):
     """A unique position on the board.
 
     A position on the board is defined by the index of its BoardSquare (x, y),
-    and the TileSpot on that BoardSquare. This is an algebraic datatype, and is immutable.
+    and the TileSpot on that BoardSquare. This is an immutable algebraic datatype.
     """
     i: int
     j: int
