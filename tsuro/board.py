@@ -1,47 +1,126 @@
-from enum import Enum
-from typing import Tuple, List, Optional, Dict
+from typing import Tuple, List, Dict, NamedTuple
 
-
-from player import Player
 
 DEFAULT_WIDTH = 5
 DEFAULT_HEIGHT = 5
 
 
-def check_bounds(function):
-    """A decorator that checks input bounds."""
-    def decorator(i, j, *args, **kwargs):
-        pass
-    pass
+class Position(NamedTuple):
+    """A unique position on the board.
+
+    A position on the board is defined by the index of its BoardSquare (x, y),
+    and the TileSpot on that BoardSquare. This is an algebraic datatype, and is immutable.
+    """
+    i: int
+    j: int
+    tile_spot: int
 
 
 class Board:
-    """
+    """The Tsuro game board.
+
+    The board is indexed by (row, column).
+
+         0  1  2  3
+       +------------+
+    0  |            |
+    1  |            |
+    2  |            |
+    3  | x (3, 0)   |
+       +------------+
+
+    In our game design, board doesn't have any knowledge of Players. The responsibility of
+    tracking player positions goes to the the Admin/Controller. Board has the responsibility of
+    providing paths and checking the validity of moves.
+
     Attributes:
-        _board (List[List[MapSquare]])
+        _board (List[List[BoardSquare]])
+        _width (int)
+        _height (int)
+        _edge_positions (List[Position])
     """
-    def __init__(self):
-        self._board = [[MapSquare() for _ in range(DEFAULT_WIDTH)] for _ in range(DEFAULT_HEIGHT)]
-        pass
 
-    def place_token_start(self, loc, token):
-        """Place a token in one of the 2x6x4 starting spots.
+    # The (row, column) offset needed to get to the connecting square, given a TileSpot.
+    TILE_SPOT_OFFSETS = {
+        # top
+        0: (-1, 0),
+        1: (-1, 0),
+        # right
+        2: (0, 1),
+        3: (0, 1),
+        # bottom
+        4: (1, 0),
+        5: (1, 0),
+        # left
+        6: (0, -1),
+        7: (0, -1),
+    }
 
-        Args:
-            loc (int): The location around the edge clockwise. [0,2x6x4)
-        """
-        # TODO: make this actually work. Currently only works for loc=0
-        self._board[0][0]._spots[1].receive_token_via_adjacent(token)
+    def __init__(self, height=DEFAULT_HEIGHT, width=DEFAULT_WIDTH):
+        self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]
+        self._width = width
+        self._height = height
+        self._edge_positions = None
+
+    @property
+    def edge_positions(self) -> List[Position]:
+        # Memoized, since it only needs to be calculated once.
+        if not self._edge_positions:
+            posns = []  # type: List[Position]
+            w = self._width
+            h = self._height
+            posns += [Position(0, j, k)     for j in range(w) for k in (0, 1)]  # top edge     # noqa: E272
+            posns += [Position(i, w - 1, k) for i in range(h) for k in (2, 3)]  # right edge   # noqa: E272
+            posns += [Position(h - 1, j, k) for j in range(w) for k in (4, 5)]  # bottom edge  # noqa: E272
+            posns += [Position(i, 0, k)     for i in range(h) for k in (6, 7)]  # left edge    # noqa: E272
+            self._edge_positions = posns
+
+        return self._edge_positions
 
     def place_tile(self, i: int, j: int, path_tile: 'PathTile'):
-        self._board[i][j].place_tile(path_tile)
+        self._check_bounds(i, j)
+        self._board[i][j].path_tile = path_tile
 
+    def traverse_path(self, p: Position) -> List[Position]:
+        self._check_bounds(p.i, p.j)
 
-class Side(Enum):
-    TOP = 0
-    RIGHT = 1
-    BOTTOM = 2
-    LEFT = 3
+        if not self._board[p.i][p.j].has_tile():
+            return []
+
+        path = []
+        while p:
+            i, j, tile_spot = p
+            next_tile_spot = self._board[i][j][tile_spot]
+
+            # This is the path within the square.
+            path.append(p)
+            path.append(Position(p.i, p.j, next_tile_spot))
+
+            # Now, traverse to the next square if possible.
+            i_offset, j_offset = self.TILE_SPOT_OFFSETS[next_tile_spot]
+            next_i = p.i + i_offset
+            next_j = p.j + j_offset
+
+            if not self._in_bounds(next_i, next_j) or not self._board[next_i][next_j].has_tile():
+                p = None
+            else:
+                p = Position(next_i, next_j, next_tile_spot)
+
+        return path
+
+    def is_on_edge(self, p: Position) -> bool:
+        """Return True if the position is on the edge of the board, False otherwise.
+
+        Use to check if a path leads off the board.
+        """
+        return p in self.edge_positions
+
+    def _check_bounds(self, i: int, j: int):
+        if not self._in_bounds(i, j):
+            raise IndexError('({},{}) is out of bounds.'.format(i, j))
+
+    def _in_bounds(self, i: int, j: int) -> bool:
+        return 0 <= i < self._height and 0 <= j < self._width
 
 
 # TODO: Use an enum to represent the 8 possible TileSpots?
@@ -49,60 +128,43 @@ class Side(Enum):
 
 
 class NoPathTileError(Exception):
-    """Raised when indexing into a MapSquare missing a path tile."""
+    """Raised when indexing into a BoardSquare missing a path tile."""
     pass
 
 
-class MapSquare:
+class BoardSquare:
     """A square on the map.
 
     Attributes:
-        _path_tile: Optional[PathTile]
+        path_tile: Optional[PathTile]
         _rotation: int
     """
     def __init__(self):
-        # This is an example of the Strategy pattern.
-        self._path_tile = None
-        self._rotation = 0
+        self.path_tile = None  # Using the Strategy Pattern with path tiles.
+        # self._rotation = 0
 
-    def place_tile(self, path_tile: 'PathTile') -> None:
-        self._path_tile = path_tile
+    def has_tile(self) -> bool:
+        return self.path_tile is not None
 
-    def get_player(self) -> Optional[Tuple[Player, int]]:
-        """Return the players on the square as a list of (player, position)."""
-        return None
-
-    def get_offset(self, key: int) -> Tuple[int, int]:
-        """Return a tuple indicating the side of MapSquare.
+    def next(self, tile_spot: int) -> int:
+        """Given a entering tile spot, return the exiting TileSpot.
 
         Args:
-            key: int
+            tile_spot: int
 
         Returns:
-            Tuple[int, int]
-                This approach is like an offset matrix in physics applications.
+            TileSpot
         """
-        if not self._path_tile:
+        if not self.path_tile:
             raise NoPathTileError
 
-        # This isn't the cleanest, but type hints require a return statement that
-        # is guaranteed to be reached.
-        key = self._path_tile[key]
+        tile_spot = self.path_tile[tile_spot]
+        # TODO: Rotate.
 
-        # Top
-        if key in (0, 1):
-            offset = (0, 1)
-        # Right
-        elif key in (2, 3):
-            offset = (1, 0)
-        # Bottom
-        elif key in (4, 5):
-            offset = (0, -1)
-        # Left
-        elif key in (6, 7):
-            offset = (-1, 0)
+        return tile_spot
 
-        return offset
+    def __getitem__(self, tile_spot):
+        return self.next(tile_spot)
 
 
 class PathTile:
@@ -117,7 +179,7 @@ class PathTile:
            5   4
     """
     def __init__(self, connections: List[Tuple[int, int]]) -> None:
-        # TODO: Assert that PathTile must be created with 4 tuples? This should be asserted by type.
+        # TODO: Assert that PathTile must be created with 4 tuples? This should be enforced by type.
         if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
             raise ValueError('Path spots must be values in the range 0-7.')
 
@@ -133,7 +195,6 @@ class PathTile:
             paths[c1] = c0
         return paths
 
-    # TODO: Create a type that constrains this to 0 - 7.
     def __getitem__(self, tile_spot: int) -> int:
         """Given a tile_spot, return the connecting path."""
         return self._paths[tile_spot]
