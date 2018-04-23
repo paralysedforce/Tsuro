@@ -14,7 +14,6 @@ class Player:
         """Initialize an active player with a hand of HAND_SIZE cards
 
         Args:
-            deck (Deck): Used for drawing and replacing cards.
             dragon_card: Picked up when the deck is empty.
         """
         self._is_active = True

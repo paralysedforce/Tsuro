@@ -28,12 +28,16 @@ def test_map_square():
     assert square.get_players() is None
 
 
-def test_pathtile():
-    # Throw upon invalid path specification.
+def test_path_tile():
+    # invalid TileSpot
     with pytest.raises(ValueError):
         PathTile([(9, 10)])
 
-    # Indexing
+    # non-unique paths
+    with pytest.raises(AssertionError):
+        PathTile([(0, 1), (0, 2)])
+
+    # indexing
     tile = PathTile([(0, 1)])
     assert tile[0] == 1
     assert tile[1] == 0
@@ -44,8 +48,18 @@ def test_pathtile():
     assert tile[2] == 3
     assert tile[3] == 2
 
+    # string representation
     tile = PathTile([(0, 1)])
     assert str(tile) == '0 <-> 1'
+
+
+def test_path_tile_equality():
+    assert PathTile([(0, 1)]) == PathTile([(0, 1)])
+    assert PathTile([(0, 1)]) == PathTile([(1, 0)])
+    assert not PathTile([(0, 1)]) == PathTile([(0, 2)])
+    assert not PathTile([(0, 1)]) == PathTile([(0, 1), (2, 3)])
+    assert PathTile([(2, 3), (0, 1)]) == PathTile([(0, 1), (2, 3)])
+
 
 def test_top_border_terminal():
     pass

@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Tuple, List, Optional, Dict
 
-from map_card import MapCard
+
 from player import Player
 
 DEFAULT_WIDTH = 5
@@ -126,8 +126,9 @@ class PathTile:
 
     @staticmethod
     def create_paths_dict(connections: List[Tuple[int, int]]) -> Dict[int, int]:
-        paths = {}
+        paths = {}  # type: Dict[int, int]
         for c0, c1 in connections:
+            assert (c0 not in paths) and (c1 not in paths), 'TileSpots can only have 1 connection.'
             paths[c0] = c1
             paths[c1] = c0
         return paths
@@ -136,6 +137,9 @@ class PathTile:
     def __getitem__(self, tile_spot: int) -> int:
         """Given a tile_spot, return the connecting path."""
         return self._paths[tile_spot]
+
+    def __eq__(self, other):
+        return self._paths == other._paths
 
     def __str__(self):
         return "\n".join("{} <-> {}".format(c0, c1) for c0, c1 in self._connections)
