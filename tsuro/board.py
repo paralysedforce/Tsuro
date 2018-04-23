@@ -1,10 +1,6 @@
 from typing import Tuple, List, Dict, NamedTuple
 
 
-DEFAULT_WIDTH = 5
-DEFAULT_HEIGHT = 5
-
-
 class Position(NamedTuple):
     """A unique position on the board.
 
@@ -14,6 +10,9 @@ class Position(NamedTuple):
     i: int
     j: int
     tile_spot: int
+
+    def __repr__(self):
+        return 'Position({}, {}, {})'.format(self.i, self.j, self.tile_spot)
 
 
 class Board:
@@ -39,9 +38,8 @@ class Board:
         _height (int)
         _edge_positions (List[Position])
     """
-
     # The (row, column) offset needed to get to the connecting square, given a TileSpot.
-    TILE_SPOT_OFFSETS = {
+    TILE_SPOT_OFFSET = {
         # top
         0: (-1, 0),
         1: (-1, 0),
@@ -56,7 +54,19 @@ class Board:
         7: (0, -1),
     }
 
-    def __init__(self, height=DEFAULT_HEIGHT, width=DEFAULT_WIDTH):
+    # The adjacent tilespot on the connecting square.
+    ADJACENT_TILE_SPOT = {
+        0: 5,
+        1: 4,
+        2: 7,
+        3: 6,
+        4: 1,
+        5: 0,
+        6: 3,
+        7: 2,
+    }
+
+    def __init__(self, height, width):
         self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]
         self._width = width
         self._height = height
@@ -88,23 +98,23 @@ class Board:
             return []
 
         path = []
-        while p:
+        while True:
             i, j, tile_spot = p
-            next_tile_spot = self._board[i][j][tile_spot]
+            next_ts_within_square = self._board[i][j][tile_spot]
 
-            # This is the path within the square.
+            # First, append the movement within the square.
             path.append(p)
-            path.append(Position(p.i, p.j, next_tile_spot))
+            path.append(Position(p.i, p.j, next_ts_within_square))
 
             # Now, traverse to the next square if possible.
-            i_offset, j_offset = self.TILE_SPOT_OFFSETS[next_tile_spot]
+            i_offset, j_offset = self.TILE_SPOT_OFFSET[next_ts_within_square]
             next_i = p.i + i_offset
             next_j = p.j + j_offset
 
             if not self._in_bounds(next_i, next_j) or not self._board[next_i][next_j].has_tile():
-                p = None
-            else:
-                p = Position(next_i, next_j, next_tile_spot)
+                break
+
+            p = Position(next_i, next_j, self.ADJACENT_TILE_SPOT[next_ts_within_square])
 
         return path
 
