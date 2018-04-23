@@ -1,6 +1,21 @@
 from typing import Tuple, List, Dict, NamedTuple
 
 
+# A type for representing one of the 8 possible connecting positions on a tile.
+# TODO: Constrain this to the values in the range 0 - 7.
+# Opened an issue for this: https://github.com/python/typing/issues/554
+"""
+           0   1
+        +---------+
+    7   |         |  2
+        |         |
+    6   |         |  3
+        +---------+
+           5   4
+"""
+TileSpot = int
+
+
 class Position(NamedTuple):
     """A unique position on the board.
 
@@ -9,7 +24,7 @@ class Position(NamedTuple):
     """
     i: int
     j: int
-    tile_spot: int
+    tile_spot: TileSpot
 
     def __repr__(self):
         return 'Position({}, {}, {})'.format(self.i, self.j, self.tile_spot)
@@ -66,11 +81,11 @@ class Board:
         7: 2,
     }
 
-    def __init__(self, height, width):
+    def __init__(self, height: int, width: int) -> None:
         self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]
         self._width = width
         self._height = height
-        self._edge_positions = None
+        self._edge_positions = []  # type: List[Position]
 
     @property
     def edge_positions(self) -> List[Position]:
@@ -79,10 +94,10 @@ class Board:
             posns = []  # type: List[Position]
             w = self._width
             h = self._height
-            posns += [Position(0, j, k)     for j in range(w) for k in (0, 1)]  # top edge     # noqa: E272
-            posns += [Position(i, w - 1, k) for i in range(h) for k in (2, 3)]  # right edge   # noqa: E272
-            posns += [Position(h - 1, j, k) for j in range(w) for k in (4, 5)]  # bottom edge  # noqa: E272
-            posns += [Position(i, 0, k)     for i in range(h) for k in (6, 7)]  # left edge    # noqa: E272
+            posns += [Position(0, j, ts)     for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
+            posns += [Position(i, w - 1, ts) for i in range(h) for ts in (2, 3)]  # right edge   # noqa: E272
+            posns += [Position(h - 1, j, ts) for j in range(w) for ts in (4, 5)]  # bottom edge  # noqa: E272
+            posns += [Position(i, 0, ts)     for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
             self._edge_positions = posns
 
         return self._edge_positions
@@ -156,11 +171,11 @@ class BoardSquare:
     def has_tile(self) -> bool:
         return self.path_tile is not None
 
-    def next(self, tile_spot: int) -> int:
+    def next(self, tile_spot: TileSpot) -> TileSpot:
         """Given a entering tile spot, return the exiting TileSpot.
 
         Args:
-            tile_spot: int
+            tile_spot: TileSpot
 
         Returns:
             TileSpot
@@ -178,7 +193,7 @@ class BoardSquare:
 
 
 class PathTile:
-    """A tile with path connections.
+    """A tile that connects TileSpots.
 
            0   1
         +---------+
@@ -188,7 +203,7 @@ class PathTile:
         +---------+
            5   4
     """
-    def __init__(self, connections: List[Tuple[int, int]]) -> None:
+    def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
         # TODO: Assert that PathTile must be created with 4 tuples? This should be enforced by type.
         if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
             raise ValueError('Path spots must be values in the range 0-7.')
@@ -197,15 +212,15 @@ class PathTile:
         self._connections = connections
 
     @staticmethod
-    def create_paths_dict(connections: List[Tuple[int, int]]) -> Dict[int, int]:
-        paths = {}  # type: Dict[int, int]
+    def create_paths_dict(connections: List[Tuple[TileSpot, TileSpot]]) -> Dict[TileSpot, TileSpot]:
+        paths = {}  # type: Dict[TileSpot, TileSpot]
         for c0, c1 in connections:
             assert (c0 not in paths) and (c1 not in paths), 'TileSpots can only have 1 connection.'
             paths[c0] = c1
             paths[c1] = c0
         return paths
 
-    def __getitem__(self, tile_spot: int) -> int:
+    def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
         """Given a tile_spot, return the connecting path."""
         return self._paths[tile_spot]
 
