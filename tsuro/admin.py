@@ -1,8 +1,8 @@
 from collections import deque
 from typing import List, Tuple, Union
 
-from deck import Deck
 from board import Board, PathTile
+from deck import Deck
 
 
 class Player:

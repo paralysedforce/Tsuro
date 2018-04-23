@@ -1,6 +1,6 @@
 import pytest
 
-from board import Board, BoardSquare, NoPathTileError, PathTile,    Position
+from board import Board, BoardSquare, NoPathTileError, PathTile, Position
 
 
 def test_board_edge_positions():

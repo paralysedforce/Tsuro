@@ -1,5 +1,5 @@
-from deck import Deck
 from board import PathTile
+from deck import Deck
 
 
 def Tile(i, j):

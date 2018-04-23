@@ -39,6 +39,11 @@ MYPYPATH=tsuro mypy tsuro
 source scripts/pyannotate.sh
 ```
 
+#### Static Type Checking Strangeness
+
+https://github.com/python/mypy/issues/481
+https://github.com/python/mypy/issues/1984
+
 ### Tests
 
 Unit tests are under the `/tests` module and use the [pytest](http://pytest.org) framework.

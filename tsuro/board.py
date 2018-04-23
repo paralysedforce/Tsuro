@@ -1,5 +1,4 @@
-from typing import Tuple, List, Dict, NamedTuple
-
+from typing import Dict, List, NamedTuple, Tuple
 
 # A type for representing one of the 8 possible connecting positions on a tile.
 # TODO: Constrain this to the values in the range 0 - 7.
