@@ -125,6 +125,23 @@ public class Tile {
         throw new IllegalArgumentException("Endpoint not found");
     }
 
+    public boolean isValid(){
+        // A valid tile is a bijective map from {0..7} to itself
+        try {
+            Set<Integer> nums = new HashSet<>();
+            for (int i = 0; i < 8; i++) {
+                nums.add(findMatch(i));
+            }
+
+            // if nums.size() != 8, then the map is not onto
+            return nums.size() == 8;
+        }
+        catch (IllegalArgumentException e) {
+            // Does not contain some value in {0..7}, i.e. it's not one-to-one
+            return false;
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Tile) {

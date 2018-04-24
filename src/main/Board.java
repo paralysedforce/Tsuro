@@ -61,20 +61,21 @@ public class Board {
 
         Token token = player.getToken();*/
 
-        BoardSpace nextSpace = board.getNextSpace(token);
-        int nextTokenSpace = token.findNextTokenSpace();
+        BoardSpace curSpace = token.getBoardSpace();
+        int tokenSpace = token.getTokenSpace();
 
         // Move to the space across the tile
-        nextTokenSpace = tile.findMatch(nextTokenSpace);
+        int nextTokenSpace = tile.findMatch(tokenSpace);
+        BoardSpace nextSpace = board.getNextSpace(curSpace, nextTokenSpace);
 
         // Trace out a path by moving across spaces with tiles on them
         while (nextSpace != null){
-            nextSpace = getNextSpace(nextSpace, nextTokenSpace);
             if (!nextSpace.hasTile())
-                return true;
+                return false;
+            nextSpace = getNextSpace(nextSpace, nextTokenSpace);
             nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
         }
-        return false;
+        return true;
     }
 
     //
