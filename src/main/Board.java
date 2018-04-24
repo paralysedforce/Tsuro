@@ -1,5 +1,7 @@
 package main;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
 /**
@@ -16,7 +18,7 @@ public class Board {
     private static Board board;
     final static int BOARD_LENGTH = 6;
 
-    public Board getBoard(){
+    public static Board getBoard(){
         if (board == null) board = new Board();
         return board;
     }
@@ -41,15 +43,28 @@ public class Board {
     }
 
     // TODO: Fix isLegalMove without modifying the state of the board
-    public static boolean isLegalMove(Tile tile, SPlayer player){
-        Token token = player.getToken();
+    public boolean isLegalMove(Tile tile, SPlayer player){
 
-        BoardSpace curSpace = token.getBoardSpace();
-        int tokenSpace = token.getTokenSpace();
-
-        if (!player.hasTile(tile) || curSpace.hasTile())
+        if (!player.hasTile(tile) || player.getToken().getBoardSpace().hasTile())
             return false;
 
+        Token token = player.getToken();
+        BoardSpace nextSpace = board.getNextSpace(token);
+        int nextTokenSpace = token.findNextTokenSpace();
+
+        // Move to the space across the tile
+        nextTokenSpace = tile.findMatch(nextTokenSpace);
+
+        // Trace out a path by moving across spaces
+        while (nextSpace != null){
+            nextSpace = getNextSpace(nextSpace, nextTokenSpace);
+            if (!nextSpace.hasTile())
+                return true;
+            nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
+        }
+        return false;
+
+        /*
         int nextTokenSpace = tile.findMatch(tokenSpace);
         BoardSpace nextBoardSpace = getNextSpace(curSpace, nextTokenSpace);
         nextTokenSpace = findNextTokenSpace(nextTokenSpace);
@@ -63,7 +78,8 @@ public class Board {
             nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
             nextTokenSpace = findNextTokenSpace(nextTokenSpace);
         }
-        return false;
+        return false; */
+
     }
 
     public Set<SPlayer> placeTile(Tile tile, SPlayer player){
@@ -97,6 +113,41 @@ public class Board {
         return eliminatedPlayers;
     }
 
+    public void startPlayer(Token token, int row, int col, int tokenSpace){
+        if (!isValidCoordinate(row, col))
+            throw new IllegalArgumentException("Illegal starting row and col");
+
+        int direction = tokenSpace / 2;
+        boolean topEdge    = row == 0 && direction == 0;
+        boolean rightEdge  = col == 5 && direction == 1;
+        boolean bottomEdge = row == 5 && direction == 2;
+        boolean leftEdge   = col == 0 && direction == 3;
+
+        boolean onEdge = topEdge || rightEdge || bottomEdge || leftEdge;
+        if (!onEdge)
+            throw new IllegalArgumentException("The player can only start on an edge");
+
+        spaces[row][col].addToken(token, tokenSpace);
+    }
+
+
+    private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace){
+        // TODO: Duplicated code from Token.java: fix somehow
+        int row = boardSpace.getRow();
+        int col = boardSpace.getCol();
+        int direction = tokenSpace / 2;
+
+        if      (direction == 0)    row--; // Move up
+        else if (direction == 1)    col++; // Move right
+        else if (direction == 2)    row++; // Move down
+        else if (direction == 3)    col--; // Move left
+        else throw new IllegalArgumentException("Illegal value for tokenSpace");
+
+        if (row < 0 || row > 5 || col < 0 || col > 5)
+            return null;
+        else
+            return spaces[row][col];
+    }
 
     private BoardSpace getNextSpace(Token token){
         if (token.isOnEdge())

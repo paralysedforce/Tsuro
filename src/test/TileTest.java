@@ -1,8 +1,8 @@
 package test;
 
-import com.sun.tools.javac.util.Assert;
 import main.Tile;
 import org.junit.Test;
+import org.junit.Assert;
 
 import static org.junit.Assert.*;
 
@@ -18,9 +18,9 @@ public class TileTest {
         Tile t3 = new Tile(4,5,6,7,0,1,2,3);
         Tile t4 = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
 
-        Assert.check(t1.equals(t2));
-        Assert.check(t2.equals(t3));
-        Assert.check(!t1.equals(t4));
+        Assert.assertTrue(t1.equals(t2));
+        Assert.assertTrue(t2.equals(t3));
+        Assert.assertFalse(t1.equals(t4));
     }
 
 }

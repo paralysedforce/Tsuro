@@ -13,11 +13,11 @@ public class SPlayer {
     private String name;
     private TilePile tilePile;
 
-    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace, TilePile tilePile){
+    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
         tileBank = new Tile[MAX_TILES_IN_BANK];
-        this.tilePile = tilePile;
+        this.tilePile = TilePile.getTilePile();
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
             tileBank[i] = tilePile.drawFromDeck();
@@ -62,5 +62,10 @@ public class SPlayer {
                 break;
             }
         }
+    }
+
+    public Turn generateTurn(){
+        Turn turn = new Turn();
+        return turn;
     }
 }

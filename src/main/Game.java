@@ -1,7 +1,9 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -13,28 +15,40 @@ public class Game {
     private TilePile tilePile;
 
     public Game(String filename){
-        board = new Board();
+        board = Board.getBoard();
         remainingPlayers = new ArrayList<>();
         eliminatedPlayers = new ArrayList<>();
-        tilePile = new TilePile(filename);
+        tilePile = TilePile.getTilePile(filename);
     }
 
-    public Game(Board board, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
+    public Game(Board board, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
         this.board = board;
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
-        this.tilePile = tilePile;
+        this.tilePile = TilePile.getTilePile();
     }
 
     //to be used later in some way
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace, tilePile);
+        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
         remainingPlayers.add(player);
     }
 
-    public List<SPlayer> playTurn(Tile tile, SPlayer player){
-        List<SPlayer> failedPlayers = board.placeTile(tile, player);
+    public Set<SPlayer> playTurn(Tile tile, SPlayer player){
+        Set<SPlayer> failedPlayers = board.placeTile(tile, player);
         player.drawFromPile();
         return failedPlayers;
+    }
+
+    public void playGame(){
+        while (remainingPlayers.size() > 1) {
+            for (SPlayer player : remainingPlayers) {
+                Turn turn = player.generateTurn();
+                if (turn.getAction() == Turn.TurnAction.RESIGN) {
+                    remainingPlayers.remove(player);
+                    eliminatedPlayers.add(player);
+                }
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package main;
 import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -17,10 +18,10 @@ public class Actions {
         public  List<SPlayer> remainingPlayers;
         public  List<SPlayer> eliminatedPlayers;
         public  Board board;
-        public  List<SPlayer> winningPlayers;
+        public  Set<SPlayer> winningPlayers;
 
         public PlayReturn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
-                          Board board, List<SPlayer> winningPlayers){
+                          Board board, Set<SPlayer> winningPlayers){
             this.tilePile = tilePile;
             this.remainingPlayers = remainingPlayers;
             this.eliminatedPlayers = eliminatedPlayers;
@@ -31,10 +32,10 @@ public class Actions {
 
     public static PlayReturn PlayATurn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                                        Board board, Tile tile) {
-        Game game = new Game(board, remainingPlayers, eliminatedPlayers, tilePile);
+        Game game = new Game(board, remainingPlayers, eliminatedPlayers);
 
         SPlayer player = remainingPlayers.remove(0);
-        List<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
+        Set<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
         remainingPlayers.add(player);
 
         remainingPlayers.removeAll(playersLosingOnTurn);
@@ -54,15 +55,15 @@ public class Actions {
 
     public static void main(String[] args){
 
-        Board board = new Board();
+        Board board = Board.getBoard();
         //main.Actions.PlayATurn();
         int numberOfPlayers = 3;
         List<SPlayer> listOfPlayers = new ArrayList<>();
-        TilePile tilePile = new TilePile(); //need to add tile stuff here
+        TilePile tilePile = TilePile.getTilePile(); //need to add tile stuff here
 
         for(int i = 0; i < numberOfPlayers; i++){
             Pair<BoardSpace, Integer> position = board.getRandomStartingLocation();
-            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue(), tilePile));
+            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue()));
         }
 
         Tile testTile = listOfPlayers.get(0).getRandomTileFromBank();

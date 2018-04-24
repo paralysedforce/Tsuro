@@ -15,25 +15,36 @@ import java.util.NoSuchElementException;
  */
 public class TilePile {
 
+    /* Singleton design pattern */
     final private String DEFAULT_FILE_PATH = "tiles.txt";
+    private static TilePile tilePile;
 
-    private Deque<Tile> tiles;
-
-    public TilePile(){
+    private TilePile(){
         tiles = new LinkedList<>();
         fillTiles(DEFAULT_FILE_PATH);
     }
 
-    public TilePile(String filename){
+    private TilePile(String filename){
         tiles = new LinkedList<>();
-        /*
-        for line in file:
-            main.Tile tile = main.Tile.generateFromFile(line);
-            tiles.addLast(tile);
-         */
         fillTiles(filename);
-
     }
+
+    public static TilePile getTilePile(String filename){
+        if (tilePile == null)
+            tilePile = new TilePile(filename);
+        return tilePile;
+    }
+
+    public static TilePile getTilePile(){
+        if (tilePile == null){
+            tilePile = new TilePile();
+        }
+        return tilePile;
+    }
+
+    ///////
+
+    private Deque<Tile> tiles;
 
     private void fillTiles(String filename) {
         try {

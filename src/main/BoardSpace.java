@@ -60,7 +60,7 @@ public class BoardSpace {
     }
 
     public int findToken(Token token){
-        return tokenSpaces.get(token);
+        return tokenSpaces.getOrDefault(token, -1);
     }
 
     public int removeToken(Token token){
@@ -69,6 +69,20 @@ public class BoardSpace {
 
     public void addToken(Token token, int tokenSpace){
         tokenSpaces.put(token, tokenSpace);
+    }
+
+    public boolean willCollide(Token token){
+        if (!hasTile())
+            return false;
+
+        int tokenEndpoint = findToken(token);
+        int matching_endpoint = tile.findMatch(tokenEndpoint);
+        for (int endpoint : tokenSpaces.values()){
+            if (endpoint == matching_endpoint)
+                return true;
+        }
+
+        return false;
     }
 
     public Set<Token> getTokensOnSpace(){

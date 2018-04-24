@@ -13,7 +13,7 @@ import java.util.Set;
  * TODO: isValid methods for all main.Tile classes
  *
  */
-public class Tile implements Cloneable {
+public class Tile {
 
     private final int ROTATIONS_PER_CYCLE = 4;
     /* Helper Classes */
