@@ -78,13 +78,13 @@ public class Board {
     }
 
     //
-    public Set<SPlayer> placeTile(Tile tile, SPlayer player){
+    public Set<Token> placeTile(Tile tile, Token currentPlayerToken){
 
-        BoardSpace space = player.getToken().getBoardSpace();
+        BoardSpace space = currentPlayerToken.getBoardSpace();
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
-        Set<SPlayer> eliminatedPlayers = new HashSet<>();
+        Set<Token> eliminatedPlayers = new HashSet<>();
         spaces.add(space);
 
         while (spaces.size() > 0){
@@ -99,13 +99,12 @@ public class Board {
                     }
                     else {
                         curSpace.removeToken(token);
-                        eliminatedPlayers.add(token.getPlayer());
+                        eliminatedPlayers.add(token);
                     }
                 }
             }
         }
 
-        player.removeTileFromBank(tile);
         return eliminatedPlayers;
     }
 

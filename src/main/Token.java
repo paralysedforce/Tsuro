@@ -17,10 +17,9 @@ public class Token {
         space.addToken(this, startingTokenSpace);
     }
 
-    public void updateBoardSpace(BoardSpace location){
-        if (space != null)
-            space.removeToken(this);
-        space = location;
+    public void removeFromBoard(){
+        space.removeToken(this);
+        space = null;
     }
 
     public BoardSpace getBoardSpace(){
