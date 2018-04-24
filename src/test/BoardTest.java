@@ -24,7 +24,7 @@ public class BoardTest {
         BoardSpace space = board.getBoardSpace(0, 0);
         SPlayer player = new SPlayer("Vyas", space, 0, TilePile.getTilePile());
 
-        board.placeTile(tile, player);
+        board.placeTile(tile, player.getToken());
         Assert.assertTrue(board.isOccupied(0, 0));
         Assert.assertFalse(player.getToken().getBoardSpace().hasTile());
         Assert.assertEquals(player.getToken().getTokenSpace(), 7);
