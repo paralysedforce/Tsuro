@@ -1,6 +1,7 @@
 package test;
 
 import main.Tile;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.Assert;
 

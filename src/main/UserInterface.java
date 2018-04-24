@@ -1,8 +1,8 @@
 package main;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
+//import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 
-import javax.jws.soap.SOAPBinding;
+//import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
 import java.awt.*;
 

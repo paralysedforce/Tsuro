@@ -23,6 +23,11 @@ public class Board {
         return board;
     }
 
+    public static void resetBoard(){
+        board = new Board();
+    }
+
+
     /* Instance variables */
     private BoardSpace[][] spaces;
 

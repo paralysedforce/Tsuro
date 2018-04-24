@@ -1,6 +1,7 @@
 package test;
 
 import main.*;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -8,6 +9,12 @@ import org.junit.Assert;
  * Created by vyasalwar on 4/23/18.
  */
 public class BoardTest {
+
+    @After
+    public void resetBoard() {
+        Board.resetBoard();
+    }
+
     @Test
     public void placeTile() throws Exception {
         Board board = Board.getBoard();
