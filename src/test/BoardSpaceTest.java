@@ -1,6 +1,7 @@
 package test;
 
 
+import main.Board;
 import main.BoardSpace;
 import main.Tile;
 import main.Token;
@@ -20,7 +21,7 @@ public class BoardSpaceTest {
         Token token2 = new Token(boardSpace, 3, null);
         boardSpace.advanceTokens();
 
-        org.junit.Assert.assertTrue(token1.getTokenSpace() == 1);
+        Assert.assertTrue(token1.getTokenSpace() == 1);
         Assert.assertEquals(token2.getTokenSpace(), 2);
 
     }
@@ -35,8 +36,8 @@ public class BoardSpaceTest {
     @Test
     public void removeToken() throws Exception {
         BoardSpace boardSpace = new BoardSpace(0, 0);
-        Token token = new Token(boardSpace, 0, null);
-        Assert.assertEquals(boardSpace.findToken(token), 0);
+        Token token = new Token(boardSpace, 3, null);
+        Assert.assertEquals(boardSpace.findToken(token), 3);
 
         boardSpace.removeToken(token);
         Assert.assertEquals(boardSpace.findToken(token), -1);
@@ -44,7 +45,17 @@ public class BoardSpaceTest {
 
     @Test
     public void willCollide() throws Exception {
+        BoardSpace boardspace = new BoardSpace(0, 0);
+        Token token1 = new Token(boardspace, 2, null);
+        Token token2 = new Token(boardspace, 3, null);
 
+        Assert.assertFalse(boardspace.willCollide(token1));
+        Assert.assertFalse(boardspace.willCollide(token2));
+
+        Tile tile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
+        boardspace.setTile(tile);
+        Assert.assertTrue(boardspace.willCollide(token1));
+        Assert.assertTrue(boardspace.willCollide(token2));
     }
 
     @Test

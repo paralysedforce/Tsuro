@@ -23,13 +23,8 @@ public class Turn {
             action = TurnAction.RESIGN;
     }
 
+    // Not implemented
     public void playTile(Tile playerTile, SPlayer player){
-        if (action == TurnAction.PLAYABLE){
-            Board board = Board.getBoard();
-            if (board.isLegalMove(playerTile, player)) {
-                action = TurnAction.TILE;
-                tile = playerTile;
-            }
-        }
+
     }
 }

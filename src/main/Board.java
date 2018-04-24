@@ -37,25 +37,32 @@ public class Board {
     }
 
     /* Methods */
+    public BoardSpace getBoardSpace(int row, int col){
+        if (!isValidCoordinate(row, col))
+            return null;
+        return spaces[row][col];
+    }
 
+    // Returns true if there is a tile on the row and col
     public boolean isOccupied(int row, int col){
         return isValidCoordinate(row, col) && spaces[row][col].hasTile();
     }
 
-    // TODO: Fix isLegalMove without modifying the state of the board
-    public boolean isLegalMove(Tile tile, SPlayer player){
 
-        if (!player.hasTile(tile) || player.getToken().getBoardSpace().hasTile())
+    public boolean willKillPlayer(Tile tile, Token token){
+
+        /*if (!player.hasTile(tile) || player.getToken().getBoardSpace().hasTile())
             return false;
 
-        Token token = player.getToken();
+        Token token = player.getToken();*/
+
         BoardSpace nextSpace = board.getNextSpace(token);
         int nextTokenSpace = token.findNextTokenSpace();
 
         // Move to the space across the tile
         nextTokenSpace = tile.findMatch(nextTokenSpace);
 
-        // Trace out a path by moving across spaces
+        // Trace out a path by moving across spaces with tiles on them
         while (nextSpace != null){
             nextSpace = getNextSpace(nextSpace, nextTokenSpace);
             if (!nextSpace.hasTile())
@@ -63,25 +70,9 @@ public class Board {
             nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
         }
         return false;
-
-        /*
-        int nextTokenSpace = tile.findMatch(tokenSpace);
-        BoardSpace nextBoardSpace = getNextSpace(curSpace, nextTokenSpace);
-        nextTokenSpace = findNextTokenSpace(nextTokenSpace);
-        while (nextBoardSpace != null){
-
-            if (!nextBoardSpace.hasTile())
-                return true;
-
-            Tile curTile = nextBoardSpace.getTile();
-            nextTokenSpace = curTile.findMatch(nextTokenSpace);
-            nextBoardSpace = getNextSpace(nextBoardSpace, nextTokenSpace);
-            nextTokenSpace = findNextTokenSpace(nextTokenSpace);
-        }
-        return false; */
-
     }
 
+    //
     public Set<SPlayer> placeTile(Tile tile, SPlayer player){
 
         BoardSpace space = player.getToken().getBoardSpace();
@@ -97,7 +88,7 @@ public class Board {
                 Set<Token> advancedTokens = curSpace.advanceTokens();
 
                 for (Token token : advancedTokens){
-                    if (!token.isOnEdge()) {
+                    if (!isOnEdge(token)) {
                         transferToken(token);
                         spaces.add(token.getBoardSpace());
                     }
@@ -113,24 +104,18 @@ public class Board {
         return eliminatedPlayers;
     }
 
+    // Places a token on the board at a row, col, and token space.
+    //  throws an IllegalArgumentException if a token is attempted to be placed not on an edge
     public void startPlayer(Token token, int row, int col, int tokenSpace){
-        if (!isValidCoordinate(row, col))
-            throw new IllegalArgumentException("Illegal starting row and col");
-
-        int direction = tokenSpace / 2;
-        boolean topEdge    = row == 0 && direction == 0;
-        boolean rightEdge  = col == 5 && direction == 1;
-        boolean bottomEdge = row == 5 && direction == 2;
-        boolean leftEdge   = col == 0 && direction == 3;
-
-        boolean onEdge = topEdge || rightEdge || bottomEdge || leftEdge;
-        if (!onEdge)
-            throw new IllegalArgumentException("The player can only start on an edge");
+        if (!isOnEdge(row, col, tokenSpace))
+            throw new IllegalArgumentException("Token must start on edge");
 
         spaces[row][col].addToken(token, tokenSpace);
     }
 
 
+    // Gets the adjacent space of an arbitrary board space and token space.
+    //  Returns null if the
     private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace){
         // TODO: Duplicated code from Token.java: fix somehow
         int row = boardSpace.getRow();
@@ -143,40 +128,56 @@ public class Board {
         else if (direction == 3)    col--; // Move left
         else throw new IllegalArgumentException("Illegal value for tokenSpace");
 
-        if (row < 0 || row > 5 || col < 0 || col > 5)
+        if (!isValidCoordinate(row, col))
             return null;
         else
             return spaces[row][col];
     }
 
+    // Gets the adjacent space that the token is on.
+    //  Returns null if token is on the edge
     private BoardSpace getNextSpace(Token token){
-        if (token.isOnEdge())
-            return null;
-
-        Pair<Integer, Integer> newCoordinates = token.nextCoordinate();
-        int row = newCoordinates.getKey();
-        int col = newCoordinates.getValue();
-
-        return spaces[row][col];
+        return getNextSpace(token.getBoardSpace(), token.getTokenSpace());
     }
 
+    // Moves a token from a board space to its adjacent board space.
+    //  Assumes the token is not on the edge
     private void transferToken(Token token) {
 
         int nextTokenSpace = token.findNextTokenSpace();
         BoardSpace nextSpace = getNextSpace(token);
         BoardSpace oldSpace = token.getBoardSpace();
 
-        // TODO: Refactor to remove this redundancy
-        nextSpace.addToken(token, nextTokenSpace);
-        oldSpace.removeToken(token);
-        token.setBoardSpace(nextSpace, nextTokenSpace);
+        // TODO: Refactor Data structures to remove this redundancy
+        token.moveToken(nextSpace, nextTokenSpace);
     }
 
+    /* Helpers */
 
+    // Returns true if the row and col pair are a valid address in the board
     private static boolean isValidCoordinate(int row, int col){
         return (0 <= row && row < BOARD_LENGTH) && (0 <= col && col < BOARD_LENGTH);
     }
 
+    private static boolean isOnEdge(int row, int col, int tokenSpace){
+        int direction = tokenSpace / 2;
+        boolean topEdge    = row == 0 && direction == 0;
+        boolean rightEdge  = col == 5 && direction == 1;
+        boolean bottomEdge = row == 5 && direction == 2;
+        boolean leftEdge   = col == 0 && direction == 3;
+        boolean onEdge = topEdge || rightEdge || bottomEdge || leftEdge;
+
+        return isValidCoordinate(row, col) && onEdge;
+    }
+
+    private static boolean isOnEdge(Token token){
+
+
+        int row = token.getBoardSpace().getRow();
+        int col = token.getBoardSpace().getCol();
+        int tokenSpace = token.getTokenSpace();
+        return isOnEdge(row, col, tokenSpace);
+    }
 
     public Pair<BoardSpace, Integer> getRandomStartingLocation(){
         Random random = new Random();
@@ -211,7 +212,4 @@ public class Board {
         return new Pair(spaces[row][col], tokenLocation);
 
     }
-
-
-
 }

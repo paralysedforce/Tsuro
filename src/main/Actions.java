@@ -32,7 +32,7 @@ public class Actions {
 
     public static PlayReturn PlayATurn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                                        Board board, Tile tile) {
-        Game game = new Game(board, remainingPlayers, eliminatedPlayers);
+        Game game = new Game(remainingPlayers, eliminatedPlayers);
 
         SPlayer player = remainingPlayers.remove(0);
         Set<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);
@@ -49,47 +49,47 @@ public class Actions {
         }
     }
 
-    public static boolean isLegalMove(SPlayer player, Board board, Tile tile){
-        return board.isLegalMove(tile, player);
-    }
+//    public static boolean isLegalMove(SPlayer player, Board board, Tile tile){
+//        return game.isLegalMove(tile, player);
+//    }
 
     public static void main(String[] args){
 
-        Board board = Board.getBoard();
-        //main.Actions.PlayATurn();
-        int numberOfPlayers = 3;
-        List<SPlayer> listOfPlayers = new ArrayList<>();
-        TilePile tilePile = TilePile.getTilePile(); //need to add tile stuff here
-
-        for(int i = 0; i < numberOfPlayers; i++){
-            Pair<BoardSpace, Integer> position = board.getRandomStartingLocation();
-            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue()));
-        }
-
-        Tile testTile = listOfPlayers.get(0).getRandomTileFromBank();
-        boolean isMoveValid = isLegalMove(listOfPlayers.get(0), board, testTile);
-        PlayReturn ret = Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, testTile);
-        if (ret.tilePile != tilePile)
-            throw new AssertionError();
-        if (ret.winningPlayers != null)
-            throw new AssertionError();
-        if (ret.board != board)
-            throw new AssertionError();
-        if (!ret.eliminatedPlayers.isEmpty() && isMoveValid)
-            throw new AssertionError();
-        if (ret.eliminatedPlayers.isEmpty() && !isMoveValid)
-            throw new AssertionError();
-        if (!ret.remainingPlayers.equals(listOfPlayers))
-            throw new AssertionError();
-
-
-//        Tile trueTile  = listOfPlayers.get(0).getRandomTileFromBank();
-        Tile falseTile = listOfPlayers.get(1).getRandomTileFromBank();
-
-//        if (Actions.isLegalMove(listOfPlayers.get(0), board, trueTile) != true)
-//            throw new AssertionError(); -- test doesn't work right now
-        if (Actions.isLegalMove(listOfPlayers.get(0), board, falseTile) != false)
-            throw new AssertionError();
+//        Board board = Board.getBoard();
+//        //main.Actions.PlayATurn();
+//        int numberOfPlayers = 3;
+//        List<SPlayer> listOfPlayers = new ArrayList<>();
+//        TilePile tilePile = TilePile.getTilePile(); //need to add tile stuff here
+//
+//        for(int i = 0; i < numberOfPlayers; i++){
+//            Pair<BoardSpace, Integer> position = board.getRandomStartingLocation();
+//            listOfPlayers.add(new SPlayer("john" + i, position.getKey(), position.getValue()));
+//        }
+//
+//        Tile testTile = listOfPlayers.get(0).getRandomTileFromBank();
+//        boolean isMoveValid = isLegalMove(listOfPlayers.get(0), board, testTile);
+//        PlayReturn ret = Actions.PlayATurn(tilePile, listOfPlayers, new ArrayList<SPlayer>(), board, testTile);
+//        if (ret.tilePile != tilePile)
+//            throw new AssertionError();
+//        if (ret.winningPlayers != null)
+//            throw new AssertionError();
+//        if (ret.board != board)
+//            throw new AssertionError();
+//        if (!ret.eliminatedPlayers.isEmpty() && isMoveValid)
+//            throw new AssertionError();
+//        if (ret.eliminatedPlayers.isEmpty() && !isMoveValid)
+//            throw new AssertionError();
+//        if (!ret.remainingPlayers.equals(listOfPlayers))
+//            throw new AssertionError();
+//
+//
+////        Tile trueTile  = listOfPlayers.get(0).getRandomTileFromBank();
+//        Tile falseTile = listOfPlayers.get(1).getRandomTileFromBank();
+//
+////        if (Actions.isLegalMove(listOfPlayers.get(0), board, trueTile) != true)
+////            throw new AssertionError(); -- test doesn't work right now
+//        if (Actions.isLegalMove(listOfPlayers.get(0), board, falseTile) != false)
+//            throw new AssertionError();
     }
 
 }

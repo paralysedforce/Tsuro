@@ -68,4 +68,18 @@ public class SPlayer {
         Turn turn = new Turn();
         return turn;
     }
+
+    public boolean hasLegalMove(){
+        Board board = Board.getBoard();
+
+        for (Tile tile: tileBank){
+            Tile copy = new Tile(tile);
+            for (int i = 0; i < 4; i++){
+                copy.rotateClockwise();
+                if (!board.willKillPlayer(copy, token))
+                    return true;
+            }
+        }
+        return false;
+    }
 }

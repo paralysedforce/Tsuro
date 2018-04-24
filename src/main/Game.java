@@ -21,8 +21,8 @@ public class Game {
         tilePile = TilePile.getTilePile(filename);
     }
 
-    public Game(Board board, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
-        this.board = board;
+    public Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
+        this.board = Board.getBoard();
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
         this.tilePile = TilePile.getTilePile();
@@ -32,6 +32,15 @@ public class Game {
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
         SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
         remainingPlayers.add(player);
+    }
+
+    public boolean isLegalMove(Tile tile, SPlayer player){
+        if(!player.hasTile(tile))
+            return false;
+        if(player.hasLegalMove() && board.willKillPlayer(tile, player.getToken()))
+            return false;
+
+        return true;
     }
 
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){

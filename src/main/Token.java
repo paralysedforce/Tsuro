@@ -17,7 +17,9 @@ public class Token {
         space.addToken(this, startingTokenSpace);
     }
 
-    public void setBoardSpace(BoardSpace location, int tokenSpace){
+    public void updateBoardSpace(BoardSpace location){
+        if (space != null)
+            space.removeToken(this);
         space = location;
     }
 
@@ -33,27 +35,10 @@ public class Token {
         return player;
     }
 
-    public Pair<Integer, Integer> nextCoordinate(){
-        int nextRow = space.getRow();
-        int nextCol = space.getCol();
-        int direction = getTokenSpace() / 2;
-
-        switch (direction){
-            case 0: // Top of space
-                nextRow--;
-                break;
-            case 1: // Right of space
-                nextCol++;
-                break;
-            case 2: // Bottom of space
-                nextRow++;
-                break;
-            case 3: // Left of space
-                nextCol--;
-                break;
-        }
-
-        return new Pair(nextRow, nextCol);
+    public void moveToken(BoardSpace boardSpace, int tokenSpace){
+        space.removeToken(this);
+        boardSpace.addToken(this, tokenSpace);
+        space = boardSpace;
     }
 
     public int findNextTokenSpace(){
@@ -72,8 +57,4 @@ public class Token {
         throw new IllegalArgumentException("Invalid tokenSpace");
     }
 
-    public boolean isOnEdge(){
-        Pair<Integer, Integer> pair = nextCoordinate();
-        return pair.getKey() < 0 || pair.getKey() > 5 || pair.getValue() < 0 || pair.getValue() > 5;
-    }
 }

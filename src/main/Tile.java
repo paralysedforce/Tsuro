@@ -103,7 +103,7 @@ public class Tile {
         }
     }
 
-    private Tile(Tile other){
+    public Tile(Tile other){
         connections = new HashSet<>();
         for (TileConnection tileConnection : other.connections){
             connections.add(new TileConnection(tileConnection));
