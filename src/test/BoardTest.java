@@ -25,7 +25,7 @@ public class BoardTest {
 
         Tile tile = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer("Vyas", space, 0, TilePile.getTilePile());
 
         board.placeTile(tile, player.getToken());
         Assert.assertTrue(board.isOccupied(0, 0));
@@ -39,12 +39,12 @@ public class BoardTest {
         Board board = Board.getBoard();
 
         BoardSpace upperSpace = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer("Vyas", upperSpace, 0);
+        SPlayer vyas = new SPlayer("Vyas", upperSpace, 0, TilePile.getTilePile());
         Tile vyasTile = new Tile(0, 4, 1, 5, 2, 3, 6, 7);
 
 
         BoardSpace lowerSpace = board.getBoardSpace(1, 0);
-        SPlayer keith = new SPlayer("Keith", lowerSpace, 7);
+        SPlayer keith = new SPlayer("Keith", lowerSpace, 7, TilePile.getTilePile());
         Tile keithTile = new Tile(7, 0, 1, 2, 3, 4, 5, 6);
 
 
@@ -104,7 +104,7 @@ public class BoardTest {
         Assert.assertEquals(vyas.getToken().getBoardSpace().getCol(), 1);
         Assert.assertEquals(vyas.getToken().getTokenSpace(), 7);
         Assert.assertEquals(removedPlayers.size(), 1);
-        Assert.assertTrue(removedPlayers.contains(keith));
+        Assert.assertTrue(removedPlayers.contains(keith.getToken()));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class BoardTest {
         /* Setup */
         Board board = Board.getBoard();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer keith = new SPlayer("Keith", start, 0);
+        SPlayer keith = new SPlayer("Keith", start, 0, TilePile.getTilePile());
         Tile tile = new Tile(0, 7, 2, 6, 1, 3, 4, 5);
 
         /* Goal:
