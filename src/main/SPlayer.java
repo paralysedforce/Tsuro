@@ -34,7 +34,7 @@ public class SPlayer {
 
     public boolean hasTile(Tile tile){
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (tileBank[i].equals(tile)) {
+            if (tileBank[i] != null && tileBank[i].equals(tile)) {
                 return true;
             }
         }
@@ -86,6 +86,9 @@ public class SPlayer {
         Board board = Board.getBoard();
 
         for (Tile tile: tileBank){
+            if(tile == null)
+                continue;
+
             Tile copy = new Tile(tile);
             for (int i = 0; i < 4; i++){
                 copy.rotateClockwise();

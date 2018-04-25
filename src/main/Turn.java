@@ -1,6 +1,5 @@
 package main;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -27,6 +26,6 @@ public class Turn {
 
     // Not implemented
     public void playTile(Tile playerTile, SPlayer player){
-        throw new NotImplementedException();
+        return;
     }
 }
