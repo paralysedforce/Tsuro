@@ -11,6 +11,8 @@ public class Game {
     private List<SPlayer> eliminatedPlayers;
     private TilePile tilePile;
 
+    //prob add a state variable here to keep track of the player with the dragon tile
+
     public Game(String filename){
         board = Board.getBoard();
         remainingPlayers = new ArrayList<>();
@@ -44,6 +46,7 @@ public class Game {
     private void eliminatePlayer(SPlayer player){
         player.getToken().removeFromBoard();
         player.returnTilesToPile();
+        //add drawing w/ dragon tile logic here prob in a private method
     }
 
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){

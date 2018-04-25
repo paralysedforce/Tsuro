@@ -27,5 +27,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="com.bluecatcode.junit:junit-4.12-extended:1.0.4" level="project" />
+    <orderEntry type="library" name="com.bluecatcode.mockito:mockito-1.10.19-extended:1.1.0" level="project" />
   </component>
 </module>

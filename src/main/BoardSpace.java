@@ -71,6 +71,8 @@ public class BoardSpace {
         tokenSpaces.put(token, tokenSpace);
     }
 
+    //currently only using this function during testing so mayb should remove it?
+    //could also keep it just for testing if it is important for that
     public boolean willCollide(Token token){
         if (!hasTile())
             return false;

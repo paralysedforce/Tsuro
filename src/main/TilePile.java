@@ -42,6 +42,10 @@ public class TilePile {
         return tilePile;
     }
 
+    public static void resetTilePile() {
+        tilePile = new TilePile();
+    }
+
     ///////
 
     private Deque<Tile> tiles;

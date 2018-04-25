@@ -151,9 +151,7 @@ public class Board {
 
         int nextTokenSpace = token.findNextTokenSpace();
         BoardSpace nextSpace = getNextSpace(token);
-        BoardSpace oldSpace = token.getBoardSpace();
 
-        // TODO: Refactor Data structures to remove this redundancy
         token.moveToken(nextSpace, nextTokenSpace);
     }
 
