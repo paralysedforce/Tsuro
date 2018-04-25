@@ -13,11 +13,11 @@ public class SPlayer {
     private String name;
     private TilePile tilePile;
 
-    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
+    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace, TilePile tilepile){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
         tileBank = new Tile[MAX_TILES_IN_BANK];
-        this.tilePile = TilePile.getTilePile();
+        this.tilePile = tilepile;
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
             tileBank[i] = tilePile.drawFromDeck();
