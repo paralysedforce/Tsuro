@@ -1,9 +1,6 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -30,7 +27,7 @@ public class Game {
 
     //to be used later in some way
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
+        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace, TilePile.getTilePile());
         remainingPlayers.add(player);
     }
 
@@ -43,9 +40,26 @@ public class Game {
         return true;
     }
 
+    //Maybe should be moved into the SPlayer
+    private void eliminatePlayer(SPlayer player){
+        player.getToken().removeFromBoard();
+        player.returnTilesToPile();
+    }
+
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){
-        Set<SPlayer> failedPlayers = board.placeTile(tile, player);
+        Set<Token> failedTokens = board.placeTile(tile, player.getToken());
+        Set<SPlayer> failedPlayers = new HashSet<SPlayer>();
+        for(Token failedToken : failedTokens){
+            failedPlayers.add(failedToken.getPlayer());
+        }
+
+        player.removeTileFromBank(tile);
         player.drawFromPile();
+
+        for(SPlayer failedPlayer : failedPlayers){
+            eliminatePlayer(failedPlayer);
+        }
+
         return failedPlayers;
     }
 
