@@ -11,6 +11,3 @@ test :
 	MYPYPATH=tsuro mypy tsuro       # Static type checking
 	isort -c tsuro/*.py tests/*.py  # Import order checking
 
-
-default :
-	python game

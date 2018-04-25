@@ -1,343 +1,238 @@
-from enum import Enum
+from typing import Dict, List, NamedTuple, Tuple
 
-from map_card import MapCard
+# A type for representing one of the 8 possible connecting positions on a tile.
+# TODO: Constrain this to the values in the range 0 - 7.
+# Opened an issue for this: https://github.com/python/typing/issues/554
+"""
+           0   1
+        +---------+
+    7   |         |  2
+        |         |
+    6   |         |  3
+        +---------+
+           5   4
+"""
+TileSpot = int
 
-BOARD_HEIGHT = 6
-BOARD_WIDTH = 6
+
+class Position(NamedTuple):
+    """A unique position on the board.
+
+    A position on the board is defined by the index of its BoardSquare (x, y),
+    and the TileSpot on that BoardSquare. This is an immutable algebraic datatype.
+    """
+    i: int
+    j: int
+    tile_spot: TileSpot
+
+    def __repr__(self):
+        return 'Position({}, {}, {})'.format(self.i, self.j, self.tile_spot)
 
 
 class Board:
-    def __init__(self):
-        # init squares
-        self._squares = []
-        for _ in range(BOARD_HEIGHT):
-            row = []
-            for _ in range(BOARD_WIDTH):
-                square = MapSquare()
-                row.append(square)
-            self._squares.append(row)
+    """The Tsuro game board.
 
-        # terminate boundary squares
-        for square in self._squares[0]:
-            square.set_terminal(Side.TOP)
-        for square in self._squares[BOARD_HEIGHT - 1]:
-            square.set_terminal(Side.BOTTOM)
-        for squares in self._squares:
-            squares[0].set_terminal(Side.LEFT)
-            squares[BOARD_WIDTH - 1].set_terminal(Side.RIGHT)
+    The board is indexed by (row, column).
 
-        # Bind adjacent squares
-        prev_row = []
-        for row in self._squares:
-            prev_square = None
-            for i in range(BOARD_WIDTH):
-                square = row[i]
+         0  1  2  3
+       +------------+
+    0  |            |
+    1  |            |
+    2  |            |
+    3  | x (3, 0)   |
+       +------------+
 
-                # Bind left
-                if prev_square is not None:
-                    square.set_adjacent(prev_square, Side.LEFT)
-                prev_square = square
+    In our game design, board doesn't have any knowledge of Players. The responsibility of
+    tracking player positions goes to the the Admin/Controller. Board has the responsibility of
+    providing paths and checking the validity of moves.
 
-                # Bind above
-                if len(prev_row) > 0:  # This was necessary because
-                    # subscripting prev_row was throwing errors
-                    square.set_adjacent(prev_row[i], Side.TOP)
-
-            prev_row = row
-
-    def place_token_start(self, loc, token):
-        """Place a token in one of the 2x6x4 starting spots.
-
-        Args:
-            loc (int): The location around the edge clockwise. [0,2x6x4)
-        """
-        # TODO: make this actually work. Currently only works for loc=0
-        self._squares[0][0]._spots[1].receive_token_via_adjacent(token)
-
-
-class TokenSpot:
-    """ Spot on the board where a Token may be.
-
-        Attributes:
-            _parent (MapSquare): The MapSquare that contains this TokensSpot.
-            _next_spot (TokenSpot): The spot connected to this one via a path.
-            _next_card (TokenSpot): The spotconnected to this one
-                via parent adjacency.
-            _is_terminal_spot: Whether this spot is on the edge of the board.
-            _occupant (Token): The token located on this TokenSpot.
+    Attributes:
+        _board (List[List[BoardSquare]])
+        _width (int)
+        _height (int)
+        _edge_positions (List[Position])
     """
+    # The (row, column) offset needed to get to the connecting square, given a TileSpot.
+    TILE_SPOT_OFFSET = {
+        # top
+        0: (-1, 0),
+        1: (-1, 0),
+        # right
+        2: (0, 1),
+        3: (0, 1),
+        # bottom
+        4: (1, 0),
+        5: (1, 0),
+        # left
+        6: (0, -1),
+        7: (0, -1),
+    }
 
-    def __init__(self,
-                 is_terminal_spot=False,
-                 next_card=None,
-                 next_spot=None,
-                 parent_square=None):
-        """ Initializes a TokenSpot.
+    # The adjacent tilespot on the connecting square.
+    ADJACENT_TILE_SPOT = {
+        0: 5,
+        1: 4,
+        2: 7,
+        3: 6,
+        4: 1,
+        5: 0,
+        6: 3,
+        7: 2,
+    }
 
-            Args:
-                is_terminal_spot=False: whether this TokenSpot is terminal
-                    (on edge of the board).
-                next_card (TokenSpot): The spot in the MapSquare adjacent
-                    to the one that holds this Tokespot.
-                next_spot: The TokenSpot connected to this one
-                    via a path through the paret's square.
+    def __init__(self, height: int, width: int) -> None:
+        self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]
+        self._width = width
+        self._height = height
+        self._edge_positions = []  # type: List[Position]
+
+    @property
+    def edge_positions(self) -> List[Position]:
+        # Memoized, since it only needs to be calculated once.
+        if not self._edge_positions:
+            posns = []  # type: List[Position]
+            w = self._width
+            h = self._height
+            posns += [Position(0, j, ts)     for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
+            posns += [Position(i, w - 1, ts) for i in range(h) for ts in (2, 3)]  # right edge   # noqa: E272
+            posns += [Position(h - 1, j, ts) for j in range(w) for ts in (4, 5)]  # bottom edge  # noqa: E272
+            posns += [Position(i, 0, ts)     for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
+            self._edge_positions = posns
+
+        return self._edge_positions
+
+    def place_tile(self, i: int, j: int, path_tile: 'PathTile'):
+        self._check_bounds(i, j)
+        self._board[i][j].path_tile = path_tile
+
+    def traverse_path(self, p: Position) -> List[Position]:
+        self._check_bounds(p.i, p.j)
+
+        if not self._board[p.i][p.j].has_tile():
+            return []
+
+        path = []
+        while True:
+            i, j, tile_spot = p
+            next_ts_within_square = self._board[i][j][tile_spot]
+
+            # First, append the movement within the square.
+            path.append(p)
+            path.append(Position(p.i, p.j, next_ts_within_square))
+
+            # Now, traverse to the next square if possible.
+            i_offset, j_offset = self.TILE_SPOT_OFFSET[next_ts_within_square]
+            next_i = p.i + i_offset
+            next_j = p.j + j_offset
+
+            if not self._in_bounds(next_i, next_j):
+                break
+
+            next_p = Position(next_i, next_j, self.ADJACENT_TILE_SPOT[next_ts_within_square])
+            if not self._board[next_i][next_j].has_tile():
+                path.append(next_p)
+                break
+
+            p = next_p
+
+        return path
+
+    def is_on_edge(self, p: Position) -> bool:
+        """Return True if the position is on the edge of the board, False otherwise.
+
+        Use to check if a path leads off the board.
         """
-        self._parent = parent_square
-        self._next_spot = next_spot
-        self._next_card = next_card
-        self._is_terminal_spot = is_terminal_spot
-        self._occupant = None
+        return p in self.edge_positions
 
-    def get_parent(self):
-        """ Retrieve the parent MapSquare.
+    def _check_bounds(self, i: int, j: int):
+        if not self._in_bounds(i, j):
+            raise IndexError('({},{}) is out of bounds.'.format(i, j))
 
-            Returns:
-                MapSquare: The square that holds this spot.
-        """
-        return self._parent
+    def _in_bounds(self, i: int, j: int) -> bool:
+        return 0 <= i < self._height and 0 <= j < self._width
 
-    def set_parent(self, parent):
-        """ Update the parent MapSquare.
-
-            Args:
-                paret (MapSquare): The square that contains this spot.
-        """
-        self._parent = parent
-
-    def set_terminal(self, is_terminal: bool):
-        """ Changes whether this TokenSpot is considered terminal
-
-                Args:
-                    is_terminal: Whether this spot is terminal.
-        """
-        self._is_terminal_spot = is_terminal
-
-    def receive_token_via_adjacent(self, token):
-        """ Receive a token that arrived via an adjacent spot.
-
-            Args:
-                token: The token that is arriving to this TokenSpot.
-        """
-        # No need to check if it is necessary to eliminate the token
-        # because it did not arrive via card placement.
-
-        # Pass the token along if possible.
-        if self._next_spot is not None:
-            self._next_spot.receive_token_via_path(token)
-        else:
-            self._occupant = token
-            token.set_location(self)
-
-    def receive_token_via_path(self, token):
-        """ Receive a token that arrived via a path.
-
-                Args:
-                    token: The toke that is arriving to this TokenSpot.
-        """
-        # Check if the token should be eliminated.
-        if self._is_terminal_spot:
-            token.eliminate()
-
-        # Pass the token along if possible.
-        elif self._next_card is not None:
-            self._next_card.receive_token_via_adjacent(token)
-
-        # Make token the occupant.
-        else:
-            self._occupant = token
-            token.set_location(self)
-
-    def pair_via_path(self, other):
-        """ Pair this TokenSpot to another via a path.
-
-            Args:
-                other (TokenSpot): The spot to be connected to self via a path.
-        """
-        self._next_spot = other
-
-    def pair_via_adjacency(self, other):
-        """ Pairs this TokenSpot to another via adjacency from a different card
-
-            Args:
-                other (TokenSpot): Representing the same space on the board.
-        """
-        self._next_card = other
-
-    def get_occupant(self):
-        """ Retrieves the occupying token from this TokenSpot
-
-            Return:
-                The Token occupant of this TokenSpot
-        """
-        return self._occupant
-
-    @staticmethod
-    def pair_adjacent(spot1, spot2):
-        """ Static function for pairing two adjacent spots in one go
-
-            Args:
-                spot1 (TokenSpot): adjacent to spot2
-                spot2 (TokenSpot): adjacent to spot1
-        """
-        spot1.pair_via_adjacency(spot2)
-        spot2.pair_via_adjacency(spot1)
-
-    @staticmethod
-    def pair_path(spot1, spot2):
-        """ Static function for pairing two path connected spots in one go
-
-            Args:
-                spot1 (TokenSpot): connected via a path to spot2
-                spot2 (TokenSpot): connected via a path to spot1
-        """
-        spot1.pair_via_path(spot2)
-        spot2.pair_via_path(spot1)
+    def __getitem__(self, index):
+        return self._board[index]
 
 
-class Side(Enum):
-    TOP = 0
-    RIGHT = 1
-    BOTTOM = 2
-    LEFT = 3
+# TODO: Use an enum to represent the 8 possible TileSpots?
+# TODO: Use an enum to represent the 4 possible Rotations?
 
 
-class MapSquare:
+class NoPathTileError(Exception):
+    """Raised when indexing into a BoardSquare missing a path tile."""
+    pass
+
+
+class BoardSquare:
     """A square on the map.
 
     Attributes:
-        _spots (None | TokenSpot[])
+        path_tile: Optional[PathTile]
+        _rotation: int
     """
-    def __init__(self, token_spots=None):
-        """Create a MapSquare that contains TokenSpots and can receive a MapCard.
+    def __init__(self):
+        self.path_tile = None  # Using the Strategy Pattern with path tiles.
+        # self._rotation = 0
+
+    def has_tile(self) -> bool:
+        return self.path_tile is not None
+
+    def next(self, tile_spot: TileSpot) -> TileSpot:
+        """Given a entering tile spot, return the exiting TileSpot.
 
         Args:
-            token_spots (None | TokenSpot[])
+            tile_spot: TileSpot
+
+        Returns:
+            TileSpot
         """
-        if token_spots is None:
-            self._spots = [
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-                TokenSpot(),
-            ]
-        else:
-            self._spots = token_spots
+        if not self.path_tile:
+            raise NoPathTileError
 
-        # Set token parents as self
-        for token_spot in self._spots:
-            token_spot.set_parent(self)
+        tile_spot = self.path_tile[tile_spot]
+        # TODO: Rotate.
 
-        self._map_card = None
+        return tile_spot
 
-    def place_card(self, map_card: MapCard):
-        """Place a card in the MapSquare, connecting TokenSpots as appropriate.
-
-        Args:
-            map_card (MapCard)
-        """
-        assert self._map_card is None
-
-        self._map_card = map_card
-
-        for path in map_card.get_paths():
-            start = self._spots[path.get_start()]
-            end = self._spots[path.get_end()]
-
-            TokenSpot.pair_path(start, end)
-
-            # If either have a token, send it along
-            occupant_start = start.get_occupant()
-            occupant_end = end.get_occupant()
-            if occupant_start is not None:
-                end.receive_token_via_path(occupant_start)
-            if occupant_end is not None:
-                start.receive_token_via_path(occupant_end)
-
-    def set_adjacent(self, other, side):
-        """Binds the TokenSpots on the borders of adjacent MapSquares.
-
-        Args:
-            other (MapSquare): MapSquare that is adjacent to self.
-            side (Side): Side showing on which side of self other lies.
-        """
-        # Sadly, switch doesn't exist :(
-
-        if side == Side.TOP:
-            # Set the 0th and 1st nodes of self to 5th and 4th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[0], other._spots[5])
-            TokenSpot.pair_adjacent(self._spots[1], other._spots[4])
-        elif side == Side.RIGHT:
-            # Set the 2nd and 3rd nodes of self to 8th and 7th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[2], other._spots[7])
-            TokenSpot.pair_adjacent(self._spots[3], other._spots[6])
-        elif side == Side.BOTTOM:
-            # Set the 4th and 5th nodes of self to 1st and 0th nodes of other.
-            TokenSpot.pair_adjacent(self._spots[4], other._spots[1])
-            TokenSpot.pair_adjacent(self._spots[5], other._spots[0])
-            pass
-        elif side == Side.LEFT:
-            # Set the 6th and 7th nodes of self to 3rd and 2nd nodes of other.
-            TokenSpot.pair_adjacent(self._spots[6], other._spots[3])
-            TokenSpot.pair_adjacent(self._spots[7], other._spots[2])
-        else:
-            # Improper imput, don't mess anything up by doing anything
-            raise ValueError("Invalid side argument: {0}".format(side))
-
-    def set_terminal(self, side):
-        """Set all TokenSpots on the indicated side as terminal.
-
-        Args:
-            side (Side): The side on which the TokenSpot terminates.
-        """
-        if side == Side.TOP:
-            # Set 0 and 1 to terminal
-            self._spots[0].set_terminal(True)
-            self._spots[1].set_terminal(True)
-        elif side == Side.RIGHT:
-            # Set 2 and 3 to terminal
-            self._spots[2].set_terminal(True)
-            self._spots[3].set_terminal(True)
-        elif side == Side.BOTTOM:
-            # Set 4 and 5 to terminal
-            self._spots[4].set_terminal(True)
-            self._spots[5].set_terminal(True)
-        elif side == Side.LEFT:
-            # Set 6 and 7 to terminal
-            self._spots[6].set_terminal(True)
-            self._spots[7].set_terminal(True)
-        else:
-            # Improper imput, don't mess anything up by doing anything
-            raise ValueError("Invalid side argument: {}".format(side))
+    def __getitem__(self, tile_spot):
+        return self.next(tile_spot)
 
 
-class Token:
-    """Marks a player's location on the board.
+class PathTile:
+    """A tile that connects TileSpots.
 
-    Attributes:
-        _player (Player)
-        _location (TokenSpot)
+           0   1
+        +---------+
+    7   |         |  2
+        |         |
+    6   |         |  3
+        +---------+
+           5   4
     """
+    def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
+        # TODO: Assert that PathTile must be created with 4 tuples? This should be enforced by type.
+        if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
+            raise ValueError('Path spots must be values in the range 0-7.')
 
-    def __init__(self, player):
-        """Initialize a token for the given player.
+        self._paths = PathTile.create_paths_dict(connections)  # type: Dict[int, int]
+        self._connections = connections
 
-        Args:
-            player (Player)
-        """
-        self._player = player
-        player.set_token(self)
-        self._location = None
+    @staticmethod
+    def create_paths_dict(connections: List[Tuple[TileSpot, TileSpot]]) -> Dict[TileSpot, TileSpot]:
+        paths = {}  # type: Dict[TileSpot, TileSpot]
+        for c0, c1 in connections:
+            assert (c0 not in paths) and (c1 not in paths), 'TileSpots can only have 1 connection.'
+            paths[c0] = c1
+            paths[c1] = c0
+        return paths
 
-    def set_location(self, spot):
-        self._location = spot
+    def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
+        """Given a tile_spot, return the connecting path."""
+        return self._paths[tile_spot]
 
-    def get_location(self):
-        return self._location
+    def __eq__(self, other):
+        return self._paths == other._paths
 
-    def eliminate(self):
-        """Eliminate the token and its associated player from the board."""
-        self._player.eliminate()
+    def __str__(self):
+        return "\n".join("{} <-> {}".format(c0, c1) for c0, c1 in self._connections)

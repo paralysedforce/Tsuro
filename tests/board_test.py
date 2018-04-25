@@ -1,55 +1,153 @@
-from board import BOARD_HEIGHT, BOARD_WIDTH, Board
+import pytest
+
+from board import Board, BoardSquare, NoPathTileError, PathTile, Position
+
+# For readability
+P = Position
+
+def test_board_edge_positions():
+    b = Board(1, 1)
+    expected = [
+        P(0, 0, 0),
+        P(0, 0, 1),
+        P(0, 0, 2),
+        P(0, 0, 3),
+        P(0, 0, 4),
+        P(0, 0, 5),
+        P(0, 0, 6),
+        P(0, 0, 7),
+    ]
+    assert b.edge_positions == expected
+
+    b = Board(2, 2)
+    expected = [
+        P(0, 0, 0),
+        P(0, 0, 1),
+        P(0, 1, 0),
+        P(0, 1, 1),
+
+        P(0, 1, 2),
+        P(0, 1, 3),
+        P(1, 1, 2),
+        P(1, 1, 3),
+
+        P(1, 0, 4),
+        P(1, 0, 5),
+        P(1, 1, 4),
+        P(1, 1, 5),
+
+        P(0, 0, 6),
+        P(0, 0, 7),
+        P(1, 0, 6),
+        P(1, 0, 7),
+    ]
+    assert expected == b.edge_positions
 
 
-def test_top_border_terminal():
-    board = Board()
-    for square in board._squares[0]:
-        assert square._spots[0]._is_terminal_spot and square._spots[1]._is_terminal_spot
+def test_board_place_tile():
+    tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
+
+    b = Board(3, 3)
+    b.place_tile(1, 1, tile)
+    assert b._board[1][1].path_tile == tile
+
+    with pytest.raises(IndexError):
+        b.place_tile(-1, 0, tile)
+        b.place_tile(3, 0, tile)
 
 
-def test_bottom_border_terminal():
-    board = Board()
-    for square in board._squares[BOARD_HEIGHT - 1]:
-        assert square._spots[4]._is_terminal_spot and square._spots[5]._is_terminal_spot
+def test_board_traverse_path_no_tiles():
+    b = Board(3, 3)
+
+    with pytest.raises(IndexError):
+        b.traverse_path(P(-1, 0, 0))
+        b.traverse_path(P(3, 0, 0))
+
+    assert b.traverse_path(P(0, 0, 0)) == [], 'empty list if no pathtile'
 
 
-def test_left_border_terminal():
-    board = Board()
-    for row in board._squares:
-        assert row[0]._spots[6]._is_terminal_spot and row[0]._spots[7]._is_terminal_spot
+def test_board_traverse_path_2x2():
+    b = Board(2, 2)
+    b.place_tile(0, 0, PathTile([(7, 2)]))
+    assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7)], 'path to middle'
+    assert b.traverse_path(P(0, 0, 2)) == [P(0, 0, 2), P(0, 0, 7)], 'path to left edge'
+
+    b.place_tile(0, 1, PathTile([(7, 2)]))
+    assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2)], 'path to right edge'
 
 
-def test_right_border_terminal():
-    board = Board()
-    for row in board._squares:
-        assert row[BOARD_WIDTH -
-                   1]._spots[2]._is_terminal_spot and row[BOARD_WIDTH -
-                                                          1]._spots[3]._is_terminal_spot
+def test_board_traverse_path_three_tiles():
+    b = Board(3, 3)
+    b.place_tile(0, 0, PathTile([(7, 2)]))
+    b.place_tile(0, 1, PathTile([(7, 2)]))
+
+    start = P(0, 0, 7)
+
+    expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7)]
+    assert b.traverse_path(start) == expected, 'traverse in a straight line across the top of the board'
+
+    # Connect a path straight across the top edge of the board.
+    b.place_tile(0, 2, PathTile([(7, 2)]))
+
+    expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7), P(0, 2, 2)]
+    actual = b.traverse_path(start)
+    assert actual == expected, 'stop when the edge is reached'
+    assert b.is_on_edge(actual[-1]), 'the path terminates on the edge of the board'
 
 
-def test_horizontal_connections():
-    board = Board()
-    for row in board._squares:
-        prev = None
-        for square in row:
-            if prev is not None:
-                assert square._spots[6]._next_card == prev._spots[3]
-                assert square._spots[7]._next_card == prev._spots[2]
-                assert prev._spots[2]._next_card == square._spots[7]
-                assert prev._spots[3]._next_card == square._spots[6]
-            prev = square
+def test_board_square():
+    square = BoardSquare()
+
+    # Raises exception before a PathTile is placed.
+    with pytest.raises(NoPathTileError):
+        square.next(0)
+
+    assert not square.has_tile()
+    square.path_tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
+    assert square.has_tile()
+
+    # top
+    assert square.next(0) == 1
+    assert square.next(1) == 0
+    # right
+    assert square.next(2) == 3
+    assert square.next(3) == 2
+    # bottom
+    assert square.next(4) == 5
+    assert square.next(5) == 4
+    # left
+    assert square.next(6) == 7
+    assert square.next(7) == 6
 
 
-def test_vertical_connections():
-    board = Board()
-    prev_row = []
-    for row in board._squares:
-        for i in range(BOARD_WIDTH):
-            square = row[i]
-            if len(prev_row) == BOARD_WIDTH:
-                prev = prev_row[i]
-                assert prev._spots[4]._next_card == square._spots[1]
-                assert prev._spots[5]._next_card == square._spots[0]
-                assert square._spots[0]._next_card == prev._spots[5]
-                assert square._spots[1]._next_card == prev._spots[4]
-        prev_row = row
+def test_path_tile():
+    # invalid TileSpot
+    with pytest.raises(ValueError):
+        PathTile([(9, 10)])
+
+    # non-unique paths
+    with pytest.raises(AssertionError):
+        PathTile([(0, 1), (0, 2)])
+
+    # indexing
+    tile = PathTile([(0, 1)])
+    assert tile[0] == 1
+    assert tile[1] == 0
+
+    tile = PathTile([(0, 1), (2, 3)])
+    assert tile[0] == 1
+    assert tile[1] == 0
+    assert tile[2] == 3
+    assert tile[3] == 2
+
+    # string representation
+    tile = PathTile([(0, 1)])
+    assert str(tile) == '0 <-> 1'
+
+
+def test_path_tile_equality():
+    assert PathTile([(0, 1)]) == PathTile([(0, 1)])
+    assert PathTile([(0, 1)]) == PathTile([(1, 0)])
+    assert not PathTile([(0, 1)]) == PathTile([(0, 2)])
+    assert not PathTile([(0, 1)]) == PathTile([(0, 1), (2, 3)])
+    assert PathTile([(2, 3), (0, 1)]) == PathTile([(0, 1), (2, 3)])

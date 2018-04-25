@@ -1,56 +1,64 @@
-from deck import DEFAULT_CARDS, Deck
-from map_card import MapCard
+from board import PathTile
+from deck import Deck
 
 
-def test_init():
-    card_desc = [(0, 1)]
-    deck = Deck([card_desc])
-    card = MapCard(card_desc)
-    assert card in deck._cards
+def Tile(i, j):
+    """Create a PathTile with a single connection."""
+    # Just using this to make the tests read a bit easier.
+    return PathTile([(i, j)])
 
 
-def test_default_init():
-    deck1 = Deck()
-    deck2 = Deck(DEFAULT_CARDS)
-    assert deck1 == deck2
+def test_deck_equality():
+    assert Deck([]) == Deck([])
+    assert not Deck([Tile(0, 1)]) == Deck([])
+
+    assert Deck([Tile(0, 1)]) == Deck([Tile(0, 1)])
+    assert not Deck([Tile(0, 1), Tile(2, 3)]) == Deck([Tile(0, 1)]), 'different lengths'
+
+    assert Deck([Tile(0, 1), Tile(2, 3)]) == Deck([Tile(0, 1), Tile(2, 3)])
+    assert not Deck([Tile(2, 3), Tile(0, 1)]) == Deck([Tile(0, 1), Tile(2, 3)]), 'ordering matters'
 
 
-def test_equal():
-    deck1 = Deck(DEFAULT_CARDS)
-    deck2 = Deck(DEFAULT_CARDS)
-    assert deck1 == deck2
+def test_deck_len():
+    assert len(Deck([])) == 0
+    assert len(Deck([Tile(0, 1)])) == 1
+    assert len(Deck([Tile(0, 1), Tile(2, 3)])) == 2
 
 
-def test_equal_after_shuffle():
-    deck1 = Deck(DEFAULT_CARDS)
-    deck2 = Deck(DEFAULT_CARDS)
-    deck1.shuffle()
-    assert deck1 == deck2
+def test_deck_contains():
+    assert Tile(0, 1) in Deck([Tile(0, 1)])
+    assert Tile(0, 2) not in Deck([Tile(0, 1)])
 
 
-def test_not_equal():
-    deck1 = Deck([[(0, 1)]])
-    # Leave out first card
-    deck2 = Deck(DEFAULT_CARDS)
-    assert not deck1 == deck2
+def test_deck_factories():
+    assert Deck([PathTile([(0, 1)])]) == Deck.from_connections([[(0, 1)]])
 
 
-def test_not_equal_lengths():
-    deck1 = Deck(DEFAULT_CARDS)
-    # Leave out first card
-    deck2 = Deck(DEFAULT_CARDS[1:])
-    assert not deck1 == deck2
+def test_deck_draw():
+    deck = Deck([])
+    assert deck.draw() is None
+
+    deck = Deck([Tile(0, 1)])
+    assert deck.draw() == Tile(0, 1)
+    assert deck.draw() is None
+
+    deck = Deck([Tile(0, 1), Tile(2, 3)])
+    assert deck.draw() == Tile(0, 1), 'draws from top of the deck'
+    assert deck.draw() == Tile(2, 3)
+    assert deck.draw() is None
 
 
-def test_none_after_exhausted():
-    deck = Deck([DEFAULT_CARDS[0]])  # init deck with one card
+def test_deck_replace_tiles():
+    # from empty deck
+    deck = Deck([])
+    assert deck.draw() is None
+    deck.replace_tiles([Tile(0, 1)])
+    assert deck.draw() == Tile(0, 1)
+    assert deck.draw() is None
 
-    result = deck.draw()
-    result = deck.draw()
-
-    assert result is None
-
-
-def test_default_size():
-    deck = Deck()
-    assert deck.get_size() == len(DEFAULT_CARDS)
+    # from non-empty deck
+    deck = Deck([Tile(0, 1)])
+    deck.replace_tiles([Tile(2, 3)])
+    assert deck.draw() == Tile(0, 1), 'existing cards are drawn first'
+    assert deck.draw() == Tile(2, 3)
+    assert deck.draw() is None
