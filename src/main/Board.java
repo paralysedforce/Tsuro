@@ -99,6 +99,7 @@ public class Board {
                         spaces.add(token.getBoardSpace());
                     }
                     else {
+                        token.removeFromBoard();
                         eliminatedPlayers.add(token);
                     }
                 }

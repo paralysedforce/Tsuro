@@ -44,7 +44,6 @@ public class Game {
 
     //Maybe should be moved into the SPlayer
     private void eliminatePlayer(SPlayer player){
-        player.getToken().removeFromBoard();
         player.returnTilesToPile();
         //add drawing w/ dragon tile logic here prob in a private method
     }
