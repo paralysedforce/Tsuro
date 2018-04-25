@@ -125,10 +125,15 @@ class Board:
             next_i = p.i + i_offset
             next_j = p.j + j_offset
 
-            if not self._in_bounds(next_i, next_j) or not self._board[next_i][next_j].has_tile():
+            if not self._in_bounds(next_i, next_j):
                 break
 
-            p = Position(next_i, next_j, self.ADJACENT_TILE_SPOT[next_ts_within_square])
+            next_p = Position(next_i, next_j, self.ADJACENT_TILE_SPOT[next_ts_within_square])
+            if not self._board[next_i][next_j].has_tile():
+                path.append(next_p)
+                break
+
+            p = next_p
 
         return path
 
@@ -145,6 +150,9 @@ class Board:
 
     def _in_bounds(self, i: int, j: int) -> bool:
         return 0 <= i < self._height and 0 <= j < self._width
+
+    def __getitem__(self, index):
+        return self._board[index]
 
 
 # TODO: Use an enum to represent the 8 possible TileSpots?

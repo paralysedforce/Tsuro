@@ -2,42 +2,44 @@ import pytest
 
 from board import Board, BoardSquare, NoPathTileError, PathTile, Position
 
+# For readability
+P = Position
 
 def test_board_edge_positions():
     b = Board(1, 1)
     expected = [
-        Position(0, 0, 0),
-        Position(0, 0, 1),
-        Position(0, 0, 2),
-        Position(0, 0, 3),
-        Position(0, 0, 4),
-        Position(0, 0, 5),
-        Position(0, 0, 6),
-        Position(0, 0, 7),
+        P(0, 0, 0),
+        P(0, 0, 1),
+        P(0, 0, 2),
+        P(0, 0, 3),
+        P(0, 0, 4),
+        P(0, 0, 5),
+        P(0, 0, 6),
+        P(0, 0, 7),
     ]
     assert b.edge_positions == expected
 
     b = Board(2, 2)
     expected = [
-        Position(0, 0, 0),
-        Position(0, 0, 1),
-        Position(0, 1, 0),
-        Position(0, 1, 1),
+        P(0, 0, 0),
+        P(0, 0, 1),
+        P(0, 1, 0),
+        P(0, 1, 1),
 
-        Position(0, 1, 2),
-        Position(0, 1, 3),
-        Position(1, 1, 2),
-        Position(1, 1, 3),
+        P(0, 1, 2),
+        P(0, 1, 3),
+        P(1, 1, 2),
+        P(1, 1, 3),
 
-        Position(1, 0, 4),
-        Position(1, 0, 5),
-        Position(1, 1, 4),
-        Position(1, 1, 5),
+        P(1, 0, 4),
+        P(1, 0, 5),
+        P(1, 1, 4),
+        P(1, 1, 5),
 
-        Position(0, 0, 6),
-        Position(0, 0, 7),
-        Position(1, 0, 6),
-        Position(1, 0, 7),
+        P(0, 0, 6),
+        P(0, 0, 7),
+        P(1, 0, 6),
+        P(1, 0, 7),
     ]
     assert expected == b.edge_positions
 
@@ -58,33 +60,36 @@ def test_board_traverse_path_no_tiles():
     b = Board(3, 3)
 
     with pytest.raises(IndexError):
-        b.traverse_path(Position(-1, 0, 0))
-        b.traverse_path(Position(3, 0, 0))
+        b.traverse_path(P(-1, 0, 0))
+        b.traverse_path(P(3, 0, 0))
 
-    assert b.traverse_path(Position(0, 0, 0)) == [], 'empty list if no pathtile'
+    assert b.traverse_path(P(0, 0, 0)) == [], 'empty list if no pathtile'
 
 
-def test_board_traverse_path_single_tile():
-    b = Board(3, 3)
+def test_board_traverse_path_2x2():
+    b = Board(2, 2)
     b.place_tile(0, 0, PathTile([(7, 2)]))
+    assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7)], 'path to middle'
+    assert b.traverse_path(P(0, 0, 2)) == [P(0, 0, 2), P(0, 0, 7)], 'path to left edge'
 
-    start = Position(0, 0, 7)
-    assert b.traverse_path(start) == [Position(0, 0, 7), Position(0, 0, 2)], 'path within tile'
+    b.place_tile(0, 1, PathTile([(7, 2)]))
+    assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2)], 'path to right edge'
 
 
-def test_board_traverse_path_two_tiles():
+def test_board_traverse_path_three_tiles():
     b = Board(3, 3)
     b.place_tile(0, 0, PathTile([(7, 2)]))
     b.place_tile(0, 1, PathTile([(7, 2)]))
 
-    start = Position(0, 0, 7)
+    start = P(0, 0, 7)
 
-    expected = [Position(0, 0, 7), Position(0, 0, 2), Position(0, 1, 7), Position(0, 1, 2)]
+    expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7)]
     assert b.traverse_path(start) == expected, 'traverse in a straight line across the top of the board'
 
     # Connect a path straight across the top edge of the board.
     b.place_tile(0, 2, PathTile([(7, 2)]))
-    expected = expected + [Position(0, 2, 7), Position(0, 2, 2)]
+
+    expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7), P(0, 2, 2)]
     actual = b.traverse_path(start)
     assert actual == expected, 'stop when the edge is reached'
     assert b.is_on_edge(actual[-1]), 'the path terminates on the edge of the board'

@@ -78,8 +78,18 @@ class TsuroGame:
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
-    def place_tile(self, path_tile: PathTile, i: int, j: int):
-        """Place a tile at a certain index."""
+    def peek_path(self, player: Player, path_tile: PathTile) -> List[Position]:
+        """Return the resulting path from a certain tile placement.
+
+        Does not mutate the board.
+        """
+        i, j, _ = player.position
+        self.board.place_tile(i, j, path_tile)
+        path = self.board.traverse_path(player.position)
+        self.board._board[i][j] = None
+        return path
+
+    def peek_path_list(self, players: List[Player], path_tile: PathTile) -> List[Tuple[Player, List[Position]]]:
         pass
 
     @staticmethod
