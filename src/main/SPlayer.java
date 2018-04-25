@@ -73,6 +73,14 @@ public class SPlayer {
         }
     }
 
+    public boolean hasFullHand() {
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            if (tileBank[i] == null)
+                return false;
+        }
+        return true;
+    }
+
     private void requestDragonTile(){
         Game game = Game.getGame();
         game.requestDragonTile(this);

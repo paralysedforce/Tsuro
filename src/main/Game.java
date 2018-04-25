@@ -30,16 +30,16 @@ public class Game {
        dragonTileOwner = null;
    }
 
-    private Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
+    private Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
         this.board = Board.getBoard();
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
-        this.tilePile = TilePile.getTilePile();
+        this.tilePile = tilePile;
         dragonTileOwner = null;
     }
 
-    public static Game getGame(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
-        if (game == null) game = new Game(remainingPlayers, eliminatedPlayers);
+    public static Game getGame(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
+        if (game == null) game = new Game(remainingPlayers, eliminatedPlayers, tilePile);
         return game;
     }
 
@@ -68,11 +68,23 @@ public class Game {
     }
 
     //Maybe should be moved into the SPlayer
-    private void eliminatePlayer(SPlayer eliminatedPlayer, SPlayer currentPlayer){
+    private void eliminatePlayer(SPlayer eliminatedPlayer){
         eliminatedPlayer.returnTilesToPile();
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
-        processEliminatedPlayerDragonTile(eliminatedPlayer, currentPlayer);
+    }
+
+    private SPlayer findPlayerToDrawFirst(Set<SPlayer> failedPlayers, SPlayer currentPlayer){
+        if (dragonTileOwner != null && !failedPlayers.contains(dragonTileOwner)){
+            return dragonTileOwner;
+        }
+        else {
+            int currentIndex = remainingPlayers.indexOf(currentPlayer);
+            while (failedPlayers.contains(remainingPlayers.get(currentIndex))){
+                currentIndex = (currentIndex + 1) % remainingPlayers.size();
+            }
+            return remainingPlayers.get(currentIndex);
+        }
     }
 
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){
@@ -82,11 +94,25 @@ public class Game {
             failedPlayers.add(failedToken.getPlayer());
         }
 
+        if(failedPlayers.containsAll(remainingPlayers))
+            return new HashSet<>();
+
         player.removeTileFromBank(tile);
         player.drawFromPile();
 
-        for(SPlayer failedPlayer : failedPlayers){
-            eliminatePlayer(failedPlayer, player);
+        if (!failedPlayers.isEmpty())
+        {
+            for(SPlayer failedPlayer : failedPlayers){
+                failedPlayer.returnTilesToPile();
+            }
+
+            SPlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
+
+            for(SPlayer failedPlayer : failedPlayers){
+                eliminatePlayer(failedPlayer);
+            }
+
+            drawAfterElimination(playerToDrawFirst);
         }
 
         return failedPlayers;
@@ -104,25 +130,31 @@ public class Game {
         }
     }
 
-    private void processEliminatedPlayerDragonTile(SPlayer eliminatedPlayer, SPlayer currentPlayer){
-        //add drawing w/ dragon tile logic here prob in a private method
-        if (dragonTileOwner != null){
-            int N = remainingPlayers.size();
+    private boolean areAllRemainingHandsFull() {
+       for(SPlayer player : remainingPlayers){
+           if (!player.hasFullHand())
+               return false;
+       }
+       return true;
+    }
 
-            if (dragonTileOwner != eliminatedPlayer) {
-                int dragonTileOwnerIndex = remainingPlayers.indexOf(dragonTileOwner);
-                for (int i = dragonTileOwnerIndex; i != dragonTileOwnerIndex + N; i++) {
-                    remainingPlayers.get(i % N).drawFromPile();
+    private void drawAfterElimination(SPlayer playerToDrawFirst){
+        int playerToDrawIndex = remainingPlayers.indexOf(playerToDrawFirst);
+        while(!tilePile.isEmpty() && !areAllRemainingHandsFull()){
+            remainingPlayers.get(playerToDrawIndex).drawFromPile();
+            playerToDrawIndex = (playerToDrawIndex + 1) % remainingPlayers.size();
+
+            /*boolean anyDrawn = false;
+            for (int i = playerToDrawIndex; i < playerToDrawIndex + remainingPlayers.size(); i++){
+                SPlayer playerToDraw = remainingPlayers.get(i % remainingPlayers.size());
+                if (!playerToDraw.hasFullHand()){
+                    playerToDraw.drawFromPile();
+                    anyDrawn = true;
                 }
             }
-            else {
-                int currentPlayerIndex = remainingPlayers.indexOf(currentPlayer);
-                for (int i = currentPlayerIndex; i != currentPlayerIndex + N; i++) {
-                    remainingPlayers.get(i % N).drawFromPile();
-                }
-            }
+            if (!anyDrawn)
+                break;*/
         }
-        resetDragonTile();
     }
 
     public void playGame(){
