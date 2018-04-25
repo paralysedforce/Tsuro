@@ -32,7 +32,7 @@ public class Actions {
 
     public static PlayReturn PlayATurn(TilePile tilePile, List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers,
                                        Board board, Tile tile) {
-        Game game = new Game(remainingPlayers, eliminatedPlayers);
+        Game game = Game.getGame(remainingPlayers, eliminatedPlayers);
 
         SPlayer player = remainingPlayers.remove(0);
         Set<SPlayer> playersLosingOnTurn = game.playTurn(tile, player);

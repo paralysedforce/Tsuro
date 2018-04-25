@@ -20,8 +20,9 @@ public class GameTest {
     TilePile tilePileMock;
 
     @Before
-    public void resetBoard() {
+    public void reset() {
         Board.resetBoard();
+        Game.resetGame();
     }
 
 
@@ -41,7 +42,7 @@ public class GameTest {
         List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
         remainingPlayers.add(player);
 
-        Game game = new Game(remainingPlayers, new ArrayList<SPlayer>());
+        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>());
         Assert.assertTrue(game.isLegalMove(testTile, player));
     }
 
@@ -61,7 +62,7 @@ public class GameTest {
         List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
         remainingPlayers.add(player);
 
-        Game game = new Game(remainingPlayers, new ArrayList<SPlayer>());
+        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>());
         Assert.assertTrue(game.isLegalMove(testTile, player));
     }
 
@@ -82,7 +83,7 @@ public class GameTest {
         List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
         remainingPlayers.add(player);
 
-        Game game = new Game(remainingPlayers, new ArrayList<SPlayer>());
+        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>());
         Assert.assertTrue(game.isLegalMove(testTileCanMove, player));
         Assert.assertFalse(game.isLegalMove(testTileCantMove, player));
     }
@@ -103,7 +104,7 @@ public class GameTest {
         List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
         remainingPlayers.add(player);
 
-        Game game = new Game(remainingPlayers, new ArrayList<SPlayer>());
+        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>());
         Assert.assertFalse(game.isLegalMove(testTile, player));
     }
 
@@ -123,7 +124,7 @@ public class GameTest {
         List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
         remainingPlayers.add(player);
 
-        Game game = new Game(remainingPlayers, new ArrayList<SPlayer>());
+        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>());
         game.playTurn(testTile, player);
         Assert.assertNull(player.getTile(0));
         Assert.assertNull(player.getTile(1));

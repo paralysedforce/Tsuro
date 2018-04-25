@@ -66,9 +66,16 @@ public class SPlayer {
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
             if (tileBank[i] == null) {
                 tileBank[i] = tilePile.drawFromDeck();
+                if (tileBank[i] == null)
+                    requestDragonTile();
                 break;
             }
         }
+    }
+
+    private void requestDragonTile(){
+        Game game = Game.getGame();
+        game.requestDragonTile(this);
     }
 
     public void removeTileFromBank(Tile tile){

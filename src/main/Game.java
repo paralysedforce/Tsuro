@@ -12,22 +12,44 @@ public class Game {
     private TilePile tilePile;
     private SPlayer dragonTileOwner;
 
-    //prob add a state variable here to keep track of the player with the dragon tile
+    static Game game;
 
-    public Game(String filename){
+   /* private Game(String filename){
         board = Board.getBoard();
         remainingPlayers = new ArrayList<>();
         eliminatedPlayers = new ArrayList<>();
         tilePile = TilePile.getTilePile(filename);
         dragonTileOwner = null;
-    }
+    }*/
 
-    public Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
+   private Game(){
+       this.board = Board.getBoard();
+       this.remainingPlayers = new ArrayList<>();
+       this.eliminatedPlayers = new ArrayList<>();
+       this.tilePile = TilePile.getTilePile();
+       dragonTileOwner = null;
+   }
+
+    private Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
         this.board = Board.getBoard();
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
         this.tilePile = TilePile.getTilePile();
         dragonTileOwner = null;
+    }
+
+    public static Game getGame(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
+        if (game == null) game = new Game(remainingPlayers, eliminatedPlayers);
+        return game;
+    }
+
+    public static Game getGame(){
+        if (game == null) game = new Game();
+        return game;
+    }
+
+    public static void resetGame(){
+        game = null;
     }
 
     //to be used later in some way
@@ -47,7 +69,6 @@ public class Game {
 
     //Maybe should be moved into the SPlayer
     private void eliminatePlayer(SPlayer eliminatedPlayer, SPlayer currentPlayer){
-        eliminatedPlayer.getToken().removeFromBoard();
         eliminatedPlayer.returnTilesToPile();
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
