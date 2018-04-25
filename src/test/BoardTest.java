@@ -14,7 +14,7 @@ import java.util.Set;
 public class BoardTest {
 
 
-    @After
+    @Before
     public void resetBoard() {
         Board.resetBoard();
     }

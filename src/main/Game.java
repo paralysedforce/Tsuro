@@ -10,6 +10,7 @@ public class Game {
     private List<SPlayer> remainingPlayers;
     private List<SPlayer> eliminatedPlayers;
     private TilePile tilePile;
+    private SPlayer dragonTileOwner;
 
     //prob add a state variable here to keep track of the player with the dragon tile
 
@@ -18,6 +19,7 @@ public class Game {
         remainingPlayers = new ArrayList<>();
         eliminatedPlayers = new ArrayList<>();
         tilePile = TilePile.getTilePile(filename);
+        dragonTileOwner = null;
     }
 
     public Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers){
@@ -25,6 +27,7 @@ public class Game {
         this.remainingPlayers = remainingPlayers;
         this.eliminatedPlayers = eliminatedPlayers;
         this.tilePile = TilePile.getTilePile();
+        dragonTileOwner = null;
     }
 
     //to be used later in some way
@@ -43,10 +46,12 @@ public class Game {
     }
 
     //Maybe should be moved into the SPlayer
-    private void eliminatePlayer(SPlayer player){
-        player.getToken().removeFromBoard();
-        player.returnTilesToPile();
-        //add drawing w/ dragon tile logic here prob in a private method
+    private void eliminatePlayer(SPlayer eliminatedPlayer, SPlayer currentPlayer){
+        eliminatedPlayer.getToken().removeFromBoard();
+        eliminatedPlayer.returnTilesToPile();
+        remainingPlayers.remove(eliminatedPlayer);
+        eliminatedPlayers.add(eliminatedPlayer);
+        processEliminatedPlayerDragonTile(eliminatedPlayer, currentPlayer);
     }
 
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){
@@ -60,10 +65,43 @@ public class Game {
         player.drawFromPile();
 
         for(SPlayer failedPlayer : failedPlayers){
-            eliminatePlayer(failedPlayer);
+            eliminatePlayer(failedPlayer, player);
         }
 
         return failedPlayers;
+    }
+
+    public void requestDragonTile(SPlayer player){
+        if (dragonTileOwner == null && tilePile.isEmpty()) {
+            dragonTileOwner = player;
+        }
+    }
+
+    private void resetDragonTile(){
+        if (dragonTileOwner != null){
+            dragonTileOwner = null;
+        }
+    }
+
+    private void processEliminatedPlayerDragonTile(SPlayer eliminatedPlayer, SPlayer currentPlayer){
+        //add drawing w/ dragon tile logic here prob in a private method
+        if (dragonTileOwner != null){
+            int N = remainingPlayers.size();
+
+            if (dragonTileOwner != eliminatedPlayer) {
+                int dragonTileOwnerIndex = remainingPlayers.indexOf(dragonTileOwner);
+                for (int i = dragonTileOwnerIndex; i != dragonTileOwnerIndex + N; i++) {
+                    remainingPlayers.get(i % N).drawFromPile();
+                }
+            }
+            else {
+                int currentPlayerIndex = remainingPlayers.indexOf(currentPlayer);
+                for (int i = currentPlayerIndex; i != currentPlayerIndex + N; i++) {
+                    remainingPlayers.get(i % N).drawFromPile();
+                }
+            }
+        }
+        resetDragonTile();
     }
 
     public void playGame(){

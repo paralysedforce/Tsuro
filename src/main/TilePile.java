@@ -74,11 +74,15 @@ public class TilePile {
             return tiles.removeFirst();
         }
         catch (NoSuchElementException e) {
-            throw new NoSuchElementException("main.TilePile is empty");
+            return null;
         }
     }
 
     public void returnToDeck(Tile tile){
         tiles.addLast(tile);
+    }
+
+    public boolean isEmpty(){
+        return tiles.isEmpty();
     }
 }
