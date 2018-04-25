@@ -64,7 +64,7 @@ public class BoardTest {
 
 
            Keith's tile        Vyas's Tile
-             (1, 0)              (0, 0)
+             @(1, 0)            @(0, 0)
 
               |  |                |  |
              -+  +-            -+  \/   +-
@@ -148,7 +148,66 @@ public class BoardTest {
     }
 
     @Test
-    public void isLegalMove() throws Exception{
+    public void multipleTokensKilled() throws Exception{
+        /* Setup */
         Board board = Board.getBoard();
+        BoardSpace start = board.getBoardSpace(0, 0);
+        SPlayer vyas = new SPlayer("Vyas", start, 0);
+        SPlayer keith = new SPlayer("Keith", start, 1);
+        SPlayer robby = new SPlayer("Robby", start, 6);
+        SPlayer christos = new SPlayer("Christos", start, 7);
+
+        Tile tile = new Tile(0, 7, 1, 6, 2, 3, 4, 5);
+
+        /*
+        Goal:
+            - A tile placed in a spot that leads multiple players to lose will kill them all
+            - Tokens pass through each other
+
+            Tile
+              V  K
+              |  |
+          R --+  |  +--
+                 |  |
+          C -----+  +--
+              +--+
+              |  |
+
+
+         */
+        Assert.assertTrue(board.willKillPlayer(tile, vyas.getToken()));
+        Set<Token> losers = board.placeTile(tile, vyas.getToken());
+        Assert.assertEquals(losers.size(), 4);
+    }
+
+    @Test
+    public void playerKilledThroughMultipleTiles(){
+        /* Setup */
+        Board board = Board.getBoard();
+        BoardSpace start = board.getBoardSpace(0, 0);
+        SPlayer vyas = new SPlayer("vyas", start, 7);
+        Tile tileSchema = new Tile(7, 2, 6, 3, 4, 5, 0, 1);
+        for (int i = 1; i < 6; i++){
+            Tile tile = new Tile(tileSchema);
+            board.getBoardSpace(0, i).setTile(tile);
+        }
+
+        /*
+        Goal:
+            - A player can die even when moving across multiple tiles
+
+            Tile            Board
+                                 ____________
+               | |        start |x x x x x x |  end
+               +-+              |            |
+          V ----------          |            |
+            ----------          |            |
+               +-+              |            |
+               | |              |____________|
+         */
+
+        Set<Token> losers = board.placeTile(new Tile(tileSchema), vyas.getToken());
+        Assert.assertEquals(losers.size(), 1);
+        Assert.assertTrue(losers.contains(vyas.getToken()));
     }
 }

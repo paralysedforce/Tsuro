@@ -24,6 +24,18 @@ public class SPlayer {
         }
     }
 
+    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
+        this.name = name;
+        token = new Token(startingLocation, startingTokenSpace, this);
+        tileBank = new Tile[MAX_TILES_IN_BANK];
+        this.tilePile = TilePile.getTilePile();
+
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            tileBank[i] = tilePile.drawFromDeck();
+        }
+
+    }
+
     public Token getToken(){
         return token;
     }
