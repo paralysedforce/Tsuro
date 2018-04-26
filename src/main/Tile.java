@@ -6,79 +6,25 @@ import java.util.Set;
 
 /**
  *
- * Represents a Single main.Tile in Tsuro
+ * Represents a single Tile in Tsuro
  *
  * Created by vyasalwar on 4/15/18.
- *
- * TODO: isValid methods for all main.Tile classes
  *
  */
 public class Tile {
 
+    //================================================================================
+    // Instance Variables
+    //================================================================================
+
     private final int ROTATIONS_PER_CYCLE = 4;
-    /* Helper Classes */
-
-    private class TileConnection {
-
-        private int endpointA;
-        private int endpointB;
-
-        public TileConnection (int endpointA, int endpointB) {
-            this.endpointA = endpointA;
-            this.endpointB = endpointB;
-        }
-
-        public TileConnection (TileConnection other) {
-            this.endpointA = other.endpointA;
-            this.endpointB = other.endpointB;
-        }
-
-        public boolean isValid(){
-            return endpointA > 0 && endpointA < 7 &&
-                   endpointB > 0 && endpointB < 7;
-        }
-
-        public boolean contains(int endpoint){
-            return endpoint == endpointA || endpoint == endpointB;
-        }
-
-        public int otherEndpoint(int endpoint){
-            if (endpoint == endpointA) return endpointB;
-            if (endpoint == endpointB) return endpointA;
-            throw new IllegalArgumentException("Endpoint object does not contain input");
-        }
-
-        @Override
-        public boolean equals(Object obj){
-            if (obj instanceof TileConnection){
-                TileConnection other = (TileConnection) obj;
-                return (this.endpointA == other.endpointA && this.endpointB == other.endpointB) ||
-                       (this.endpointB == other.endpointA && this.endpointA == other.endpointB);
-            }
-            else
-                return false;
-        }
-
-        @Override
-        public int hashCode(){
-            // We'll see if this is a good hash function later :P
-            int x = endpointA + 1, y = endpointB + 1;
-            return x * x * y + y * y * x;
-        }
-
-//        public TileConnection clone(){
-//            return new TileConnection(endpointA, endpointB);
-//        }
-
-        public void rotateClockwise(){
-            endpointA = (endpointA + 2) % 8;
-            endpointB = (endpointB + 2) % 8;
-        }
-    }
-
-    /* Object variables */
     private Set<TileConnection> connections;
 
+    //================================================================================
+    // Constructors
+    //================================================================================
+
+    // Constructor from explicit values
     public Tile(int startA, int endA,
                 int startB, int endB,
                 int startC, int endC,
@@ -91,10 +37,12 @@ public class Tile {
         connections.add(new TileConnection(startD, endD));
     }
 
+    // Constructor that reads from an input file.
+    //   See TilePile.fillAllTiles to see usage
     public Tile(String fileLine){
         connections = new HashSet<>();
 
-        // endpoints are separated by spaces when reading from file
+        // endpoints are separated by single spaces when reading from file
         String[] endpoints = fileLine.split(" ");
         for (int i = 0; i < 4; i++) {
             int endpointA = Integer.parseInt(endpoints[2 * i]);
@@ -103,6 +51,7 @@ public class Tile {
         }
     }
 
+    // Constructor from other object. Clones other tile into this one
     public Tile(Tile other){
         connections = new HashSet<>();
         for (TileConnection tileConnection : other.connections){
@@ -110,12 +59,25 @@ public class Tile {
         }
     }
 
+    //================================================================================
+    // Public methods
+    //================================================================================
+
+    // Rotates the entire tile clockwise.
+    //  Modifies the tile state instead of creating a new object.
     public void rotateClockwise() {
+        /* Important: modifying the state of a Hash Table in a way that changes hashes will
+            cause the hash table to be unusable! Reassign connections to a new HashSet instead.
+         */
+        Set<TileConnection> newConnections = new HashSet<>();
         for (TileConnection connection : connections){
             connection.rotateClockwise();
+            newConnections.add(connection);
         }
+        connections = newConnections;
     }
 
+    // Given one endpoint in the tile, returns the connected endpoint
     public int findMatch(int endpoint){
         for (TileConnection connection: connections){
             if (connection.contains(endpoint)){
@@ -125,6 +87,7 @@ public class Tile {
         throw new IllegalArgumentException("Endpoint not found");
     }
 
+    // Checks to make sure the tile contains all numbers 0..7 exactly once
     public boolean isValid(){
         // A valid tile is a bijective map from {0..7} to itself
         try {
@@ -160,6 +123,79 @@ public class Tile {
     @Override
     public int hashCode(){
         return connections.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        String ret = "Tile{";
+        for (TileConnection connection: connections){
+            ret += " " + connection.toString();
+        }
+        return ret + "}";
+    }
+
+    //================================================================================
+    // Private helper class
+    //================================================================================
+    private class TileConnection {
+
+        private int endpointA;
+        private int endpointB;
+
+        // Explicit constructor
+        public TileConnection (int endpointA, int endpointB) {
+            this.endpointA = endpointA;
+            this.endpointB = endpointB;
+        }
+
+        // Constructor from another TileConnection, i.e. clone
+        public TileConnection (TileConnection other) {
+            this.endpointA = other.endpointA;
+            this.endpointB = other.endpointB;
+        }
+
+        // Returns true if the argument is one of the endpoints
+        public boolean contains(int endpoint){
+            return endpoint == endpointA || endpoint == endpointB;
+        }
+
+        // Finds the matching endpint of the argument if it exists
+        public int otherEndpoint(int endpoint){
+            if (endpoint == endpointA) return endpointB;
+            if (endpoint == endpointB) return endpointA;
+            throw new IllegalArgumentException("Endpoint object does not contain input");
+        }
+
+        // Moves both of the endpoints clockwise around
+        public void rotateClockwise(){
+            endpointA = (endpointA + 2) % 8;
+            endpointB = (endpointB + 2) % 8;
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            if (obj instanceof TileConnection){
+                TileConnection other = (TileConnection) obj;
+                return (this.endpointA == other.endpointA && this.endpointB == other.endpointB) ||
+                        (this.endpointB == other.endpointA && this.endpointA == other.endpointB);
+            }
+            else
+                return false;
+        }
+
+        @Override
+        public int hashCode(){
+            // We'll see if this is a good hash function later :P
+            int x = endpointA + 1, y = endpointB + 1;
+            return x * x * y + y * y * x;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + endpointA + ", " + endpointB + ")";
+        }
+
+
     }
 
 }

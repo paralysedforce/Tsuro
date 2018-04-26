@@ -44,21 +44,6 @@ public class BoardSpaceTest {
     }
 
     @Test
-    public void willCollide() throws Exception {
-        BoardSpace boardspace = new BoardSpace(0, 0);
-        Token token1 = new Token(boardspace, 2, null);
-        Token token2 = new Token(boardspace, 3, null);
-
-        Assert.assertFalse(boardspace.willCollide(token1));
-        Assert.assertFalse(boardspace.willCollide(token2));
-
-        Tile tile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
-        boardspace.setTile(tile);
-        Assert.assertTrue(boardspace.willCollide(token1));
-        Assert.assertTrue(boardspace.willCollide(token2));
-    }
-
-    @Test
     public void getTokensOnSpace() throws Exception {
         BoardSpace boardSpace = new BoardSpace(0, 0);
         for (int i = 0; i < 8; i++)

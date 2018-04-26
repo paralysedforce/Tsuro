@@ -7,20 +7,24 @@ import javafx.util.Pair;
  */
 public class Token {
 
+    //================================================================================
+    // Instance Variables
+    //================================================================================
     private BoardSpace space;
     private SPlayer player;
 
+    //================================================================================
+    // Constructor
+    //================================================================================
     public Token(BoardSpace startingLocation, int startingTokenSpace, SPlayer player){
         space = startingLocation;
         this.player = player;
-
         space.addToken(this, startingTokenSpace);
     }
 
-    public void removeFromBoard(){
-        space.removeToken(this);
-        space = null;
-    }
+    //================================================================================
+    // Getters
+    //================================================================================
 
     public BoardSpace getBoardSpace(){
         return space;
@@ -34,12 +38,26 @@ public class Token {
         return player;
     }
 
+
+    //================================================================================
+    // Public Methods
+    //================================================================================
+
+    // Removes the token from the board altogether
+    //   Should only be called when a player loses
+    public void removeFromBoard(){
+        space.removeToken(this);
+        space = null;
+    }
+
+    // Places the token at the given location
     public void moveToken(BoardSpace boardSpace, int tokenSpace){
         space.removeToken(this);
         boardSpace.addToken(this, tokenSpace);
         space = boardSpace;
     }
 
+    // Gets the tokenSpace on the adjacent tile bordering
     public int findNextTokenSpace(){
         int tokenSpace = getTokenSpace();
 

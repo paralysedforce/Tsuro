@@ -15,7 +15,10 @@ import java.util.NoSuchElementException;
  */
 public class TilePile {
 
-    /* Singleton design pattern */
+    //================================================================================
+    // Singleton Design Pattern
+    //================================================================================
+
     final private String DEFAULT_FILE_PATH = "tiles.txt";
     private static TilePile tilePile;
 
@@ -46,10 +49,37 @@ public class TilePile {
         tilePile = new TilePile();
     }
 
-    ///////
-
+    //================================================================================
+    // Instance Variables
+    //================================================================================
     private Deque<Tile> tiles;
 
+
+    //================================================================================
+    // Public methods
+    //================================================================================
+    public Tile drawFromDeck(){
+        try {
+            return tiles.removeFirst();
+        }
+        catch (NoSuchElementException e) {
+            return null;
+        }
+    }
+
+    public void returnToDeck(Tile tile){
+        tiles.addLast(tile);
+    }
+
+    public boolean isEmpty(){
+        return tiles.isEmpty();
+    }
+
+    //================================================================================
+    // Private helpers
+    //================================================================================
+
+    // Initialize the TilePile using the tiles specified in the given file
     private void fillTiles(String filename) {
         try {
             File file = new File(filename);
@@ -69,20 +99,4 @@ public class TilePile {
     }
 
 
-    public Tile drawFromDeck(){
-        try {
-            return tiles.removeFirst();
-        }
-        catch (NoSuchElementException e) {
-            return null;
-        }
-    }
-
-    public void returnToDeck(Tile tile){
-        tiles.addLast(tile);
-    }
-
-    public boolean isEmpty(){
-        return tiles.isEmpty();
-    }
 }

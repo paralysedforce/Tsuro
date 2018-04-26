@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Class to provide semantics for grading.
+ *   Not actually a component in the program
  * Created by vyasalwar on 4/16/18.
  */
 

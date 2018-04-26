@@ -20,8 +20,20 @@ public class TileTest {
         Tile t4 = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
 
         Assert.assertTrue(t1.equals(t2));
+        Assert.assertTrue(t2.equals(t1));
         Assert.assertTrue(t2.equals(t3));
         Assert.assertFalse(t1.equals(t4));
+    }
+
+    @Test
+    public void RotatedTilesAreEqualTest(){
+        // This one was found to fail reflexivity for some reason
+        Tile t1 = new Tile(7, 1, 5, 0, 2, 3, 4, 6);
+        Tile t2 = new Tile(t1);
+        t1.rotateClockwise();
+
+        Assert.assertTrue(t1.equals(t1));
+        Assert.assertTrue(t1.equals(t2));
     }
 
 }
