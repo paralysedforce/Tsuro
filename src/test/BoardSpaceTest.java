@@ -1,10 +1,7 @@
 package test;
 
 
-import main.Board;
-import main.BoardSpace;
-import main.Tile;
-import main.Token;
+import main.*;
 import org.junit.Test;
 import org.junit.Assert;
 

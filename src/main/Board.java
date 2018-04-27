@@ -13,26 +13,16 @@ import java.util.*;
 public class Board {
 
     //================================================================================
-    // Singleton Pattern
+    // Constructor
     //================================================================================
-    private static Board board;
 
-    private Board() {
+    public Board() {
         this.spaces = new BoardSpace[BOARD_LENGTH][BOARD_LENGTH];
         for (int i = 0; i < BOARD_LENGTH; i++) {
             for (int j = 0; j < BOARD_LENGTH; j++) {
                 spaces[i][j] = new BoardSpace(i, j);
             }
         }
-    }
-
-    public static Board getBoard() {
-        if (board == null) board = new Board();
-        return board;
-    }
-
-    public static void resetBoard() {
-        board = new Board();
     }
 
     //================================================================================
@@ -46,7 +36,7 @@ public class Board {
     //================================================================================
     public BoardSpace getBoardSpace(int row, int col) {
         if (!isValidCoordinate(row, col))
-            return null;
+            throw new IllegalArgumentException("Invalid Tile Access");
         return spaces[row][col];
     }
 
@@ -56,39 +46,46 @@ public class Board {
 
     // Returns true if there is a tile on the row and col
     public boolean isOccupied(int row, int col) {
-        return isValidCoordinate(row, col) && spaces[row][col].hasTile();
+        if (isValidCoordinate(row, col))
+            return spaces[row][col].hasTile();
+
+        throw new IllegalArgumentException("Invalid Tile Access");
     }
 
     // Returns true if placing the tile in front of the token will lead to the player's death
-    public boolean willKillPlayer(Tile tile, Token token) {
-
-        /*if (!player.hasTile(tile) || player.getToken().getBoardSpace().hasTile())
-            return false;
-
-        Token token = player.getToken();*/
+    public boolean willKillPlayer(Tile tile, SPlayer player) {
+        Token token = player.getToken();
 
         BoardSpace curSpace = token.getBoardSpace();
         int tokenSpace = token.getTokenSpace();
 
-        // Move to the space across the tile
-        int nextTokenSpace = tile.findMatch(tokenSpace);
-        BoardSpace nextSpace = board.getNextSpace(curSpace, nextTokenSpace);
+        try {
+            // Move to the space across the tile
+            int nextTokenSpace = tile.findMatch(tokenSpace);
+            BoardSpace nextSpace = getNextSpace(curSpace, nextTokenSpace);
 
-        // Trace out a path by moving across spaces with tiles on them
-        while (nextSpace != null) {
-            if (!nextSpace.hasTile())
-                return false;
-            nextSpace = getNextSpace(nextSpace, nextTokenSpace);
-            nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
+            // Trace out a path by moving across spaces with tiles on them
+            while (nextSpace.hasTile()){
+                nextSpace = getNextSpace(nextSpace, nextTokenSpace);
+                nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
+            }
+            // We've walked to a place on the board without a tile
+            return false;
         }
-        return true;
+
+        catch (IllegalArgumentException e){
+            // We've walked to a place off the board since we're trying to
+            //   access a space with an invalid coordinate
+            return true;
+        }
     }
 
     // Places the tile in front of the player, regardless of whether it will kill the player
     //   Returns the Set of tokens driven off the board
-    public Set<Token> placeTile(Tile tile, Token currentPlayerToken) {
+    public Set<Token> placeTile(Tile tile, SPlayer player) {
 
-        BoardSpace space = currentPlayerToken.getBoardSpace();
+
+        BoardSpace space = player.getToken().getBoardSpace();
         space.setTile(tile);
 
         Deque<BoardSpace> spaces = new LinkedList<>();
@@ -142,10 +139,7 @@ public class Board {
         else if (direction == 3) col--; // Move left
         else throw new IllegalArgumentException("Illegal value for tokenSpace");
 
-        if (!isValidCoordinate(row, col))
-            return null;
-        else
-            return spaces[row][col];
+        return getBoardSpace(row, col);
     }
 
     // Gets the adjacent space that the token is on.
@@ -170,18 +164,20 @@ public class Board {
     }
 
     private static boolean isOnEdge(int row, int col, int tokenSpace) {
-        int direction = tokenSpace / 2;
-        boolean topEdge = row == 0 && direction == 0;
-        boolean rightEdge = col == 5 && direction == 1;
-        boolean bottomEdge = row == 5 && direction == 2;
-        boolean leftEdge = col == 0 && direction == 3;
-        boolean onEdge = topEdge || rightEdge || bottomEdge || leftEdge;
+        if (!isValidCoordinate(row, col))
+            throw new IllegalArgumentException("Invalid Tile Access");
 
-        return isValidCoordinate(row, col) && onEdge;
+        int direction = tokenSpace / 2;
+        boolean topEdge    = row == 0 && direction == 0;
+        boolean rightEdge  = col == 5 && direction == 1;
+        boolean bottomEdge = row == 5 && direction == 2;
+        boolean leftEdge   = col == 0 && direction == 3;
+
+        return topEdge || rightEdge || bottomEdge || leftEdge;
+
     }
 
     private static boolean isOnEdge(Token token) {
-
 
         int row = token.getBoardSpace().getRow();
         int col = token.getBoardSpace().getCol();

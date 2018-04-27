@@ -1,5 +1,4 @@
 package main;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -13,38 +12,24 @@ public class SPlayer {
     //================================================================================
     private final int MAX_TILES_IN_BANK = 3;
     private Token token;
-    private Tile[] tileBank;
+    private Tile[] hand;
     private String name;
     private TilePile tilePile;
-
 
     //================================================================================
     // Constructors
     //================================================================================
 
-    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace, TilePile tilepile){
-        this.name = name;
-        token = new Token(startingLocation, startingTokenSpace, this);
-        tileBank = new Tile[MAX_TILES_IN_BANK];
-        this.tilePile = tilepile;
-
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            tileBank[i] = tilePile.drawFromDeck();
-        }
-    }
-
     public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
         this.name = name;
         token = new Token(startingLocation, startingTokenSpace, this);
-        tileBank = new Tile[MAX_TILES_IN_BANK];
-        this.tilePile = TilePile.getTilePile();
+        hand = new Tile[MAX_TILES_IN_BANK];
+        this.tilePile = Game.getGame().getTilePile();
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            tileBank[i] = tilePile.drawFromDeck();
+            hand[i] = tilePile.drawFromDeck();
         }
-
     }
-
 
     //================================================================================
     // Getters
@@ -54,7 +39,7 @@ public class SPlayer {
     }
 
     public Tile getTile(int i){
-        return tileBank[i];
+        return hand[i];
     }
 
     public String getName(){
@@ -64,9 +49,9 @@ public class SPlayer {
     //================================================================================
     // Public Methods
     //================================================================================
-    public boolean hasTile(Tile tile){
+    public boolean holdsTile(Tile tile){
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (tileBank[i] != null && tileBank[i].equals(tile)) {
+            if (hand[i] != null && hand[i].equals(tile)) {
                 return true;
             }
         }
@@ -75,9 +60,9 @@ public class SPlayer {
 
     public void drawFromPile() {
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (tileBank[i] == null) {
-                tileBank[i] = tilePile.drawFromDeck();
-                if (tileBank[i] == null)
+            if (hand[i] == null) {
+                hand[i] = tilePile.drawFromDeck();
+                if (hand[i] == null)
                     requestDragonTile();
                 break;
             }
@@ -86,21 +71,16 @@ public class SPlayer {
 
     public boolean hasFullHand() {
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (tileBank[i] == null)
+            if (hand[i] == null)
                 return false;
         }
         return true;
     }
 
-    private void requestDragonTile(){
-        Game game = Game.getGame();
-        game.requestDragonTile(this);
-    }
-
-    public void removeTileFromBank(Tile tile){
+    public void removeTileFromHand(Tile tile){
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (tileBank[i].equals(tile)) {
-                tileBank[i] = null;
+            if (hand[i].equals(tile)) {
+                hand[i] = null;
                 break;
             }
         }
@@ -108,24 +88,24 @@ public class SPlayer {
 
     public void returnTilesToPile(){
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if(tileBank[i] != null) {
-                tilePile.returnToDeck(tileBank[i]);
-                tileBank[i] = null;
+            if(hand[i] != null) {
+                tilePile.returnToDeck(hand[i]);
+                hand[i] = null;
             }
         }
     }
 
-    public boolean hasLegalMove(){
-        Board board = Board.getBoard();
+    public boolean hasSafeMove(){
+        Board board = Game.getGame().getBoard();
 
-        for (Tile tile: tileBank){
+        for (Tile tile: hand){
             if(tile == null)
                 continue;
 
             Tile copy = new Tile(tile);
             for (int i = 0; i < 4; i++){
                 copy.rotateClockwise();
-                if (!board.willKillPlayer(copy, token))
+                if (!board.willKillPlayer(copy, this))
                     return true;
             }
         }
@@ -151,9 +131,9 @@ public class SPlayer {
 
             else if (command.startsWith("choose")){
                 Tile tile = null;
-                if      (command.endsWith("1")) tile = tileBank[0];
-                else if (command.endsWith("2")) tile = tileBank[1];
-                else if (command.endsWith("3")) tile = tileBank[2];
+                if      (command.endsWith("1")) tile = hand[0];
+                else if (command.endsWith("2")) tile = hand[1];
+                else if (command.endsWith("3")) tile = hand[2];
 
                 if (tile == null || !Game.getGame().isLegalMove(tile, this))
                     System.err.println("Error: choose a valid tile");
@@ -163,9 +143,9 @@ public class SPlayer {
 
             else if (command.startsWith("rotate")){
                 try {
-                    if      (command.endsWith("1")) tileBank[0].rotateClockwise();
-                    else if (command.endsWith("2")) tileBank[1].rotateClockwise();
-                    else if (command.endsWith("3")) tileBank[2].rotateClockwise();
+                    if      (command.endsWith("1")) hand[0].rotateClockwise();
+                    else if (command.endsWith("2")) hand[1].rotateClockwise();
+                    else if (command.endsWith("3")) hand[2].rotateClockwise();
                     else                         throw new NullPointerException();
 
                     System.out.println("Tile Rotated");
@@ -179,8 +159,8 @@ public class SPlayer {
                 System.out.println("Displaying tiles in hand...");
                 for (int i = 0; i < MAX_TILES_IN_BANK; i++){
                     String line = "\t" + (i+1) + ": ";
-                    if (tileBank[i] != null)
-                        line += tileBank[i].toString();
+                    if (hand[i] != null)
+                        line += hand[i].toString();
                     else
                         line += "No tile present";
 
@@ -192,6 +172,14 @@ public class SPlayer {
             }
         }
 
+    }
+
+    //================================================================================
+    // Private Helpers
+    //================================================================================
+    private void requestDragonTile(){
+        Game game = Game.getGame();
+        game.requestDragonTile(this);
     }
 
 }

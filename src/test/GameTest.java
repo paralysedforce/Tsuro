@@ -16,20 +16,23 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class GameTest {
 
+    Game game;
+    Board board;
+
     @Mock
     TilePile tilePileMock;
 
     @Before
     public void reset() {
-        Board.resetBoard();
         Game.resetGame();
+        game = Game.getGame();
+        board = game.getBoard();
+        game.setTilePile(tilePileMock);
     }
 
 
     @Test
     public void isLegalMoveIsTrueWithLegalMove(){
-        Board board = Board.getBoard();
-
         Tile testTile = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
 
         when(tilePileMock.drawFromDeck())
@@ -38,18 +41,14 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0, tilePileMock);
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(player);
+        SPlayer player = new SPlayer("Vyas", space, 0);
+        game.registerPlayer(player);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
         Assert.assertTrue(game.isLegalMove(testTile, player));
     }
 
     @Test
     public void isLegalMoveIsTrueWithNoMoves() {
-        Board board = Board.getBoard();
-
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
 
         when(tilePileMock.drawFromDeck())
@@ -58,17 +57,15 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0, tilePileMock);
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(player);
+        SPlayer player = new SPlayer("Vyas", space, 0);
+        game.registerPlayer(player);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
         Assert.assertTrue(game.isLegalMove(testTile, player));
     }
 
     @Test
     public void isLegalMoveFalseWithOtherMove() {
-        Board board = Board.getBoard();
+
 
         Tile testTileCantMove = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
         Tile testTileCanMove = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
@@ -79,18 +76,16 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0, tilePileMock);
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(player);
+        SPlayer player = new SPlayer("Vyas", space, 0);
+        game.registerPlayer(player);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
         Assert.assertTrue(game.isLegalMove(testTileCanMove, player));
         Assert.assertFalse(game.isLegalMove(testTileCantMove, player));
     }
 
     @Test
     public void isLegalMoveIsFalseWithRotationMove() {
-        Board board = Board.getBoard();
+
 
         Tile testTile = new Tile(0, 1, 2, 3, 4, 6, 5, 7);
 
@@ -100,17 +95,15 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0, tilePileMock);
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(player);
+        SPlayer player = new SPlayer("Vyas", space, 0);
+        game.registerPlayer(player);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
         Assert.assertFalse(game.isLegalMove(testTile, player));
     }
 
     @Test
     public void playMoveEliminatesPlayersThatLose() {
-        Board board = Board.getBoard();
+
 
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
 
@@ -122,14 +115,13 @@ public class GameTest {
 
         BoardSpace spaceOne = board.getBoardSpace(0, 0);
         BoardSpace spaceTwo = board.getBoardSpace(3, 5);
-        SPlayer vyas = new SPlayer("Vyas", spaceOne, 0, tilePileMock);
-        SPlayer keith = new SPlayer("Keith", spaceTwo, 2, tilePileMock);
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(vyas);
-        remainingPlayers.add(keith);
+        SPlayer vyas = new SPlayer("Vyas", spaceOne, 0);
+        SPlayer keith = new SPlayer("Keith", spaceTwo, 2);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
+        game.registerPlayer(vyas);
+        game.registerPlayer(keith);
         game.playTurn(testTile, vyas);
+
         Assert.assertNull(vyas.getTile(0));
         Assert.assertNull(vyas.getTile(1));
         Assert.assertNull(vyas.getTile(2));
@@ -139,7 +131,7 @@ public class GameTest {
 
     @Test
     public void dragonTileWithNoneDrawnTest() {
-        Board board = Board.getBoard();
+
 
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
 
@@ -156,18 +148,17 @@ public class GameTest {
 
         BoardSpace spaceOne = board.getBoardSpace(1, 0);
         BoardSpace spaceTwo = board.getBoardSpace(5, 5);
-        SPlayer vyas = new SPlayer("Vyas", spaceOne, 7, tilePileMock);
-        SPlayer keith =  new SPlayer("Keith", spaceOne, 6, tilePileMock);
-        SPlayer robby =  new SPlayer("Robby", spaceTwo, 2, tilePileMock);
-        SPlayer christos =  new SPlayer("Christos", spaceTwo, 5, tilePileMock);
 
-        List<SPlayer> remainingPlayers = new ArrayList<SPlayer>();
-        remainingPlayers.add(vyas);
-        remainingPlayers.add(keith);
-        remainingPlayers.add(robby);
-        remainingPlayers.add(christos);
+        SPlayer vyas = new SPlayer("Vyas", spaceOne, 7);
+        SPlayer keith =  new SPlayer("Keith", spaceOne, 6);
+        SPlayer robby =  new SPlayer("Robby", spaceTwo, 2);
+        SPlayer christos =  new SPlayer("Christos", spaceTwo, 5);
 
-        Game game = Game.getGame(remainingPlayers, new ArrayList<SPlayer>(), tilePileMock);
+        game.registerPlayer(vyas);
+        game.registerPlayer(keith);
+        game.registerPlayer(robby);
+        game.registerPlayer(christos);
+
         Assert.assertEquals(game.playTurn(testTile, vyas).size(), 2);
         Assert.assertTrue(robby.hasFullHand());
         Assert.assertTrue(christos.hasFullHand());

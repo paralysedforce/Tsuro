@@ -16,37 +16,19 @@ import java.util.NoSuchElementException;
 public class TilePile {
 
     //================================================================================
-    // Singleton Design Pattern
+    // Constructor
     //================================================================================
 
     final private String DEFAULT_FILE_PATH = "tiles.txt";
-    private static TilePile tilePile;
 
-    private TilePile(){
+    public TilePile(){
         tiles = new LinkedList<>();
         fillTiles(DEFAULT_FILE_PATH);
     }
 
-    private TilePile(String filename){
+    public TilePile(String filename){
         tiles = new LinkedList<>();
         fillTiles(filename);
-    }
-
-    public static TilePile getTilePile(String filename){
-        if (tilePile == null)
-            tilePile = new TilePile(filename);
-        return tilePile;
-    }
-
-    public static TilePile getTilePile(){
-        if (tilePile == null){
-            tilePile = new TilePile();
-        }
-        return tilePile;
-    }
-
-    public static void resetTilePile() {
-        tilePile = new TilePile();
     }
 
     //================================================================================

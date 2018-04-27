@@ -35,6 +35,9 @@ public class Tile {
         connections.add(new TileConnection(startB, endB));
         connections.add(new TileConnection(startC, endC));
         connections.add(new TileConnection(startD, endD));
+
+        if (!isValid())
+            throw new InstantiationError("Tile created with invalid arguments");
     }
 
     // Constructor that reads from an input file.
@@ -49,6 +52,9 @@ public class Tile {
             int endpointB = Integer.parseInt(endpoints[2 * i + 1]);
             connections.add(new TileConnection(endpointA, endpointB));
         }
+
+        if (!isValid())
+            throw new InstantiationError("Tile created with invalid arguments");
     }
 
     // Constructor from other object. Clones other tile into this one
@@ -87,6 +93,7 @@ public class Tile {
         throw new IllegalArgumentException("Endpoint not found");
     }
 
+    // TODO: change to private
     // Checks to make sure the tile contains all numbers 0..7 exactly once
     public boolean isValid(){
         // A valid tile is a bijective map from {0..7} to itself

@@ -12,21 +12,12 @@ public class Game {
     //================================================================================
     static Game game;
 
-    // Constructor initializing a TilePile from file
-    private Game(String filename){
-        board = Board.getBoard();
-        remainingPlayers = new ArrayList<>();
-        eliminatedPlayers = new ArrayList<>();
-        tilePile = TilePile.getTilePile(filename);
-        dragonTileOwner = null;
-    }
-
     // Default constructor
-   private Game(){
-       this.board = Board.getBoard();
+    private Game(){
+       this.board = new Board();
        this.remainingPlayers = new ArrayList<>();
        this.eliminatedPlayers = new ArrayList<>();
-       this.tilePile = TilePile.getTilePile();
+       this.tilePile = new TilePile();
        dragonTileOwner = null;
    }
 
@@ -35,23 +26,9 @@ public class Game {
         return game;
     }
 
-   /* ONLY FOR DEBUGGING!!! */
-   // TODO: Remove in production
-   private Game(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
-        this.board = Board.getBoard();
-        this.remainingPlayers = remainingPlayers;
-        this.eliminatedPlayers = eliminatedPlayers;
-        this.tilePile = tilePile;
-        dragonTileOwner = null;
-    }
-    public static Game getGame(List<SPlayer> remainingPlayers, List<SPlayer> eliminatedPlayers, TilePile tilePile){
-        if (game == null) game = new Game(remainingPlayers, eliminatedPlayers, tilePile);
-        return game;
-    }
     public static void resetGame(){
         game = null;
     }
-    /* END DEBUGGING SEGMENT */
 
     //================================================================================
     // Instance Variables
@@ -63,20 +40,42 @@ public class Game {
     private SPlayer dragonTileOwner;
 
     //================================================================================
+    // Getters
+    //================================================================================
+    public Board getBoard() {
+        return board;
+    }
+
+    public TilePile getTilePile() {
+        return tilePile;
+    }
+
+    //================================================================================
+    // Setters
+    //================================================================================
+    public void setTilePile(TilePile tilePile) {
+        this.tilePile = tilePile;
+    }
+
+    //================================================================================
     // Public Methods
     //================================================================================
 
     // Add a player to a new game
     public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace, tilePile);
+        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
+        remainingPlayers.add(player);
+    }
+
+    public void registerPlayer(SPlayer player){
         remainingPlayers.add(player);
     }
 
     // Determine whether a player has the ability to play the move.
     public boolean isLegalMove(Tile tile, SPlayer player){
-        if(!player.hasTile(tile))
+        if(!player.holdsTile(tile))
             return false;
-        if(player.hasLegalMove() && board.willKillPlayer(tile, player.getToken()))
+        if(player.hasSafeMove() && board.willKillPlayer(tile, player))
             return false;
 
         return true;
@@ -93,15 +92,15 @@ public class Game {
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
     public Set<SPlayer> playTurn(Tile tile, SPlayer player){
-        Set<Token> failedTokens = board.placeTile(tile, player.getToken());
-        Set<SPlayer> failedPlayers = new HashSet<SPlayer>();
+        Set<Token> failedTokens = board.placeTile(tile, player);
+        Set<SPlayer> failedPlayers = new HashSet<>();
         for(Token failedToken : failedTokens)
             failedPlayers.add(failedToken.getPlayer());
 
         if(failedPlayers.containsAll(remainingPlayers))
             return new HashSet<>();
 
-        player.removeTileFromBank(tile);
+        player.removeTileFromHand(tile);
         player.drawFromPile();
 
         if (!failedPlayers.isEmpty())
@@ -125,7 +124,7 @@ public class Game {
     public void playGame(){
         while (remainingPlayers.size() > 1) {
             for (SPlayer player : remainingPlayers) {
-                if  (player.hasLegalMove()) {
+                if  (player.hasSafeMove()) {
                     Tile tile = player.chooseTile();
                     playTurn(tile, player);
                 }

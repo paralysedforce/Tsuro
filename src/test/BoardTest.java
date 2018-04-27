@@ -14,20 +14,16 @@ import java.util.Set;
 public class BoardTest {
 
 
-    @Before
-    public void resetBoard() {
-        Board.resetBoard();
-    }
 
     @Test
     public void placeTile() throws Exception {
-        Board board = Board.getBoard();
+        Board board = new Board();
 
         Tile tile = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0, TilePile.getTilePile());
+        SPlayer player = new SPlayer("Vyas", space, 0);
 
-        board.placeTile(tile, player.getToken());
+        board.placeTile(tile, player);
         Assert.assertTrue(board.isOccupied(0, 0));
         Assert.assertFalse(player.getToken().getBoardSpace().hasTile());
         Assert.assertEquals(player.getToken().getTokenSpace(), 7);
@@ -36,15 +32,15 @@ public class BoardTest {
     @Test
     public void moveFromEdgeTest() throws Exception{
         /* Setup */
-        Board board = Board.getBoard();
+        Board board = new Board();
 
         BoardSpace upperSpace = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer("Vyas", upperSpace, 0, TilePile.getTilePile());
+        SPlayer vyas = new SPlayer("Vyas", upperSpace, 0);
         Tile vyasTile = new Tile(0, 4, 1, 5, 2, 3, 6, 7);
 
 
         BoardSpace lowerSpace = board.getBoardSpace(1, 0);
-        SPlayer keith = new SPlayer("Keith", lowerSpace, 7, TilePile.getTilePile());
+        SPlayer keith = new SPlayer("Keith", lowerSpace, 7);
         Tile keithTile = new Tile(7, 0, 1, 2, 3, 4, 5, 6);
 
 
@@ -82,7 +78,7 @@ public class BoardTest {
         Assert.assertTrue(vyasTile.isValid());
 
 
-        Set<Token> removedPlayers = board.placeTile(keithTile, keith.getToken());
+        Set<Token> removedPlayers = board.placeTile(keithTile, keith);
 
 
         Assert.assertTrue(lowerSpace.hasTile());
@@ -93,7 +89,7 @@ public class BoardTest {
         Assert.assertEquals(removedPlayers.size(), 0);
 
 
-        removedPlayers = board.placeTile(vyasTile, vyas.getToken());
+        removedPlayers = board.placeTile(vyasTile, vyas);
 
 
         Assert.assertTrue(lowerSpace.hasTile());
@@ -110,9 +106,9 @@ public class BoardTest {
     @Test
     public void RotateTest() throws Exception{
         /* Setup */
-        Board board = Board.getBoard();
+        Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer keith = new SPlayer("Keith", start, 0, TilePile.getTilePile());
+        SPlayer keith = new SPlayer("Keith", start, 0);
         Tile tile = new Tile(0, 7, 2, 6, 1, 3, 4, 5);
 
         /* Goal:
@@ -133,14 +129,14 @@ public class BoardTest {
         Assert.assertTrue(tile.isValid());
         Assert.assertFalse(board.isOccupied(0, 0));
         Assert.assertEquals(tile.findMatch(0), 7);
-        Assert.assertTrue(board.willKillPlayer(tile, keith.getToken()));
+        Assert.assertTrue(board.willKillPlayer(tile, keith));
 
         tile.rotateClockwise();
 
         Assert.assertEquals(tile.findMatch(0), 4);
-        Assert.assertFalse(board.willKillPlayer(tile, keith.getToken()));
+        Assert.assertFalse(board.willKillPlayer(tile, keith));
 
-        Set<Token> killed = board.placeTile(tile, keith.getToken());
+        Set<Token> killed = board.placeTile(tile, keith);
         Assert.assertTrue(killed.isEmpty());
         Assert.assertEquals(keith.getToken().getBoardSpace().getRow(), 1);
         Assert.assertEquals(keith.getToken().getBoardSpace().getCol(), 0);
@@ -150,7 +146,7 @@ public class BoardTest {
     @Test
     public void multipleTokensKilled() throws Exception{
         /* Setup */
-        Board board = Board.getBoard();
+        Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
         SPlayer vyas = new SPlayer("Vyas", start, 0);
         SPlayer keith = new SPlayer("Keith", start, 1);
@@ -175,15 +171,15 @@ public class BoardTest {
 
 
          */
-        Assert.assertTrue(board.willKillPlayer(tile, vyas.getToken()));
-        Set<Token> losers = board.placeTile(tile, vyas.getToken());
+        Assert.assertTrue(board.willKillPlayer(tile, vyas));
+        Set<Token> losers = board.placeTile(tile, vyas);
         Assert.assertEquals(losers.size(), 4);
     }
 
     @Test
     public void playerKilledThroughMultipleTiles(){
         /* Setup */
-        Board board = Board.getBoard();
+        Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
         SPlayer vyas = new SPlayer("vyas", start, 7);
         Tile tileSchema = new Tile(7, 2, 6, 3, 4, 5, 0, 1);
@@ -206,7 +202,7 @@ public class BoardTest {
                | |              |____________|
          */
 
-        Set<Token> losers = board.placeTile(new Tile(tileSchema), vyas.getToken());
+        Set<Token> losers = board.placeTile(new Tile(tileSchema), vyas);
         Assert.assertEquals(losers.size(), 1);
         Assert.assertTrue(losers.contains(vyas.getToken()));
     }
