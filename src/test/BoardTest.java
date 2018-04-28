@@ -21,7 +21,7 @@ public class BoardTest {
 
         Tile tile = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer(space, 0, new RandomPlayer("Vyas", Color.BLUE));
 
         board.placeTile(tile, player);
         Assert.assertTrue(board.isOccupied(0, 0));
@@ -35,12 +35,12 @@ public class BoardTest {
         Board board = new Board();
 
         BoardSpace upperSpace = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer("Vyas", upperSpace, 0);
+        SPlayer vyas = new SPlayer(upperSpace, 0, new RandomPlayer("Vyas", Color.BLUE));
         Tile vyasTile = new Tile(0, 4, 1, 5, 2, 3, 6, 7);
 
 
         BoardSpace lowerSpace = board.getBoardSpace(1, 0);
-        SPlayer keith = new SPlayer("Keith", lowerSpace, 7);
+        SPlayer keith = new SPlayer(lowerSpace, 7, new RandomPlayer("Keith", Color.BLACK));
         Tile keithTile = new Tile(7, 0, 1, 2, 3, 4, 5, 6);
 
 
@@ -108,7 +108,7 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer keith = new SPlayer("Keith", start, 0);
+        SPlayer keith = new SPlayer(start, 0, new RandomPlayer("Keith", Color.BLACK));
         Tile tile = new Tile(0, 7, 2, 6, 1, 3, 4, 5);
 
         /* Goal:
@@ -148,10 +148,10 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer("Vyas", start, 0);
-        SPlayer keith = new SPlayer("Keith", start, 1);
-        SPlayer robby = new SPlayer("Robby", start, 6);
-        SPlayer christos = new SPlayer("Christos", start, 7);
+        SPlayer vyas = new SPlayer(start, 0, new RandomPlayer("Vyas", Color.BLUE));
+        SPlayer keith = new SPlayer(start, 1, new RandomPlayer("Keith", Color.BLACK));
+        SPlayer robby = new SPlayer(start, 6, new RandomPlayer("Robby", Color.GREY));
+        SPlayer christos = new SPlayer(start, 7, new RandomPlayer("Christos", Color.GREEN));
 
         Tile tile = new Tile(0, 7, 1, 6, 2, 3, 4, 5);
 
@@ -181,7 +181,7 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer("vyas", start, 7);
+        SPlayer vyas = new SPlayer(start, 7, new RandomPlayer("Vyas", Color.BLUE));
         Tile tileSchema = new Tile(7, 2, 6, 3, 4, 5, 0, 1);
         for (int i = 1; i < 6; i++){
             Tile tile = new Tile(tileSchema);

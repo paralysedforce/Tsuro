@@ -35,7 +35,7 @@ public class SPlayerTest {
         when(tilePileMock.drawFromDeck())
                 .thenReturn(tileOne, tileTwo, tileThree);
 
-        SPlayer testSPlayer = new SPlayer("Keith", new BoardSpace(0, 0), 0);
+        SPlayer testSPlayer = new SPlayer(new BoardSpace(0, 0), 0, null);
         testSPlayer.drawFromPile();
 
         verify(tilePileMock, times(3)).drawFromDeck();
@@ -47,7 +47,7 @@ public class SPlayerTest {
                 .thenReturn(null, null, null)
                 .thenReturn(tileOne);
 
-        SPlayer testSPlayer = new SPlayer("Keith", new BoardSpace(0, 0), 0);
+        SPlayer testSPlayer = new SPlayer( new BoardSpace(0, 0), 0, null);
         testSPlayer.drawFromPile();
 
         verify(tilePileMock, times(4)).drawFromDeck();
@@ -60,7 +60,7 @@ public class SPlayerTest {
                 .thenReturn(tileOne, tileTwo, tileThree);
 
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
-        SPlayer testSPlayer = new SPlayer("Keith", new BoardSpace(0, 0), 0);
+        SPlayer testSPlayer = new SPlayer( new BoardSpace(0, 0), 0, null);
 
         Assert.assertTrue(testSPlayer.holdsTile(testTile));
         testTile.rotateClockwise();
@@ -74,7 +74,7 @@ public class SPlayerTest {
                 .thenReturn(tileOne, tileTwo, tileThree);
 
         Tile testTile = new Tile(0, 4, 1, 5, 2, 6, 3, 7);
-        SPlayer testSPlayer = new SPlayer("Keith", new BoardSpace(0, 0), 0);
+        SPlayer testSPlayer = new SPlayer( new BoardSpace(0, 0), 0, null);
 
         Assert.assertFalse(testSPlayer.holdsTile(testTile));
     }

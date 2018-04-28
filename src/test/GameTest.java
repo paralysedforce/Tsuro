@@ -41,7 +41,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer(space, 0,null);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTile, player));
@@ -57,7 +57,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer(space, 0, null);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTile, player));
@@ -76,7 +76,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer(space, 0,null);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTileCanMove, player));
@@ -95,7 +95,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer("Vyas", space, 0);
+        SPlayer player = new SPlayer(space, 0,null);
         game.registerPlayer(player);
 
         Assert.assertFalse(game.isLegalMove(testTile, player));
@@ -115,8 +115,8 @@ public class GameTest {
 
         BoardSpace spaceOne = board.getBoardSpace(0, 0);
         BoardSpace spaceTwo = board.getBoardSpace(3, 5);
-        SPlayer vyas = new SPlayer("Vyas", spaceOne, 0);
-        SPlayer keith = new SPlayer("Keith", spaceTwo, 2);
+        SPlayer vyas = new SPlayer(spaceOne, 0, null);
+        SPlayer keith = new SPlayer(spaceTwo, 2, null);
 
         game.registerPlayer(vyas);
         game.registerPlayer(keith);
@@ -149,10 +149,10 @@ public class GameTest {
         BoardSpace spaceOne = board.getBoardSpace(1, 0);
         BoardSpace spaceTwo = board.getBoardSpace(5, 5);
 
-        SPlayer vyas = new SPlayer("Vyas", spaceOne, 7);
-        SPlayer keith =  new SPlayer("Keith", spaceOne, 6);
-        SPlayer robby =  new SPlayer("Robby", spaceTwo, 2);
-        SPlayer christos =  new SPlayer("Christos", spaceTwo, 5);
+        SPlayer vyas = new SPlayer(spaceOne, 7, null);
+        SPlayer keith =  new SPlayer(spaceOne, 6, null);
+        SPlayer robby =  new SPlayer(spaceTwo, 2, null);
+        SPlayer christos =  new SPlayer(spaceTwo, 5, null);
 
         game.registerPlayer(vyas);
         game.registerPlayer(keith);

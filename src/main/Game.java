@@ -2,9 +2,6 @@ package main;
 
 import java.util.*;
 
-/**
- * Created by vyasalwar on 4/16/18.
- */
 public class Game {
 
     //================================================================================
@@ -62,10 +59,20 @@ public class Game {
     //================================================================================
 
     // Add a player to a new game
-    public void registerPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        SPlayer player = new SPlayer(name, startingLocation, startingTokenSpace);
-        remainingPlayers.add(player);
+    public void registerPlayer(String name, Color color, PlayerType type){
+        APlayer aplayer;
+        switch(type) {
+            case RANDOM:
+                aplayer = new RandomPlayer(name, color);
+                break;
+            default:
+                throw new IllegalArgumentException("player type given was not valid");
+
+        }
+
+        remainingPlayers.add(aplayer.splayer);
     }
+
 
     public void registerPlayer(SPlayer player){
         remainingPlayers.add(player);
@@ -204,7 +211,8 @@ public class Game {
             int row = Integer.decode(line.substring(0, 1));
             int col = Integer.decode(line.substring(2, 3));
             int tokenSpace = Integer.decode(line.substring(4, 5));
-            game.registerPlayer(player, game.board.getBoardSpace(row, col), tokenSpace);
+            //need to add human player for this maybe or this turns into the human player
+//            game.registerPlayer(player, game.board.getBoardSpace(row, col), tokenSpace);
         }
         game.playGame();
     }

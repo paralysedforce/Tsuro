@@ -13,16 +13,27 @@ public class SPlayer {
     private final int MAX_TILES_IN_BANK = 3;
     private Token token;
     private Tile[] hand;
-    private String name;
     private TilePile tilePile;
+    private APlayer aplayer;
 
     //================================================================================
     // Constructors
     //================================================================================
 
-    public SPlayer(String name, BoardSpace startingLocation, int startingTokenSpace){
-        this.name = name;
+    public SPlayer(BoardSpace startingLocation, int startingTokenSpace, APlayer aplayer){
+        this.aplayer = aplayer;
         token = new Token(startingLocation, startingTokenSpace, this);
+        hand = new Tile[MAX_TILES_IN_BANK];
+        this.tilePile = Game.getGame().getTilePile();
+
+        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
+            hand[i] = tilePile.drawFromDeck();
+        }
+    }
+
+    public SPlayer(APlayer aplayer){
+        this.aplayer = aplayer;
+        token = null;
         hand = new Tile[MAX_TILES_IN_BANK];
         this.tilePile = Game.getGame().getTilePile();
 
@@ -40,10 +51,6 @@ public class SPlayer {
 
     public Tile getTile(int i){
         return hand[i];
-    }
-
-    public String getName(){
-        return name;
     }
 
     //================================================================================
@@ -95,6 +102,15 @@ public class SPlayer {
         }
     }
 
+    public void placeToken(BoardSpace startingLocation, int startingTokenSpace){
+        token = new Token(startingLocation, startingTokenSpace, this);
+    }
+
+
+    public boolean isSafeMove(Tile tile){
+        return !Game.getGame().getBoard().willKillPlayer(tile, this);
+    }
+
     public boolean hasSafeMove(){
         Board board = Game.getGame().getBoard();
 
@@ -115,7 +131,7 @@ public class SPlayer {
     /* A command line UI for a player to play their tiles
     *  EXPERIMENTAL */
     public Tile chooseTile(){
-        System.out.println("It is " + name + "'s turn.");
+//        System.out.println("It is " + name + "'s turn.");
         System.out.println("Type help to see commands");
         /* For input */
         Scanner scanner = new Scanner(System.in);
