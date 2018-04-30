@@ -2,6 +2,7 @@ import pytest
 
 from board import Board, BoardSquare, PathTile, Position, TilePlacement
 
+
 # For readability
 def P(i, j, tile_spot):
     return Position((i, j), tile_spot)
@@ -19,6 +20,7 @@ def test_board_state():
         TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
         TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
     ]
+
 
 def test_board_from_state():
     state = [

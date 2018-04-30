@@ -47,3 +47,8 @@ https://github.com/python/mypy/issues/1984
 ### Tests
 
 Unit tests are under the `/tests` module and use the [pytest](http://pytest.org) framework.
+
+
+```bash
+pytest && MYPYPATH=tsuro mypy tsuro tests --ignore-missing-imports && isort -c tsuro/*.py tests/*.py
+```

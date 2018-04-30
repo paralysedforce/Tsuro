@@ -26,7 +26,7 @@ class GameState(NamedTuple):
 def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     """Return the path from a tile placement, given a board state and a position."""
     (i, j), _ = player.position
-    board.place_tile(i, j, tile)
+    board.place_tile((i, j), tile)
     path = board.traverse_path(player.position)
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
     return path
@@ -81,16 +81,16 @@ class TsuroGame:
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
-    def state(self) -> GameState:
-        deck_state = list(self.deck._tiles)
-        active_players = list(self.players)
-        eliminated_players = self.eliminated_players
-        # board_state =
+    # def state(self) -> GameState:
+    #     deck_state = list(self.deck._tiles)
+    #     active_players = list(self.players)
+    #     eliminated_players = self.eliminated_players
+    #     # board_state =
 
-        # GameState(
-        #     deck=self.deck.
-        # )
-        pass
+    #     # GameState(
+    #     #     deck=self.deck.
+    #     # )
+    #     pass
 
     def peek_path(self, player: Player, path_tile: PathTile) -> List[Position]:
         """Return the resulting path from a certain tile placement.
