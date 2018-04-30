@@ -131,7 +131,7 @@ class TsuroGame:
 
     @staticmethod
     def play_a_turn(
-        state: GameState
+        state: GameState,
         tile_placement: TilePlacement
     ) -> (GameState, Union[List[Player], bool]):
         """Compute the state of the game."""
