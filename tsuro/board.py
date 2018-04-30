@@ -1,8 +1,6 @@
 from typing import Dict, List, NamedTuple, Tuple
 
-# A type for representing one of the 8 possible connecting positions on a tile.
-# TODO: Constrain this to the values in the range 0 - 7.
-# Opened an issue for this: https://github.com/python/typing/issues/554
+# A type for representing one of the 8 possible positions on a tile.
 """
            0   1
         +---------+
@@ -31,8 +29,6 @@ class Position(NamedTuple):
 
 class Board:
     """The Tsuro game board.
-
-    The board is indexed by (row, column).
 
          0  1  2  3
        +------------+
@@ -159,11 +155,6 @@ class Board:
 # TODO: Use an enum to represent the 4 possible Rotations?
 
 
-class NoPathTileError(Exception):
-    """Raised when indexing into a BoardSquare missing a path tile."""
-    pass
-
-
 class BoardSquare:
     """A square on the map.
 
@@ -188,7 +179,7 @@ class BoardSquare:
             TileSpot
         """
         if not self.path_tile:
-            raise NoPathTileError
+            raise ValueError('No path tile present in the board square.')
 
         tile_spot = self.path_tile[tile_spot]
         # TODO: Rotate.
@@ -200,20 +191,10 @@ class BoardSquare:
 
 
 class PathTile:
-    """A tile that connects TileSpots.
-
-           0   1
-        +---------+
-    7   |         |  2
-        |         |
-    6   |         |  3
-        +---------+
-           5   4
-    """
+    """A tile that connects TileSpots."""
     def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
-        # TODO: Assert that PathTile must be created with 4 tuples? This should be enforced by type.
         if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
-            raise ValueError('Path spots must be values in the range 0-7.')
+            raise ValueError('Tile spots must be values in the range 0-7.')
 
         self._paths = PathTile.create_paths_dict(connections)  # type: Dict[int, int]
         self._connections = connections

@@ -1,6 +1,6 @@
 import pytest
 
-from board import Board, BoardSquare, NoPathTileError, PathTile, Position
+from board import Board, BoardSquare, PathTile, Position
 
 # For readability
 P = Position
@@ -99,7 +99,7 @@ def test_board_square():
     square = BoardSquare()
 
     # Raises exception before a PathTile is placed.
-    with pytest.raises(NoPathTileError):
+    with pytest.raises(ValueError):
         square.next(0)
 
     assert not square.has_tile()
