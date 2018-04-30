@@ -4,7 +4,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple, Union  # noqa: F401
 from dataclasses import dataclass
 
 import default_config
-from board import Board, PathTile, Position
+from board import Board, PathTile, Position, TilePlacement
 from deck import Deck
 
 
@@ -16,9 +16,16 @@ class Player:
     tiles: List[PathTile]
 
 
+class GameState(NamedTuple):
+    deck: List[PathTile]
+    active_players: List[Player]
+    eliminated_players: List[Player]
+    board_tiles: List[TilePlacement]
+
+
 def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     """Return the path from a tile placement, given a board state and a position."""
-    i, j, _ = player.position
+    (i, j), _ = player.position
     board.place_tile(i, j, tile)
     path = board.traverse_path(player.position)
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
@@ -64,11 +71,7 @@ class TsuroGame:
         self.deck = self.deck_factory()    # type: Deck
         self.dragon_tile_holder = None     # type: Optional[Player]
         self.players = deque(players)
-
-    def next_player(self) -> Player:
-        p = self.players.popleft()
-        self.players.append(p)
-        return p
+        self.eliminated_players = list()   # type: List[Player]
 
     def deal_to(self, player: Player):
         """Deal from the deck to a player. Assign the dragon card if needed."""
@@ -78,13 +81,24 @@ class TsuroGame:
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
+    def state(self) -> GameState:
+        deck_state = list(self.deck._tiles)
+        active_players = list(self.players)
+        eliminated_players = self.eliminated_players
+        # board_state =
+
+        # GameState(
+        #     deck=self.deck.
+        # )
+        pass
+
     def peek_path(self, player: Player, path_tile: PathTile) -> List[Position]:
         """Return the resulting path from a certain tile placement.
 
         Does not mutate the board.
         """
-        i, j, _ = player.position
-        self.board.place_tile(i, j, path_tile)
+        (i, j), _ = player.position
+        self.board.place_tile((i, j), path_tile)
         path = self.board.traverse_path(player.position)
         self.board._board[i][j] = None
         return path

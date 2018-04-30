@@ -8,11 +8,11 @@ class Deck:
     """A deck of PathTiles.
 
     Attributes:
-        _cards (Deque[PathTile])
+        _tiles (Deque[PathTile])
     """
 
     def __init__(self, tiles: List[PathTile]) -> None:
-        self._cards = deque(tiles)
+        self._tiles = deque(tiles)
 
     @classmethod
     def from_connections(cls, connections: List[List[Tuple[int, int]]]):
@@ -22,10 +22,10 @@ class Deck:
 
     def draw(self) -> Optional[PathTile]:
         """Return the top card from the deck. If deck is empty, return None."""
-        if not self._cards:
+        if not self._tiles:
             return None
         else:
-            return self._cards.popleft()
+            return self._tiles.popleft()
 
     def replace_tiles(self, cards: List[PathTile]):
         """Return cards to the bottom of the deck.
@@ -34,15 +34,15 @@ class Deck:
             cards: (List[PathTile])
         """
         for card in cards:
-            self._cards.append(card)
+            self._tiles.append(card)
 
     def __len__(self):
-        return len(self._cards)
+        return len(self._tiles)
 
     def __eq__(self, other):
         if not len(self) == len(other):
             return False
-        return all([c0 == c1 for c0, c1 in zip(self._cards, other._cards)])
+        return all([c0 == c1 for c0, c1 in zip(self._tiles, other._tiles)])
 
     def __contains__(self, card):
-        return card in self._cards
+        return card in self._tiles

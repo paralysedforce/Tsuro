@@ -19,12 +19,26 @@ class Position(NamedTuple):
     A position on the board is defined by the index of its BoardSquare (x, y),
     and the TileSpot on that BoardSquare. This is an immutable algebraic datatype.
     """
-    i: int
-    j: int
+    coordinate: Tuple[int, int]
     tile_spot: TileSpot
 
     def __repr__(self):
         return 'Position({}, {}, {})'.format(self.i, self.j, self.tile_spot)
+
+    @property
+    def i(self):
+        return self.coordinate[0]
+
+    @property
+    def j(self):
+        return self.coordinate[1]
+
+
+class TilePlacement(NamedTuple):
+    """The placement of a tile."""
+    tile: 'PathTile'
+    coordinate: Tuple[int, int]
+    rotation: int
 
 
 class Board:
@@ -80,24 +94,41 @@ class Board:
         self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]
         self._width = width
         self._height = height
-        self._edge_positions = []  # type: List[Position]
+
+    def state(self) -> List[TilePlacement]:
+        tile_placements = []
+        for i in range(self._width):
+            for j in range(self._height):
+                square = self._board[i][j]
+                if square.has_tile():
+                    tp = TilePlacement(square.path_tile, (i, j), square.rotation)
+                    tile_placements.append(tp)
+        return tile_placements
+
+    @classmethod
+    def from_state(cls, height, width, tile_placements: List[TilePlacement]) -> 'Board':
+        board = cls(height, width)
+        for tile, coordinate, rotation in tile_placements:
+            board.place_tile(coordinate, tile)
+        return board
 
     @property
     def edge_positions(self) -> List[Position]:
         # Memoized, since it only needs to be calculated once.
-        if not self._edge_positions:
+        if not hasattr(self, '_edge_positions'):
             posns = []  # type: List[Position]
             w = self._width
             h = self._height
-            posns += [Position(0, j, ts)     for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
-            posns += [Position(i, w - 1, ts) for i in range(h) for ts in (2, 3)]  # right edge   # noqa: E272
-            posns += [Position(h - 1, j, ts) for j in range(w) for ts in (4, 5)]  # bottom edge  # noqa: E272
-            posns += [Position(i, 0, ts)     for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
+            posns += [Position((0, j), ts)     for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
+            posns += [Position((i, w - 1), ts) for i in range(h) for ts in (2, 3)]  # right edge   # noqa: E272
+            posns += [Position((h - 1, j), ts) for j in range(w) for ts in (4, 5)]  # bottom edge  # noqa: E272
+            posns += [Position((i, 0), ts)     for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
             self._edge_positions = posns
 
         return self._edge_positions
 
-    def place_tile(self, i: int, j: int, path_tile: 'PathTile'):
+    def place_tile(self, coordinate: Tuple[int, int], path_tile: 'PathTile'):
+        i, j = coordinate
         self._check_bounds(i, j)
         self._board[i][j].path_tile = path_tile
 
@@ -109,12 +140,12 @@ class Board:
 
         path = []
         while True:
-            i, j, tile_spot = p
+            (i, j), tile_spot = p
             next_ts_within_square = self._board[i][j][tile_spot]
 
             # First, append the movement within the square.
             path.append(p)
-            path.append(Position(p.i, p.j, next_ts_within_square))
+            path.append(Position((p.i, p.j), next_ts_within_square))
 
             # Now, traverse to the next square if possible.
             i_offset, j_offset = self.TILE_SPOT_OFFSET[next_ts_within_square]
@@ -124,7 +155,7 @@ class Board:
             if not self._in_bounds(next_i, next_j):
                 break
 
-            next_p = Position(next_i, next_j, self.ADJACENT_TILE_SPOT[next_ts_within_square])
+            next_p = Position((next_i, next_j), self.ADJACENT_TILE_SPOT[next_ts_within_square])
             if not self._board[next_i][next_j].has_tile():
                 path.append(next_p)
                 break
@@ -164,7 +195,7 @@ class BoardSquare:
     """
     def __init__(self):
         self.path_tile = None  # Using the Strategy Pattern with path tiles.
-        # self._rotation = 0
+        self.rotation = 0
 
     def has_tile(self) -> bool:
         return self.path_tile is not None
@@ -215,5 +246,6 @@ class PathTile:
     def __eq__(self, other):
         return self._paths == other._paths
 
-    def __str__(self):
-        return "\n".join("{} <-> {}".format(c0, c1) for c0, c1 in self._connections)
+    def __repr__(self):
+        paths = ', '.join(['({}, {})'.format(x, y) for x, y in self._connections])
+        return "PathTile([{}])".format(paths)
