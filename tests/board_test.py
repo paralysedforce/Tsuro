@@ -1,6 +1,7 @@
 import pytest
 
-from board import Board, BoardSquare, PathTile, Position, TilePlacement
+from board import (Board, BoardSquare, BoardState, PathTile, Position,
+                   TilePlacement)
 
 
 # For readability
@@ -12,23 +13,35 @@ def test_board_state():
     b = Board(2, 2)
     tile0 = PathTile([(0, 1)])
     b.place_tile((0, 0), tile0)
-    assert b.state() == [TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0)]
+    assert b.state() == BoardState(
+        [TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0)],
+        2,
+        2,
+    )
 
     tile1 = PathTile([(2, 3)])
     b.place_tile((1, 1), tile1)
-    assert b.state() == [
-        TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
-        TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
-    ]
+    assert b.state() == BoardState(
+        tile_placements=[
+            TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
+            TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
+        ],
+        height=2,
+        width=2,
+    )
 
 
 def test_board_from_state():
-    state = [
-        TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
-        TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
-    ]
+    state = BoardState(
+        tile_placements=[
+            TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
+            TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
+        ],
+        height=2,
+        width=2,
+    )
 
-    b = Board.from_state(5, 5, state)
+    b = Board.from_state(state)
     assert b._board[0][0].path_tile == PathTile([(0, 1)])
     assert b._board[1][1].path_tile == PathTile([(2, 3)])
 

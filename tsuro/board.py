@@ -41,6 +41,14 @@ class TilePlacement(NamedTuple):
     rotation: int
 
 
+# TODO: Add a Stateful interface and a State base class. Add type annotations to
+# TsuroGame, Board, and Deck.
+class BoardState(NamedTuple):
+    tile_placements: List[TilePlacement]
+    height: int
+    width: int
+
+
 class Board:
     """The Tsuro game board.
 
@@ -95,7 +103,7 @@ class Board:
         self._width = width
         self._height = height
 
-    def state(self) -> List[TilePlacement]:
+    def state(self) -> BoardState:
         tile_placements = []
         for i in range(self._width):
             for j in range(self._height):
@@ -103,12 +111,17 @@ class Board:
                 if square.has_tile():
                     tp = TilePlacement(square.path_tile, (i, j), square.rotation)
                     tile_placements.append(tp)
-        return tile_placements
+
+        return BoardState(
+            tile_placements=tile_placements,
+            height=self._height,
+            width=self._width,
+        )
 
     @classmethod
-    def from_state(cls, height, width, tile_placements: List[TilePlacement]) -> 'Board':
-        board = cls(height, width)
-        for tile, coordinate, rotation in tile_placements:
+    def from_state(cls, state: BoardState) -> 'Board':
+        board = cls(state.height, state.width)
+        for tile, coordinate, rotation in state.tile_placements:
             board.place_tile(coordinate, tile)
         return board
 

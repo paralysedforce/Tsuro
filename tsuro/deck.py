@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 
 from board import PathTile
 
+# TODO: Make Deck stateful and add DeckState
 
 class Deck:
     """A deck of PathTiles.
@@ -46,3 +47,11 @@ class Deck:
 
     def __contains__(self, card):
         return card in self._tiles
+
+    def state(self) -> List[PathTile]:
+        return list(self._tiles)
+
+    @classmethod
+    def from_state(cls, tiles: List[PathTile]) -> 'Deck':
+        # this just aliases the default constructor
+        return cls(tiles)

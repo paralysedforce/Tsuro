@@ -4,7 +4,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple, Union  # noqa: F401
 from dataclasses import dataclass
 
 import default_config
-from board import Board, PathTile, Position, TilePlacement
+from board import Board, BoardState, PathTile, Position, TilePlacement
 from deck import Deck
 
 
@@ -17,10 +17,11 @@ class Player:
 
 
 class GameState(NamedTuple):
-    deck: List[PathTile]
     active_players: List[Player]
     eliminated_players: List[Player]
-    board_tiles: List[TilePlacement]
+    dragon_holder: Optional[int]
+    board_state: BoardState
+    deck_state: List[PathTile]
 
 
 def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
@@ -81,16 +82,30 @@ class TsuroGame:
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
-    # def state(self) -> GameState:
-    #     deck_state = list(self.deck._tiles)
-    #     active_players = list(self.players)
-    #     eliminated_players = self.eliminated_players
-    #     # board_state =
+    def state(self) -> GameState:
+        return GameState(
+            active_players=list(self.players),
+            eliminated_players=self.eliminated_players,
+            dragon_holder=self.players.index(self.dragon_tile_holder) if self.dragon_tile_holder else None,
+            board_state=self.board.state(),
+            deck_state=self.deck.state(),
+        )
 
-    #     # GameState(
-    #     #     deck=self.deck.
-    #     # )
-    #     pass
+    @classmethod
+    def from_state(cls, game_state: GameState):
+        game = cls([])
+        game.players = deque(game_state.active_players)
+        game.eliminated_players = game_state.eliminated_players
+        game.deck = Deck.from_state(game_state.deck_state)
+        game.board = Board.from_state(game_state.board_state)
+
+        if game_state.dragon_holder is None:
+            game.dragon_tile_holder = None
+        else:
+            holder_index = game_state.dragon_holder
+            game.dragon_tile_holder = game.players[holder_index]
+
+        return game
 
     def peek_path(self, player: Player, path_tile: PathTile) -> List[Position]:
         """Return the resulting path from a certain tile placement.
