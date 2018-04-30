@@ -4,7 +4,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple, Union  # noqa: F401
 from dataclasses import dataclass
 
 import default_config
-from board import Board, BoardState, PathTile, Position, TilePlacement
+from board import Board, PathTile, Position, TilePlacement, BoardState
 from deck import Deck
 
 
@@ -32,6 +32,12 @@ def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
     return path
 
+def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]):
+    for player in active_players:
+        if player.position.coordinate == square:
+            path = board.traverse_path(player.position)
+            player.position = path[-1]
+
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
     path = peek_path(player, board, tile)
@@ -39,9 +45,11 @@ def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool
     return board.is_on_edge(landing_position)
 
 
-def legal_play(player: Player, board: Board, tile: PathTile) -> bool:
-    # not valid if player doesn't hold the tile being placed
-    if tile not in player.tiles:
+def legal_play(player: Player, board: Board, placement: TilePlacement) -> bool:
+    tile = placement.tile
+
+    # Not valid if attempting to place where the player is not
+    if not placement.coordinate == player.position.coordinate:
         return False
 
     # not valid if placement of the tile eliminates the player, unless all tiles eliminate player
@@ -123,44 +131,55 @@ class TsuroGame:
 
     @staticmethod
     def play_a_turn(
-        deck: Deck,
-        active_players: List[Player],
-        elim_players: List[Player],
-        board: Board,
-        new_tile: PathTile,
-        i: int,
-        j: int
-    ) -> Tuple[Deck, List[Player], List, Board, Union[List[Player], bool]]:
+        state: GameState
+        tile_placement: TilePlacement
+    ) -> (GameState, Union[List[Player], bool]):
         """Compute the state of the game."""
-        # moving_player = active_players[0]
+        # Assume the tile to be placed has already been removed from the
+        # player's hand and is being placed in the proper loction.
 
-        # square = moving_player.get_token().get_location().get_parent()
+        game = TsuroGame.from_state(state)
 
-        # # Place tile in the square
-        # square.place_card(placement_tile)
-        # moving_player.draw_card()
+        # Place the tile and move the players
+        game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
+        move_players(game.active_players, game.board)
 
-        # # Remove inactive players
-        # for player in active_players:
-        #     if not player.is_active():
-        #         active_players.remove(player)
+        # Deal to the current player and put it last in line
+        current_player = game.players.popleft()
+        game.deal_to(current_player)
+        game.players.append(current_player)
 
-        # # Still need to move to the end of the list
-        # if moving_player.is_active():
-        #     active_players.remove(moving_player)
-        #     active_players.append(moving_player)
+        # Eliminate players on the edge
+        for player in game.active_players:
+            if board.is_on_edge(player.position):
+                # Eliminate the player
+                game.active_players.remove(player)
+                game.eliminated_players.append(player)
 
-        # sum_hands = 0
-        # for player in active_players:
-        #     sum_hands += len(player._hand)
+                # Return cards to deck
+                game.deck.replace_tiles(player.tiles)
 
-        # game_over = len(active_players) < 2 or sum_hands == 0
+                if game.dragon_tile_holder is not None:
+                    # If the recently-eliminated player was the holder, pass it
+                    # along. (note: if next player has full hand, everyone does)
+                    if game.dragon_tile_holder == player:
+                        game.dragon_tile_holder = None
+                        player_index = game.players.index(player)
+                        candidate = game.players[(player_index + 1) % len(game.players)]
+                        if len(candidate.tiles) < 3:
+                            game.dragon_tile_holder = candidate
 
-        # if game_over:
-        #     return (draw_pile, active_players, eliminated_players, board, active_players)
-        # else:
-        #     return (draw_pile, active_players, eliminated_players, board, False)
-        pass
+                # Draw cards if dragon card is held
+                if game.dragon_tile_holder is not None:
+                    player_index = game.players.index(game.dragon_tile_holder)
+                    game.dragon_tile_holder = None
+                    # Let all players draw until dragon card is held again,
+                    # starting with dragon holder.
+                    for i in range(len(game.players)):
+                        drawer = game.players[(player_index + i) % len(game.players)]
+                        if game.dragon_tile_holder is not None or len(drawer.tiles) == 3:
+                            break
+                        game.deal_to(drawer)
 
     def board_factory(self) -> Board:
         return Board(default_config.DEFAULT_WIDTH, default_config.DEFAULT_HEIGHT)
