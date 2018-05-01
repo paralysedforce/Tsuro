@@ -222,8 +222,6 @@ def test_dragon_player_self_elimination_deck_behavior():
     )
 
     tile0 = PathTile([(0, 1)])
-    tile1 = PathTile([(2, 3)])
-    tile2 = PathTile([(4, 5)])
 
     # one_card = start_game_state().update(dragon_holder=0, deck_state=[tile0])
     # two_cards = start_game_state().update(dragon_holder=0, deck_state=[tile0, tile1])
