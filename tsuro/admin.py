@@ -159,8 +159,7 @@ class TsuroGame:
         for player in to_eliminate:
             if game.board.is_on_edge(player.position):
                 # Eliminate the player
-                game.players.remove(player)
-                game.eliminated_players.append(player)
+                # (wait to do this until dragon tile reference removed)
 
                 # Return cards to deck
                 game.deck.replace_tiles(player.tiles)
@@ -175,6 +174,9 @@ class TsuroGame:
                         if len(candidate.tiles) < 3:
                             game.dragon_tile_holder = candidate
 
+                game.players.remove(player)
+                game.eliminated_players.append(player)
+
                 # Draw cards if dragon card is held
                 if game.dragon_tile_holder is not None:
                     player_index = game.players.index(game.dragon_tile_holder)
@@ -187,11 +189,11 @@ class TsuroGame:
                             break
                         game.deal_to(drawer)
 
-        # Game ends if there are no more active players,
+        # Game ends if there are less than 2 active players,
         # or all of the tiles have been placed
         end_state = game.state()
         game_did_end = False
-        game_did_end = game_did_end or len(end_state.active_players) == 0
+        game_did_end = game_did_end or len(end_state.active_players) < 2
         game_did_end = game_did_end or len(end_state.deck_state) ==\
             (end_state.board_state.height * end_state.board_state.width)-1
 

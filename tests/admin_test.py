@@ -208,7 +208,16 @@ def test_move_multiple_players():
 
 # making a move where multiple players are eliminated
 def test_eliminate_multiple():
-    pass
+    initial_state = start_game_state()
+    placement = TilePlacement(
+        tile=PathTile([(0, 1), (6, 7)]),
+        coordinate=(0,0),
+        rotation=0
+    )
+
+    (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
+    assert len(final_state.active_players) == 1
+
 
 # making a move where the tile is not placed in its original position (i.e., it is rotated)
 def test_test_place_rotation():
