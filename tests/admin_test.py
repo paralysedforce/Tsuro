@@ -6,22 +6,12 @@ from deck import Deck, PathTile
 from default_config import DEFAULT_WIDTH, DEFAULT_HEIGHT
 
 
-# def test_illegal_move():
-#     player = Player(Deck([[(0, 1), (2, 3), (4, 5), (6, 7), ]]), DragonCard())
-#     token = Token(player)
-
-#     board = Board()
-#     board.place_token_start(0, token)
-
-#     assert not (Administrator.is_legal_play(board, player._hand[0], player))
-
-
 def start_game_state():
     """Build a consistent game state for testing.
 
-    1: Player('Eric', Position((0, 0), 0), [])
-    2: Player('Will', Position((0, 0), 6), [])
-    3: Player('John', Position((0, 2), 0), [])
+    1: Player('A', Position((0, 0), 0), [])
+    2: Player('B', Position((0, 0), 6), [])
+    3: Player('C', Position((0, 2), 0), [])
 
 
             +---------++---------++---------+
@@ -41,9 +31,9 @@ def start_game_state():
     """
     return GameState(
         active_players=[
-            Player('Eric', Position((0, 0), 0), []),
-            Player('Will', Position((0, 0), 6), []),
-            Player('John', Position((0, 2), 0), []),
+            Player('A', Position((0, 0), 0), []),
+            Player('B', Position((0, 0), 6), []),
+            Player('C', Position((0, 2), 0), []),
         ],
         eliminated_players=[],
         dragon_holder=None,
@@ -60,95 +50,6 @@ def P(i, j, tile_spot):
     return Position((i, j), tile_spot)
 
 
-class TsuroGameOneCard(TsuroGame):
-    def deck_factory(self):
-        return Deck([PathTile([(0, 1)])])
-
-
-# def admin_base(deck: Deck=TsuroGameOneCard.deck_factory()):
-#     """Creates a game with 4 players on the 4 corners of the board"""
-#     player1 = Player(name='Robby', position=P(i=0, j=0, tile_spot=0), tiles=[])
-#     player2 = Player(name='Will', position=P(i=4, j=0, tile_spot=2), tiles=[])
-#     player3 = Player(name='Eric', position=P(i=4, j=4, tile_spot=4), tiles=[])
-#     player4 = Player(name='Jerry', position=P(i=0, j=4, tile_spot=6), tiles=[])
-
-#     game = TsuroGame([player1, player2, player3, player4])
-#     game.deck = deck
-
-
-def test_deal_to():
-    player = Player(name='Robby', position=None, tiles=[])
-    game = TsuroGameOneCard([player])
-
-    assert player.tiles == [], 'start with no tiles'
-    game.deal_to(player)
-    assert player.tiles == [PathTile([(0, 1)])], 'deal one tile'
-    game.deal_to(player)
-    assert player.tiles == [PathTile([(0, 1)])], 'deal from empty deck'
-
-
-def test_dragon_tile():
-    p0 = Player(name='Eric', position=None, tiles=[])
-    p1 = Player(name='Will', position=None, tiles=[])
-
-    game = TsuroGameOneCard([p0, p1])
-    assert game.dragon_tile_holder is None, "dragon tile isn't held at start of game"
-
-    game.deal_to(p0)
-    assert game.dragon_tile_holder is None, "if a card is dealt, don't assign dragon card"
-
-    game.deal_to(p0)
-    assert game.dragon_tile_holder is p0, "assign dragon card once deck is empty"
-
-    game.deal_to(p1)
-    assert game.dragon_tile_holder is p0, "don't reassign dragon card if it's held"
-
-
-def test_place_tile():
-    # (0, 0, 0) -> (0, 0, 5)
-    p0 = Player(name='Eric', position=P(0, 0, 0), tiles=[])
-    game = TsuroGame([p0])
-    tile = PathTile([(0, 5)])
-    assert game.peek_path(player=p0, path_tile=tile) == [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0)]
-
-
-def test_place_two_tiles():
-    # Place a tile at (0,1) and peek path at (0,0)
-    tile0 = PathTile([(0, 5)])
-    tile1 = PathTile([(0, 5)])
-
-    p0 = Player('p0', P(0, 0, 0), [])
-
-    game = TsuroGame([p0])
-    game.board.place_tile((1, 0), tile0)
-
-    expected_path = [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0), P(1, 0, 5), P(2, 0, 0)]
-    assert game.peek_path(player=p0, path_tile=tile1) == expected_path
-    assert not game.board[0][1].has_tile(), 'does not modify state of the board'
-
-
-# def test_play_a_turn():
-#     placed_tile = PathTile([(0, 5)])
-#     p0 = Player('p0', P(0, 0, 0), tiles=[placed_tile])
-
-    # game = TsuroGameOneCard([p0])
-
-    # deck: Deck,
-    # active_players: List[Player],
-    # elim_players: List[Player],
-    # board: Board,
-    # new_tile: PathTile,
-    # i: int,
-    # j: int
-    # -> Tuple[Deck, List[Player], List[Player], Board, Optional[List[Player]]]
-    # (new_deck, active_players, eliminated_players, board, winners_or_false) = game.play_a_turn(game.deck, [p0], [], game.board, t0, 0, 0)
-
-    # assert not new_deck
-    # assert active_players == [Player('p0', P(0, 1, 0), [PathTile([(0, 1)])])]
-    # assert not eliminated_players
-    # assert board._board[0][0].path_tile == placed_tile
-    # assert not winners_or_false
-
 # making a move from the edge
 def test_move_from_edge():
     initial_state = start_game_state()
@@ -161,8 +62,9 @@ def test_move_from_edge():
 
     assert final_state.active_players[1].position == P(1, 2, 0)
 
+
 # making a move that causes a token to cross multiple tiles
-def test_move_accross_multiple():
+def test_move_across_multiple():
     initial_state = start_game_state()
 
     placement0 = TilePlacement(
@@ -276,7 +178,7 @@ def test_dragon_player_eliminates_other():
 # moving where a player that does not have the dragon tile makes a move and it causes an elimination of the player that has the dragon tile
 def test_dragon_player_eliminated_other_dragon_tile_behavior():
     state = start_game_state()
-    # Player John is the dragon holder, and Player D comes right after John
+    # Player C is the dragon holder, and Player D comes right after C
     additional_player = state.active_players + [Player('D', Position((3, 3), 3), [])]
     state = state.update(
         active_players=additional_player,
@@ -289,11 +191,11 @@ def test_dragon_player_eliminated_other_dragon_tile_behavior():
         rotation=0,
     )
 
-    assert state.active_players[state.dragon_holder].name == 'John', 'Player John is the original dragon tile holder'
+    assert state.active_players[state.dragon_holder].name == 'C', 'Player C is the original dragon tile holder'
 
     new_state, _ = TsuroGame.play_a_turn(state, placement)
     assert new_state.active_players[new_state.dragon_holder].name == 'D', 'Player D is now the dragon tile holder'
-    assert new_state.dragon_holder == 1, 'Player Eric plays a turn that eliminates Player John, then requeues, leaving D in index 1'
+    assert new_state.dragon_holder == 1, 'Player A plays a turn that eliminates Player C, then requeues, leaving D in index 1'
 
 
 # moving where the player that has the dragon tile makes a move that causes themselves to be eliminated
@@ -308,8 +210,8 @@ def test_dragon_player_self_elimination_dragon_tile_behavior():
     )
 
     new_state, _ = TsuroGame.play_a_turn(state, eliminate_player_A)
-    assert new_state.active_players[0].name == 'Will', 'Eric was eliminated'
-    assert new_state.dragon_holder == 0, 'Will is now the dragon tile holder'
+    assert new_state.active_players[0].name == 'B', 'A was eliminated'
+    assert new_state.dragon_holder == 0, 'B is now the dragon tile holder'
 
 
 def test_dragon_player_self_elimination_deck_behavior():
@@ -338,3 +240,71 @@ def test_dragon_player_self_elimination_deck_behavior():
     # new_state, _ = TsuroGame.play_a_turn(three_cards, eliminate_player_A)
     # print(new_state)
     # assert new_state.active_players[0].tiles == [tile0, tile2], 'Card drawing rotates to front of queue'
+
+
+# OLD TESTS
+
+class TsuroGameOneCard(TsuroGame):
+    def deck_factory(self):
+        return Deck([PathTile([(0, 1)])])
+
+
+def test_deal_to():
+    player = Player(name='A', position=None, tiles=[])
+    game = TsuroGameOneCard([player])
+
+    assert player.tiles == [], 'start with no tiles'
+    game.deal_to(player)
+    assert player.tiles == [PathTile([(0, 1)])], 'deal one tile'
+    game.deal_to(player)
+    assert player.tiles == [PathTile([(0, 1)])], 'deal from empty deck'
+
+
+def test_dragon_tile():
+    p0 = Player(name='A', position=None, tiles=[])
+    p1 = Player(name='B', position=None, tiles=[])
+
+    game = TsuroGameOneCard([p0, p1])
+    assert game.dragon_tile_holder is None, "dragon tile isn't held at start of game"
+
+    game.deal_to(p0)
+    assert game.dragon_tile_holder is None, "if a card is dealt, don't assign dragon card"
+
+    game.deal_to(p0)
+    assert game.dragon_tile_holder is p0, "assign dragon card once deck is empty"
+
+    game.deal_to(p1)
+    assert game.dragon_tile_holder is p0, "don't reassign dragon card if it's held"
+
+
+def test_place_tile():
+    # (0, 0, 0) -> (0, 0, 5)
+    p0 = Player(name='A', position=P(0, 0, 0), tiles=[])
+    game = TsuroGame([p0])
+    tile = PathTile([(0, 5)])
+    assert game.peek_path(player=p0, path_tile=tile) == [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0)]
+
+
+def test_place_two_tiles():
+    # Place a tile at (0,1) and peek path at (0,0)
+    tile0 = PathTile([(0, 5)])
+    tile1 = PathTile([(0, 5)])
+
+    p0 = Player('p0', P(0, 0, 0), [])
+
+    game = TsuroGame([p0])
+    game.board.place_tile((1, 0), tile0)
+
+    expected_path = [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0), P(1, 0, 5), P(2, 0, 0)]
+    assert game.peek_path(player=p0, path_tile=tile1) == expected_path
+    assert not game.board[0][1].has_tile(), 'does not modify state of the board'
+
+
+# def test_illegal_move():
+#     player = Player(Deck([[(0, 1), (2, 3), (4, 5), (6, 7), ]]), DragonCard())
+#     token = Token(player)
+
+#     board = Board()
+#     board.place_token_start(0, token)
+
+#     assert not (Administrator.is_legal_play(board, player._hand[0], player))

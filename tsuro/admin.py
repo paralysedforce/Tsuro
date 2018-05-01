@@ -48,18 +48,6 @@ def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     return path
 
 
-def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
-    """Moves the active_players that are in square along their paths and returns
-        the players that should be eliminated"""
-    to_eliminate = []
-    for player in active_players:
-        if player.position.coordinate == square:
-            path = board.traverse_path(player.position)
-            player.position = path[-1]
-            if board.is_on_edge(player.position):
-                to_eliminate.append(player)
-    return to_eliminate
-
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
     path = peek_path(player, board, tile)
@@ -149,8 +137,18 @@ class TsuroGame:
         self.board._board[i][j] = None
         return path
 
-    def peek_path_list(self, players: List[Player], path_tile: PathTile) -> List[Tuple[Player, List[Position]]]:
-        pass
+    @staticmethod
+    def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
+        """Moves the active_players that are in square along their paths and returns
+            the players that should be eliminated"""
+        to_eliminate = []
+        for player in active_players:
+            if player.position.coordinate == square:
+                path = board.traverse_path(player.position)
+                player.position = path[-1]
+                if board.is_on_edge(player.position):
+                    to_eliminate.append(player)
+        return to_eliminate
 
     @staticmethod
     def play_a_turn(
@@ -165,7 +163,7 @@ class TsuroGame:
 
         # Place the tile and move the players
         game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        to_eliminate = move_players(game.players, game.board, tile_placement.coordinate)
+        to_eliminate = TsuroGame.move_players(game.players, game.board, tile_placement.coordinate)
 
         # Deal to the current player and put it last in line
         current_player = game.players.popleft()
@@ -192,7 +190,7 @@ class TsuroGame:
                 # Eliminate the player
                 game.players.remove(player)
                 game.eliminated_players.append(player)
-
+#
                 # Draw cards if dragon card is held
                 if game.dragon_tile_holder is not None:
                     player_index = game.players.index(game.dragon_tile_holder)
