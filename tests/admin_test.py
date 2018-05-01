@@ -159,14 +159,29 @@ def test_move_from_edge():
     )
     (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
 
-    for player in final_state.active_players:
-        if player.name == 'John':
-            assert player.position == P(1, 2, 0)
+    assert final_state.active_players[1].position == P(1, 2, 0)
 
 # making a move that causes a token to cross multiple tiles
 def test_move_accross_multiple():
-    # placement0 = create_simple_placement()
-    # placement1 = create_simple_placement()
+    initial_state = start_game_state()
+
+    placement0 = TilePlacement(
+        tile=PathTile([(0, 5), (6, 3)]),
+        coordinate=(1, 2),
+        rotation=0
+    )
+    placement1 = TilePlacement(
+        tile=PathTile([(0, 5), (6, 3)]),
+        coordinate=(0, 2),
+        rotation=0
+    )
+
+    (mid_state, _) = TsuroGame.play_a_turn(initial_state, placement0)
+    (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
+
+    assert final_state.active_players[0].position == P(2, 2, 0)
+
+
     # # Update placement0 to be not adjacent to the player
     # placement0 = TilePlacement(placement0[0], (1, 0), placement0[2])
     # initial_state = create_simple_game_state()
