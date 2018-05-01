@@ -124,11 +124,9 @@ def test_move_from_edge():
 
     game = TsuroGame.from_state(after_state)
 
-    assert len(game.eliminated_players) == 0
-    p0_after = Player('p0', P(0, 1, 0), tiles=[])
-    assert game.players == [p0]
-    assert game.board.state() == ([placement], DEFAULT_WIDTH, DEFAULT_HEIGHT)
-
+    p0_after_expected = Player('p0', P(0, 1, 0), tiles=[])
+    # assert p0_after_expected == game.players[0]
+    assert False
 
 
 

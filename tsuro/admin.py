@@ -36,7 +36,12 @@ def move_players(active_players: List[Player], board: Board, square: Tuple[int, 
     for player in active_players:
         if player.position.coordinate == square:
             path = board.traverse_path(player.position)
+            assert path is None
             player.position = path[-1]
+        else:
+            print(player.position.coordinate)
+            print(square)
+            assert player.position.coordinate == square
 
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
@@ -186,10 +191,13 @@ class TsuroGame:
         end_state = game.state()
         game_did_end = False
         game_did_end = game_did_end or len(end_state.active_players) == 0
-        # game_did_end = game_did_end or len(end_state.deck_state) == end_state.board_state.
+        game_did_end = game_did_end or len(end_state.deck_state) ==\
+            (end_state.board_state.height * end_state.board_state.width)-1
 
-
-        return (game.state(), game_did_end)
+        if game_did_end:
+            return (end_state, end_state.active_players)
+        else:
+            return (game.state(), False)
 
     def board_factory(self) -> Board:
         return Board(default_config.DEFAULT_WIDTH, default_config.DEFAULT_HEIGHT)
