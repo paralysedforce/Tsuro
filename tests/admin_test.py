@@ -257,7 +257,26 @@ def test_never_dragon():
 
 # moving where one player has the dragon tile before and no one gets any new tiles
 def test_no_new_tiles():
-    pass
+    initial_state = start_game_state()
+
+    placement0 = TilePlacement(
+        tile=PathTile([(0, 5), (6, 3)]),
+        coordinate=(1, 2),
+        rotation=0
+    )
+    placement1 = TilePlacement(
+        tile=PathTile([(0, 5), (6, 3)]),
+        coordinate=(0, 2),
+        rotation=0
+    )
+
+    (mid_state, _) = TsuroGame.play_a_turn(initial_state, placement0)
+    # Now the last player should be the dragon holder
+    assert mid_state.dragon_holder == 2
+    (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
+    # All that has changed is that the holder is further up in the queue
+    assert final_state.dragon_holder == 1
+
 
 # moving where the player that has the dragon tile makes a move that causes an elimination (of another player)
 def test_dragon_player_eliminates_other():
