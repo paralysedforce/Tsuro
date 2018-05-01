@@ -32,11 +32,17 @@ def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
     return path
 
-def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]):
+def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
+    """Moves the active_players that are in square along their paths and returns
+        the players that should be eliminated"""
+    to_eliminate = []
     for player in active_players:
         if player.position.coordinate == square:
             path = board.traverse_path(player.position)
             player.position = path[-1]
+            if board.is_on_edge(player.position):
+                to_eliminate.append(player)
+    return to_eliminate
 
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
@@ -142,7 +148,7 @@ class TsuroGame:
 
         # Place the tile and move the players
         game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        move_players(game.players, game.board, tile_placement.coordinate)
+        to_eliminate = move_players(game.players, game.board, tile_placement.coordinate)
 
         # Deal to the current player and put it last in line
         current_player = game.players.popleft()
@@ -150,7 +156,7 @@ class TsuroGame:
         game.players.append(current_player)
 
         # Eliminate players on the edge
-        for player in list(game.players):
+        for player in to_eliminate:
             if game.board.is_on_edge(player.position):
                 # Eliminate the player
                 game.players.remove(player)

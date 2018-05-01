@@ -136,7 +136,16 @@ def test_move_from_edge():
 
 # making a move that causes a token to cross multiple tiles
 def test_move_accross_multiple():
-    pass
+    placement0 = create_simple_placement()
+    placement1 = create_simple_placement()
+    # Update placement0 to be not adjacent to the player
+    placement0 = TilePlacement(placement0[0], (1, 0), placement0[2])
+    initial_state = create_simple_game_state()
+    (mid_state, _) = TsuroGame.play_a_turn(initial_state, placement0)
+    (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
+
+    p0_expected_position = P(2, 0, 0)
+    assert final_state.active_players[0].position == p0_expected_position
 
 # making a move where multiple players move at once
 def test_move_multiple_players():
