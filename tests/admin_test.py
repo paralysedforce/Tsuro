@@ -223,14 +223,37 @@ def test_elimination_move():
 
 # moving where no player has the dragon tile before or after
 def test_never_dragon():
-    # before_state = create_simple_game_state()
-    # placement = create_simple_placement()
+    initial_state = start_game_state()
+    # Update the deck state so that nobody takes the dragon
+    initial_state = initial_state.update(deck_state=[
+        PathTile([(6, 0)]),
+        PathTile([]),
+        PathTile([]),
+        PathTile([]),
+        PathTile([(6, 0)]),
+        PathTile([]),
+        PathTile([]),
+        PathTile([]),
+        PathTile([(6, 0)]),
+    ])
+    assert len(initial_state.deck_state) > 0
+    game = TsuroGame.from_state(initial_state)
+    for player in game.players:
+        game.deal_to(player)
+        game.deal_to(player)
+        game.deal_to(player)
+    initial_state = game.state()
 
-    # # To make sure the test is actually testing the proper initial state
-    # assert before_state.dragon_holder is None
-    # (after_state, _) = TsuroGame.play_a_turn(before_state, placement)
-    # assert after_state.dragon_holder is None
-    pass
+    placement = TilePlacement(
+        tile=PathTile([(0, 1), (6, 7)]),
+        coordinate=(0,0),
+        rotation=0
+    )
+
+    # To make sure the test is actually testing the proper initial state
+    assert initial_state.dragon_holder is None
+    (after_state, _) = TsuroGame.play_a_turn(initial_state, placement)
+    assert after_state.dragon_holder is None
 
 # moving where one player has the dragon tile before and no one gets any new tiles
 def test_no_new_tiles():
