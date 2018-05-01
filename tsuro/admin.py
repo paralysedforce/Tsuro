@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union  # noqa: F401
+from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 
 from dataclasses import dataclass
 
@@ -23,6 +23,21 @@ class GameState(NamedTuple):
     board_state: BoardState
     deck_state: List[PathTile]
 
+    # TODO: derive this from the State base class
+    def update(self,
+               active_players=None,
+               eliminated_players=None,
+               dragon_holder=None,
+               board_state=None,
+               deck_state=None):
+        return GameState(
+            active_players=active_players if active_players else self.active_players,
+            eliminated_players=eliminated_players if eliminated_players else self.eliminated_players,
+            dragon_holder=dragon_holder if dragon_holder else self.dragon_holder,
+            board_state=board_state if board_state else self.board_state,
+            deck_state=deck_state if deck_state else self.deck_state,
+        )
+
 
 def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     """Return the path from a tile placement, given a board state and a position."""
@@ -31,6 +46,7 @@ def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     path = board.traverse_path(player.position)
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
     return path
+
 
 def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
     """Moves the active_players that are in square along their paths and returns
@@ -139,7 +155,7 @@ class TsuroGame:
     def play_a_turn(
         state: GameState,
         tile_placement: TilePlacement
-    ) -> (GameState, Union[List[Player], bool]):
+    ) -> Tuple[GameState, Optional[List[Player]]]:
         """Compute the state of the game."""
         # Assume the tile to be placed has already been removed from the
         # player's hand and is being placed in the proper loction.
