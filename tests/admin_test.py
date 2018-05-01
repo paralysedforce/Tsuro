@@ -149,31 +149,85 @@ def test_place_two_tiles():
     # assert not winners_or_false
 
 
+def create_simple_game_state() -> GameState:
+    p0 = Player('p0', P(0, 0, 0), tiles=[])
+    game = TsuroGame([p0])
+    return game.state()
 
-# making a move from the edge
-def test_move_from_edge():
+def create_simple_placement() -> TilePlacement:
     tile = PathTile([(0, 5)])
     placement = TilePlacement(
         tile=tile,
-        coordinate=[0, 0],
+        coordinate=(0, 0),
         rotation=0,
         )
-    p0 = Player('p0', P(0, 0, 0), tiles=[])
-    game = TsuroGame([p0])
-    (after_state, winners) = TsuroGame.play_a_turn(game.state(), placement)
+    return placement
+
+# making a move from the edge
+def test_move_from_edge():
+    placement = create_simple_placement()
+    initial_state = create_simple_game_state()
+    (after_state, winners) = TsuroGame.play_a_turn(initial_state, placement)
 
     game = TsuroGame.from_state(after_state)
 
-    p0_after_expected = Player('p0', P(0, 1, 0), tiles=[])
-    # assert p0_after_expected == game.players[0]
-    assert False
-
-
-
-
+    p0_expected_position = P(1, 0, 0)
+    assert p0_expected_position == game.players[0].position
 
 # making a move that causes a token to cross multiple tiles
+def test_move_accross_multiple():
+    placement0 = create_simple_placement()
+    placement1 = create_simple_placement()
+    # Update placement0 to be not adjacent to the player
+    placement0 = TilePlacement(placement0[0], (1, 0), placement0[2])
+    initial_state = create_simple_game_state()
+    (mid_state, _) = TsuroGame.play_a_turn(initial_state, placement0)
+    (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
+
+    p0_expected_position = P(2, 0, 0)
+    assert final_state.active_players[0].position == p0_expected_position
+
 # making a move where multiple players move at once
+def test_move_multiple_players():
+    pass
+
 # making a move where multiple players are eliminated
+def test_eliminate_multiple():
+    pass
+
 # making a move where the tile is not placed in its original position (i.e., it is rotated)
+def test_test_place_rotation():
+    pass
+
 # making an illegal move, specifically where the move is an elimination move, but there are non-elimination moves available
+def test_elimination_move():
+    pass
+
+
+# moving where no player has the dragon tile before or after
+def test_never_dragon():
+    before_state = create_simple_game_state()
+    placement = create_simple_placement()
+
+    # To make sure the test is actually testing the proper initial state
+    assert before_state.dragon_holder is None
+    (after_state, _) = TsuroGame.play_a_turn(before_state, placement)
+    assert after_state.dragon_holder is None
+
+
+# moving where one player has the dragon tile before and no one gets any new tiles
+def test_no_new_tiles():
+    pass
+
+# moving where the player that has the dragon tile makes a move that causes an elimination (of another player)
+def test_dragon_player_eliminates_other():
+    pass
+
+# moving where a player that does not have the dragon tile makes a move and it causes an elimination of the player that has the dragon tile
+def test_dragon_player_eliminated():
+    pass
+
+# moving where the player that has the dragon tile makes a move that causes themselves to be eliminated
+def test_dragon_player_self_elimination():
+    pass
+
