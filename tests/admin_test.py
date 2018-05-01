@@ -321,8 +321,6 @@ def test_dragon_player_self_elimination_deck_behavior():
     )
 
     tile0 = PathTile([(0, 1)])
-    tile1 = PathTile([(2, 3)])
-    tile2 = PathTile([(4, 5)])
 
     full_deck = state.update(
         active_players= [
