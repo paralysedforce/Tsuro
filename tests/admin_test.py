@@ -115,7 +115,7 @@ def test_move_from_edge():
     tile = PathTile([(0, 5)])
     placement = TilePlacement(
         tile=tile,
-        coordinate=[0, 0],
+        coordinate=(0, 0),
         rotation=0,
         )
     p0 = Player('p0', P(0, 0, 0), tiles=[])
@@ -124,15 +124,13 @@ def test_move_from_edge():
 
     game = TsuroGame.from_state(after_state)
 
-    p0_after_expected = Player('p0', P(0, 1, 0), tiles=[])
-    # assert p0_after_expected == game.players[0]
-    assert False
-
-
-
-
+    p0_expected_position = P(1, 0, 0)
+    assert p0_expected_position == game.players[0].position
 
 # making a move that causes a token to cross multiple tiles
+
+
+
 # making a move where multiple players move at once
 # making a move where multiple players are eliminated
 # making a move where the tile is not placed in its original position (i.e., it is rotated)

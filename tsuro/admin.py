@@ -36,12 +36,7 @@ def move_players(active_players: List[Player], board: Board, square: Tuple[int, 
     for player in active_players:
         if player.position.coordinate == square:
             path = board.traverse_path(player.position)
-            assert path is None
             player.position = path[-1]
-        else:
-            print(player.position.coordinate)
-            print(square)
-            assert player.position.coordinate == square
 
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
