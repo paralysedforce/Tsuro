@@ -1,9 +1,10 @@
 import pytest
 
-from admin import Player, TsuroGame
-from board import Board, Position, TilePlacement
+from admin import Player, TsuroGame, GameState
+from board import Board, BoardState, Position, TilePlacement
 from deck import Deck, PathTile
 from default_config import DEFAULT_WIDTH, DEFAULT_HEIGHT
+
 
 # def test_illegal_move():
 #     player = Player(Deck([[(0, 1), (2, 3), (4, 5), (6, 7), ]]), DragonCard())
@@ -13,6 +14,45 @@ from default_config import DEFAULT_WIDTH, DEFAULT_HEIGHT
 #     board.place_token_start(0, token)
 
 #     assert not (Administrator.is_legal_play(board, player._hand[0], player))
+
+
+def start_game_state():
+    """Build a consistent game state for testing.
+
+    1: Player('Eric', Position((0, 0), 0), [])
+    2: Player('Will', Position((0, 0), 6), [])
+    3: Player('John', Position((0, 2), 0), [])
+
+
+            +---------++---------++---------+
+            | 1       ||         || 3       |
+            |         ||         ||         |
+            |2        ||         ||         |
+            +---------++---------++---------+
+            |         ||         ||         |
+            |         ||         ||         |
+            |         ||         ||         |
+            +---------++---------++---------+
+            |         ||         ||         |
+            |         ||         ||         |
+            |         ||         ||         |
+            +---------++---------++---------+
+
+    """
+    return GameState(
+        active_players=[
+            Player('Eric', Position((0, 0), 0), []),
+            Player('Will', Position((0, 0), 5), []),
+            Player('John', Position((0, 2), 0), []),
+        ],
+        eliminated_players=[],
+        dragon_holder=None,
+        board_state=BoardState(
+            tile_placements=[],
+            height=3,
+            width=3,
+        )
+    )
 
 
 def P(i, j, tile_spot):
