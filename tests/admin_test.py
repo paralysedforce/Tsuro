@@ -324,11 +324,34 @@ def test_dragon_player_self_elimination_deck_behavior():
     tile1 = PathTile([(2, 3)])
     tile2 = PathTile([(4, 5)])
 
-    one_card = state.update(
+    full_deck = state.update(
+        active_players= [
+            Player('Eric', Position((0, 0), 0), [tile0, tile0]),
+            Player('Will', Position((0, 0), 6), [tile0, tile0]),
+            Player('John', Position((0, 2), 0), [tile0, tile0, tile0]),
+            ],
         dragon_holder=0,
-        deck_state=[tile0],
     )
-    new_state, _ = TsuroGame.play_a_turn(one_card, eliminate_player_A)
-    print(one_card)
-    print(new_state)
-    assert new_state.active_players[0].tiles == [tile0], 'Player to move draws the single tile from the deck'
+    new_state, _ = TsuroGame.play_a_turn(full_deck, eliminate_player_A)
+    # Eric's tiles should have returned to the deck, to have one of them delt
+    # to Will.
+    assert len(new_state.deck_state) == 1
+    assert len(new_state.active_players[0].tiles) == 3
+
+    full_deck = state.update(
+        active_players= [
+            Player('Eric', Position((0, 0), 0), [tile0]),
+            Player('Will', Position((0, 0), 6), [tile0, tile0]),
+            Player('John', Position((0, 2), 0), [tile0, tile0]),
+            ],
+        dragon_holder=0,
+    )
+    new_state, _ = TsuroGame.play_a_turn(full_deck, eliminate_player_A)
+    # This case came about because Eric picked up the dragon tile, a whole round
+    # passed, and then Eric eliminated himself. The new tile should go to Will
+    # And John should become the next dragon holder.
+    assert len(new_state.deck_state) == 0
+    assert len(new_state.active_players[0].tiles) == 3
+    assert new_state.dragon_holder == 1
+
+
