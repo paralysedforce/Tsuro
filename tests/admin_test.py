@@ -1,8 +1,9 @@
 import pytest
 
 from admin import Player, TsuroGame
-from board import Board, Position
+from board import Board, Position, TilePlacement
 from deck import Deck, PathTile
+from default_config import DEFAULT_WIDTH, DEFAULT_HEIGHT
 
 # def test_illegal_move():
 #     player = Player(Deck([[(0, 1), (2, 3), (4, 5), (6, 7), ]]), DragonCard())
@@ -85,9 +86,9 @@ def test_place_two_tiles():
     assert not game.board[0][1].has_tile(), 'does not modify state of the board'
 
 
-def test_play_a_turn():
-    placed_tile = PathTile([(0, 5)])
-    p0 = Player('p0', P(0, 0, 0), tiles=[placed_tile])
+# def test_play_a_turn():
+#     placed_tile = PathTile([(0, 5)])
+#     p0 = Player('p0', P(0, 0, 0), tiles=[placed_tile])
 
     # game = TsuroGameOneCard([p0])
 
@@ -106,3 +107,35 @@ def test_play_a_turn():
     # assert not eliminated_players
     # assert board._board[0][0].path_tile == placed_tile
     # assert not winners_or_false
+
+
+
+# making a move from the edge
+def test_move_from_edge():
+    tile = PathTile([(0, 5)])
+    placement = TilePlacement(
+        tile=tile,
+        coordinate=[0, 0],
+        rotation=0,
+        )
+    p0 = Player('p0', P(0, 0, 0), tiles=[])
+    game = TsuroGame([p0])
+    (after_state, winners) = TsuroGame.play_a_turn(game.state(), placement)
+
+    game = TsuroGame.from_state(after_state)
+
+    assert len(game.eliminated_players) == 0
+    p0_after = Player('p0', P(0, 1, 0), tiles=[])
+    assert game.players == [p0]
+    assert game.board.state() == ([placement], DEFAULT_WIDTH, DEFAULT_HEIGHT)
+
+
+
+
+
+
+# making a move that causes a token to cross multiple tiles
+# making a move where multiple players move at once
+# making a move where multiple players are eliminated
+# making a move where the tile is not placed in its original position (i.e., it is rotated)
+# making an illegal move, specifically where the move is an elimination move, but there are non-elimination moves available

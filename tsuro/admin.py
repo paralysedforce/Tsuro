@@ -142,7 +142,7 @@ class TsuroGame:
 
         # Place the tile and move the players
         game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        move_players(game.active_players, game.board)
+        move_players(game.players, game.board, tile_placement.coordinate)
 
         # Deal to the current player and put it last in line
         current_player = game.players.popleft()
@@ -150,10 +150,10 @@ class TsuroGame:
         game.players.append(current_player)
 
         # Eliminate players on the edge
-        for player in game.active_players:
-            if board.is_on_edge(player.position):
+        for player in list(game.players):
+            if game.board.is_on_edge(player.position):
                 # Eliminate the player
-                game.active_players.remove(player)
+                game.players.remove(player)
                 game.eliminated_players.append(player)
 
                 # Return cards to deck
@@ -180,6 +180,16 @@ class TsuroGame:
                         if game.dragon_tile_holder is not None or len(drawer.tiles) == 3:
                             break
                         game.deal_to(drawer)
+
+        # Game ends if there are no more active players,
+        # or all of the tiles have been placed
+        end_state = game.state()
+        game_did_end = False
+        game_did_end = game_did_end or len(end_state.active_players) == 0
+        # game_did_end = game_did_end or len(end_state.deck_state) == end_state.board_state.
+
+
+        return (game.state(), game_did_end)
 
     def board_factory(self) -> Board:
         return Board(default_config.DEFAULT_WIDTH, default_config.DEFAULT_HEIGHT)
