@@ -2,6 +2,8 @@ package main;
 
 import javafx.util.Pair;
 
+import java.util.List;
+
 public abstract class APlayer {
 
     //================================================================================
@@ -9,7 +11,9 @@ public abstract class APlayer {
     //================================================================================
     private String name;
     private Color color;
-    protected SPlayer splayer;
+    private boolean isTurn;
+    public SPlayer splayer;
+    private List<Token> otherPlayers;
 
     //================================================================================
     // Constructor
@@ -40,6 +44,9 @@ public abstract class APlayer {
         splayer.placeToken(startingTokenLocation.getKey(), startingTokenLocation.getValue());
     }
 
+    public void endGame(){}
+
+
 
     //================================================================================
     // Abstract methods
@@ -48,5 +55,5 @@ public abstract class APlayer {
 
     abstract public Tile chooseTile();
 
-    abstract public void endGame();
+
 }

@@ -18,9 +18,17 @@ public class RandomPlayer extends APlayer {
     //================================================================================
     public RandomPlayer(String name, Color color){
         super(name, color);
-
         random = new Random();
+
     }
+
+    //For testing
+    public RandomPlayer(String name, Color color, int seed){
+        super(name, color);
+        random = new Random(seed);
+    }
+
+
 
     //================================================================================
     // Override methods
@@ -35,16 +43,16 @@ public class RandomPlayer extends APlayer {
         int tokenSpace = edgeNumber * 2 + leftOrRightTokenSpace;
 
         if(edgeNumber == 0){
-            return new Pair<BoardSpace, Integer>(board.getBoardSpace(0, indexOfEdge), tokenSpace);
+            return new Pair<>(board.getBoardSpace(0, indexOfEdge), tokenSpace);
         }
         else if (edgeNumber == 1){
-            return new Pair<BoardSpace, Integer>(board.getBoardSpace(indexOfEdge, 5), tokenSpace);
+            return new Pair<>(board.getBoardSpace(indexOfEdge, 5), tokenSpace);
         }
         else if (edgeNumber == 2){
-            return new Pair<BoardSpace, Integer>(board.getBoardSpace(5, indexOfEdge), tokenSpace);
+            return new Pair<>(board.getBoardSpace(5, indexOfEdge), tokenSpace);
         }
         else{
-            return new Pair<BoardSpace, Integer>(board.getBoardSpace(indexOfEdge, 0), tokenSpace);
+            return new Pair<>(board.getBoardSpace(indexOfEdge, 0), tokenSpace);
         }
     }
 

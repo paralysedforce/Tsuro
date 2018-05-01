@@ -93,6 +93,19 @@ public class Tile {
         throw new IllegalArgumentException("Endpoint not found");
     }
 
+    public int calculateSymmetries(){
+        Tile copy = new Tile(this);
+        int symmetries = 0;
+
+        for (int i = 0; i < 4; i++){
+            if (connections.equals(copy.connections)){
+                symmetries++;
+            }
+            copy.rotateClockwise();
+        }
+        return symmetries;
+    }
+
     // TODO: change to private
     // Checks to make sure the tile contains all numbers 0..7 exactly once
     public boolean isValid(){

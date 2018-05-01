@@ -36,4 +36,36 @@ public class TileTest {
         Assert.assertTrue(t1.equals(t2));
     }
 
+    @Test
+    public void SymmetryTest(){
+        /*
+             Tile 1               Tile 2             Tile 3
+              |  |                |  |                |   |
+             -+  +-            -+  \/   +-       -+    \  +--
+                                |  /\   |         |     \
+             -+  +-            -+ /  \  +-       -+   .--+---
+              |  |                |  |               /    \
+                                                     |    |
+             Sym=4              Sym=2                Sym=1
+
+      */
+
+        Tile tile1 = new Tile(1, 2, 3, 4, 5, 6, 7, 0);
+        Tile tile2 = new Tile(0, 4, 1, 5, 2, 3, 6, 7);
+        Tile tile3 = new Tile(0, 4, 1, 2, 3, 5, 6, 7);
+
+        Assert.assertEquals(tile1.calculateSymmetries(), 4);
+        Assert.assertEquals(tile2.calculateSymmetries(), 2);
+        Assert.assertEquals(tile3.calculateSymmetries(), 1);
+
+        // Rotations shouldn't affect symmetries
+        tile1.rotateClockwise();
+        tile2.rotateClockwise();
+        tile3.rotateClockwise();
+
+        Assert.assertEquals(tile1.calculateSymmetries(), 4);
+        Assert.assertEquals(tile2.calculateSymmetries(), 2);
+        Assert.assertEquals(tile3.calculateSymmetries(), 1);
+    }
+
 }

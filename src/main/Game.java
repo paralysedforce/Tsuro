@@ -58,7 +58,7 @@ public class Game {
     // Public Methods
     //================================================================================
 
-    // Add a player to a new game
+    // Adds a player to a new game
     public void registerPlayer(String name, Color color, PlayerType type){
         APlayer aplayer;
         switch(type) {
@@ -67,13 +67,14 @@ public class Game {
                 break;
             default:
                 throw new IllegalArgumentException("player type given was not valid");
-
         }
 
         remainingPlayers.add(aplayer.splayer);
     }
 
 
+    // For testing purposes only
+    // TODO: Remove in production
     public void registerPlayer(SPlayer player){
         remainingPlayers.add(player);
     }
