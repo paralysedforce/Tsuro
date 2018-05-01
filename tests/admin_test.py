@@ -181,17 +181,6 @@ def test_move_accross_multiple():
 
     assert final_state.active_players[0].position == P(2, 2, 0)
 
-
-    # # Update placement0 to be not adjacent to the player
-    # placement0 = TilePlacement(placement0[0], (1, 0), placement0[2])
-    # initial_state = create_simple_game_state()
-    # (mid_state, _) = TsuroGame.play_a_turn(initial_state, placement0)
-    # (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
-
-    # p0_expected_position = P(2, 0, 0)
-    # assert final_state.active_players[0].position == p0_expected_position
-    pass
-
 # making a move where multiple players move at once
 def test_move_multiple_players():
     initial_state = start_game_state()
@@ -203,11 +192,8 @@ def test_move_multiple_players():
     (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
 
     # Assert that the two players have moved
-    for player in final_state.active_players:
-        if player.name == 'Eric':
-            assert player.position == P(1, 0, 0)
-        elif player.name == 'Will':
-            assert player.position == P(0, 1, 6)
+    assert final_state.active_players[2].position == P(1, 0, 0)
+    assert final_state.active_players[0].position == P(0, 1, 6)
 
 
 # making a move where multiple players are eliminated
