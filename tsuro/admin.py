@@ -31,11 +31,11 @@ class GameState(NamedTuple):
                board_state=None,
                deck_state=None):
         return GameState(
-            active_players=active_players if active_players else self.active_players,
-            eliminated_players=eliminated_players if eliminated_players else self.eliminated_players,
-            dragon_holder=dragon_holder if dragon_holder else self.dragon_holder,
-            board_state=board_state if board_state else self.board_state,
-            deck_state=deck_state if deck_state else self.deck_state,
+            active_players=active_players if active_players is not None else self.active_players,
+            eliminated_players=eliminated_players if eliminated_players is not None else self.eliminated_players,
+            dragon_holder=dragon_holder if dragon_holder is not None else self.dragon_holder,
+            board_state=board_state if board_state is not None else self.board_state,
+            deck_state=deck_state if deck_state is not None else self.deck_state,
         )
 
 
@@ -88,6 +88,7 @@ class TsuroGame:
     Attributes:
         board: Board
         deck: Deck
+        # TODO: Match this representation of dragon tile holder with GameState.
         dragon_tile_holder: Optional[Player]
         players: Deque[Player]
         positions: Dict[Player, Position]
@@ -174,8 +175,6 @@ class TsuroGame:
         # Eliminate players on the edge
         for player in to_eliminate:
             if game.board.is_on_edge(player.position):
-                # Eliminate the player
-                # (wait to do this until dragon tile reference removed)
 
                 # Return cards to deck
                 game.deck.replace_tiles(player.tiles)
@@ -190,6 +189,7 @@ class TsuroGame:
                         if len(candidate.tiles) < 3:
                             game.dragon_tile_holder = candidate
 
+                # Eliminate the player
                 game.players.remove(player)
                 game.eliminated_players.append(player)
 
@@ -205,7 +205,7 @@ class TsuroGame:
                             break
                         game.deal_to(drawer)
 
-        # Game ends if there are less than 2 active players,
+        # Game ends if there are no more active players,
         # or all of the tiles have been placed
         end_state = game.state()
         game_did_end = False

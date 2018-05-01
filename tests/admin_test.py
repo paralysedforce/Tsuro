@@ -52,7 +52,7 @@ def start_game_state():
             height=3,
             width=3,
         ),
-        deck_state=[]
+        deck_state=[],
     )
 
 
@@ -198,16 +198,7 @@ def test_move_multiple_players():
 
 # making a move where multiple players are eliminated
 def test_eliminate_multiple():
-    initial_state = start_game_state()
-    placement = TilePlacement(
-        tile=PathTile([(0, 1), (6, 7)]),
-        coordinate=(0,0),
-        rotation=0
-    )
-
-    (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
-    assert len(final_state.active_players) == 1
-
+    pass
 
 # making a move where the tile is not placed in its original position (i.e., it is rotated)
 def test_test_place_rotation():
@@ -283,10 +274,61 @@ def test_dragon_player_eliminates_other():
     pass
 
 # moving where a player that does not have the dragon tile makes a move and it causes an elimination of the player that has the dragon tile
-def test_dragon_player_eliminated():
-    pass
+def test_dragon_player_eliminated_other_dragon_tile_behavior():
+    state = start_game_state()
+    # Player John is the dragon holder, and Player D comes right after John
+    additional_player = state.active_players + [Player('D', Position((3, 3), 3), [])]
+    state = state.update(
+        active_players=additional_player,
+        dragon_holder=2,
+    )
+
+    placement = TilePlacement(
+        tile=PathTile([(0, 1)]),
+        coordinate=(0, 2),
+        rotation=0,
+    )
+
+    assert state.active_players[state.dragon_holder].name == 'John', 'Player John is the original dragon tile holder'
+
+    new_state, _ = TsuroGame.play_a_turn(state, placement)
+    assert new_state.active_players[new_state.dragon_holder].name == 'D', 'Player D is now the dragon tile holder'
+    assert new_state.dragon_holder == 1, 'Player Eric plays a turn that eliminates Player John, then requeues, leaving D in index 1'
+
 
 # moving where the player that has the dragon tile makes a move that causes themselves to be eliminated
-def test_dragon_player_self_elimination():
-    pass
+def test_dragon_player_self_elimination_dragon_tile_behavior():
+    state = start_game_state()
+    state = state.update(dragon_holder=0)
 
+    eliminate_player_A = TilePlacement(
+        tile=PathTile([(0, 1), (6, 5)]),
+        coordinate=(0, 0),
+        rotation=0,
+    )
+
+    new_state, _ = TsuroGame.play_a_turn(state, eliminate_player_A)
+    assert new_state.active_players[0].name == 'Will', 'Eric was eliminated'
+    assert new_state.dragon_holder == 0, 'Will is now the dragon tile holder'
+
+def test_dragon_player_self_elimination_deck_behavior():
+    state = start_game_state()
+
+    eliminate_player_A = TilePlacement(
+        tile=PathTile([(0, 1), (6, 5)]),
+        coordinate=(0, 0),
+        rotation=0,
+    )
+
+    tile0 = PathTile([(0, 1)])
+    tile1 = PathTile([(2, 3)])
+    tile2 = PathTile([(4, 5)])
+
+    one_card = state.update(
+        dragon_holder=0,
+        deck_state=[tile0],
+    )
+    new_state, _ = TsuroGame.play_a_turn(one_card, eliminate_player_A)
+    print(one_card)
+    print(new_state)
+    assert new_state.active_players[0].tiles == [tile0], 'Player to move draws the single tile from the deck'
