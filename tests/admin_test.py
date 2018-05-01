@@ -42,7 +42,7 @@ def start_game_state():
     return GameState(
         active_players=[
             Player('Eric', Position((0, 0), 0), []),
-            Player('Will', Position((0, 0), 5), []),
+            Player('Will', Position((0, 0), 6), []),
             Player('John', Position((0, 2), 0), []),
         ],
         eliminated_players=[],
@@ -51,7 +51,8 @@ def start_game_state():
             tile_placements=[],
             height=3,
             width=3,
-        )
+        ),
+        deck_state=[]
     )
 
 
@@ -189,7 +190,21 @@ def test_move_accross_multiple():
 
 # making a move where multiple players move at once
 def test_move_multiple_players():
-    pass
+    initial_state = start_game_state()
+    placement = TilePlacement(
+        tile=PathTile([(0, 5), (6, 3)]),
+        coordinate=(0,0),
+        rotation=0
+    )
+    (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
+
+    # Assert that the two players have moved
+    for player in final_state.active_players:
+        if player.name == 'Eric':
+            assert player.position == P(1, 0, 0)
+        elif player.name == 'Will':
+            assert player.position == P(0, 1, 6)
+
 
 # making a move where multiple players are eliminated
 def test_eliminate_multiple():
