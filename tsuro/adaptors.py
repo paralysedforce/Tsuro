@@ -20,7 +20,6 @@ class PlayerAdaptor(CPlayerInterface):
 
     def __init__(self, player):
         self.player = player
-        self.other_colors =
 
     def get_name(self):
         return self.player.name
@@ -41,19 +40,21 @@ class PlayerAdaptor(CPlayerInterface):
 class AdministratorAdaptor:
     """An adaptor class to adapt our TsuroGame to the class's Administrator."""
 
+    def __init__(self):
+        pass
+
     def play_a_turn(self, deck, active_players, eliminated_players, board, tile_placement):
         state = self._convert_to_game_state(deck, active_players, eliminated_players, board, tile_placement)
         game = TsuroGame.from_state(state)
         game.play_turn(tile_placement)
 
-        (_deck_state, _active_players, _dragon_holder, _eliminated_players, _board_state) = game.state()
-
-        end_indicator = _active_players if game.ended() else False
+        state = game.state()
+        end_indicator = state.active_players if game.ended() else False
         return (
-            list(_deck_state),
-            _active_players,
-            _eliminated_players,
-            _board_state,
+            list(state.deck_state),
+            state.active_players,
+            state.eliminated_players,
+            state.board_state,
             end_indicator
         )
 
