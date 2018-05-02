@@ -1,5 +1,7 @@
 package main;
 
+import org.omg.PortableServer.THREAD_POLICY_ID;
+
 import java.util.*;
 
 /**
@@ -26,6 +28,10 @@ public class BoardSpace {
         tokenSpaces = new HashMap<>();
         this.row = row;
         this.col = col;
+
+        if (!Board.isValidCoordinate(row, col)){
+            throw new IllegalArgumentException("Invalid Tile Access");
+        }
     }
 
 
@@ -46,7 +52,7 @@ public class BoardSpace {
     }
 
     public Set<Token> getTokensOnSpace(){
-        return tokenSpaces.keySet();
+        return new HashSet<>(tokenSpaces.keySet());
     }
 
     //================================================================================
@@ -84,6 +90,13 @@ public class BoardSpace {
         return tokensAdvanced;
     }
 
+    public void advanceToken(Token token){
+        if (hasTile()) {
+            int endpoint = findToken(token);
+            tokenSpaces.replace(token, tile.findMatch(endpoint));
+        }
+    }
+
     // Returns the token space the the token is on.
     //   If the token is not on the space, return -1
     public int findToken(Token token){
@@ -95,7 +108,11 @@ public class BoardSpace {
     }
 
     public void addToken(Token token, int tokenSpace){
-        tokenSpaces.put(token, tokenSpace);
+        if (0 <= tokenSpace && tokenSpace < 8)
+            tokenSpaces.put(token, tokenSpace);
+
+        else
+            throw new IllegalArgumentException("Invalid token space");
     }
 
 

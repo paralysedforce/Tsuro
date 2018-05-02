@@ -55,7 +55,6 @@ public class Board {
     // Returns true if placing the tile in front of the token will lead to the player's death
     public boolean willKillPlayer(Tile tile, SPlayer player) {
         Token token = player.getToken();
-
         BoardSpace curSpace = token.getBoardSpace();
         int tokenSpace = token.getTokenSpace();
 
@@ -84,28 +83,17 @@ public class Board {
     //   Returns the Set of tokens driven off the board
     public Set<Token> placeTile(Tile tile, SPlayer player) {
 
-
         BoardSpace space = player.getToken().getBoardSpace();
         space.setTile(tile);
 
-        Deque<BoardSpace> spaces = new LinkedList<>();
+        Set<Token> tokensToMove = space.getTokensOnSpace();
         Set<Token> eliminatedPlayers = new HashSet<>();
-        spaces.add(space);
 
-        while (spaces.size() > 0) {
-            BoardSpace curSpace = spaces.removeFirst();
-            if (curSpace.hasTile()) {
-                Set<Token> advancedTokens = curSpace.advanceTokens();
-
-                for (Token token : advancedTokens) {
-                    if (!isOnEdge(token)) {
-                        transferToken(token);
-                        spaces.add(token.getBoardSpace());
-                    } else {
-                        token.removeFromBoard();
-                        eliminatedPlayers.add(token);
-                    }
-                }
+        for (Token token: tokensToMove){
+            advanceToEnd(token);
+            if (isOnEdge(token)) {
+                eliminatedPlayers.add(token);
+                token.removeFromBoard();
             }
         }
 
@@ -158,8 +146,20 @@ public class Board {
         token.moveToken(nextSpace, nextTokenSpace);
     }
 
+    private void advanceToEnd(Token token){
+        BoardSpace curSpace = token.getBoardSpace();
+        while (curSpace.hasTile()){
+            curSpace.advanceToken(token);
+            if (isOnEdge(token)) {
+                break;
+            }
+            transferToken(token);
+            curSpace = token.getBoardSpace();
+        }
+    }
+
     // Returns true if the row and col pair are a valid address in the board
-    private static boolean isValidCoordinate(int row, int col) {
+    public static boolean isValidCoordinate(int row, int col) {
         return (0 <= row && row < BOARD_LENGTH) && (0 <= col && col < BOARD_LENGTH);
     }
 
@@ -174,7 +174,6 @@ public class Board {
         boolean leftEdge   = col == 0 && direction == 3;
 
         return topEdge || rightEdge || bottomEdge || leftEdge;
-
     }
 
     private static boolean isOnEdge(Token token) {

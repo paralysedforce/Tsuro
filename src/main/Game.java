@@ -65,6 +65,12 @@ public class Game {
             case RANDOM:
                 aplayer = new RandomPlayer(name, color);
                 break;
+            case MOSTSYMMETRIC:
+                aplayer = new MostSymmetricPlayer(name, color);
+                break;
+            case LEASTSYMMETRIC:
+                aplayer = new LeastSymmetricPlayer(name, color);
+                break;
             default:
                 throw new IllegalArgumentException("player type given was not valid");
         }

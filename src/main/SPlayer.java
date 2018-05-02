@@ -31,7 +31,7 @@ public class SPlayer {
         }
     }
 
-    public SPlayer(APlayer aplayer){
+    public SPlayer(APlayer aplayer, Color color){
         this.aplayer = aplayer;
         token = null;
         hand = new Tile[MAX_TILES_IN_BANK];

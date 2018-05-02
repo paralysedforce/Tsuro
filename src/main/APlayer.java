@@ -12,7 +12,7 @@ public abstract class APlayer {
     private String name;
     private Color color;
     private boolean isTurn;
-    public SPlayer splayer;
+    protected SPlayer splayer;
     private List<Token> otherPlayers;
 
     //================================================================================
@@ -20,8 +20,7 @@ public abstract class APlayer {
     //================================================================================
     public APlayer(String name, Color color){
         this.name = name;
-        this.color = color;
-        this.splayer = new SPlayer(this);
+        this.splayer = new SPlayer(this, color);
     }
 
     //================================================================================
@@ -35,12 +34,13 @@ public abstract class APlayer {
         return name;
     }
 
+    public SPlayer getSplayer(){ return splayer; }
+
     //================================================================================
     // Public methods
     //================================================================================
     public void placeToken() {
         Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation();
-
         splayer.placeToken(startingTokenLocation.getKey(), startingTokenLocation.getValue());
     }
 

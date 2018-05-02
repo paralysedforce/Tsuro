@@ -48,7 +48,7 @@ public class RandomPlayerTest {
         APlayer randomPlayer = new RandomPlayer("Vyas", Color.BLACK, 0);
         randomPlayer.placeToken();
         Tile tile = randomPlayer.chooseTile();
-        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.splayer));
+        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.getSplayer()));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class RandomPlayerTest {
         APlayer randomPlayer = new RandomPlayer("Vyas", Color.BLACK, 0);
         randomPlayer.placeToken();
         Tile tile = randomPlayer.chooseTile();
-        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.splayer));
+        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.getSplayer()));
         Assert.assertTrue(tile.equals(new Tile(0, 5, 1, 4, 2, 7, 3, 6)));
     }
 

@@ -48,7 +48,7 @@ public class MostSymmetricPlayerTest {
         APlayer mostSymmetricPlayer = new MostSymmetricPlayer("Vyas", Color.BLACK);
         mostSymmetricPlayer.placeToken();
         Tile tile = mostSymmetricPlayer.chooseTile();
-        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.splayer));
+        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.getSplayer()));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class MostSymmetricPlayerTest {
         APlayer mostSymmetricPlayer = new MostSymmetricPlayer("Vyas", Color.BLACK);
         mostSymmetricPlayer.placeToken();
         Tile tile = mostSymmetricPlayer.chooseTile();
-        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.splayer));
+        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.getSplayer()));
         Assert.assertTrue(tile.equals(new Tile(0, 5, 1, 4, 2, 7, 3, 6)));
     }
 
@@ -113,7 +113,7 @@ public class MostSymmetricPlayerTest {
         APlayer mostSymmetricPlayer = new MostSymmetricPlayer("Vyas", Color.BLACK);
         mostSymmetricPlayer.placeToken();
         Tile tile = mostSymmetricPlayer.chooseTile();
-        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.splayer));
+        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, mostSymmetricPlayer.getSplayer()));
         Assert.assertTrue(tile.equals(new Tile(0, 5, 1, 4, 2, 7, 3, 6)));
         Assert.assertEquals(tile.calculateSymmetries(), 4);
     }
