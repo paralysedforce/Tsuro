@@ -2,7 +2,7 @@ from typing import Dict, List, NamedTuple, Tuple
 
 import attr
 
-from _stateful import State, Stateful
+from _stateful import State, ImmutableMixin, StatefulInterface
 
 
 # A type alias representing one of the 8 possible positions on a tile.
@@ -42,7 +42,7 @@ class TilePlacement(NamedTuple):
 
 
 @attr.s
-class BoardState(State):
+class BoardState(State, ImmutableMixin):
     """The state of the board.
 
     A unique board state is defined by a list of TilePlacements and the
@@ -53,7 +53,7 @@ class BoardState(State):
     width: int = attr.ib()
 
 
-class Board(Stateful):
+class Board(StatefulInterface):
     """The Tsuro game board.
 
          0  1  2  3
@@ -186,7 +186,7 @@ class Board(Stateful):
     def __getitem__(self, index):
         return self._board[index]
 
-    # implement the Stateful interface
+    # implement the StatefulInterface interface
     def state(self) -> BoardState:
         return BoardState(
             tile_placements=self.tile_placements,

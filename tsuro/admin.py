@@ -7,13 +7,13 @@ import default_config
 from board import Board, PathTile, Position, TilePlacement, BoardState
 from deck import Deck
 from player import Color, PlayerABC
-from _stateful import State, Stateful
+from _stateful import State, ImmutableMixin, StatefulInterface
 
 
 class Player(PlayerABC):
     """Placeholder to keep old tests compiling.
 
-    ... Until we replace instances of Player with other implemented Players.
+    ...Until we replace instances of Player with other implemented Players.
     """
     def initialize(cls, color):
         pass
@@ -29,8 +29,12 @@ class Player(PlayerABC):
 
 
 @attr.s
-class GameState(State):
-    """A named tuple representing the state of a game."""
+class GameState(State, ImmutableMixin):
+    """A named tuple representing the state of a game.
+
+    Example:
+        >>> game.state()
+    """
     active_players: List[Player] = attr.ib()
     eliminated_players: List[Player] = attr.ib()
     dragon_holder: Optional[int] = attr.ib()
@@ -38,7 +42,7 @@ class GameState(State):
     deck_state: List[PathTile] = attr.ib()
 
 
-class TsuroGame(Stateful):
+class TsuroGame(StatefulInterface):
     """Controller / administrator for Tsuro.
 
     Attributes:
@@ -183,4 +187,3 @@ class TsuroGame(Stateful):
             game.dragon_tile_holder = game.players[holder_index]
 
         return game
-

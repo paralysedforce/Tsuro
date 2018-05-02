@@ -3,12 +3,12 @@ from typing import List, Optional, Tuple
 
 from board import PathTile
 
-from _stateful import State, Stateful
+from _stateful import State, ImmutableMixin, StatefulInterface
 
 # TODO: Make Deck stateful and add DeckState
 
 
-class Deck(Stateful):
+class Deck(StatefulInterface):
     """A deck of PathTiles.
 
     Attributes:

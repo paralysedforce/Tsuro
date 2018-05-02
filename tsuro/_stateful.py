@@ -1,19 +1,60 @@
 from typing import NamedTuple, List
 
 import attr
+import json
 
 
-class Stateful:
-    @classmethod
-    def from_state(cls):
-        raise NotImplementedError
+@attr.s
+class State:
+    """A State is a serializable representation of some object.
 
-    def state(self):
-        raise NotImplementedError
+    The @attr.s class decorator derives setters, getters, and other operators
+    to simulate working with a tuple.
+
+    Example:
+
+        @attr.s
+        class Point(State):
+            '''An example state representing a point in a 2D plane.'''
+            x: int = attr.ib()
+            y: int = attr.ib()
+
+        >>> p = Point(1, 2)
+        >>> p  # derived __repr___
+        Point(x=1, y=2)
+        >>> x, y = p  # tuple unpacking
+        >>> p.to_dict()
+        {'x': 1, 'y': 2}
+    """
+    def to_dict(self):
+        return attr.asdict(self)
+
+    def to_json(self):
+        json.dumps(self.to_dict(), indent=4)
 
 
-@attr.s(frozen=True)  # frozen=True makes the class immutable
-class State(object):
+@attr.s(frozen=True)
+class ImmutableMixin:
+    """A mixin to add immutability to any State.
+
+    Prevents inplace modifying of fields and adds an update() method.
+
+    Example:
+
+        @attr.s
+        class IPoint(State, ImmutableMixin):
+            '''An example state representing a point in a 2D plane.'''
+            x: int = attr.ib()
+            y: int = attr.ib()
+
+        >>> p = IPoint(1, 2)
+        >>> p
+        IPoint(x=1, y=2)
+        >>> p.x = 99
+        attr.exceptions.FrozenInstanceError
+        >>> p.update(x=99)
+        IPoint(x=99, y=2)
+    """
     def update(self, **replacement_attrs):
         """Return a new instance of State with the arguments overwritten, shallow copying all mutable members."""
         cls = type(self)
@@ -23,3 +64,20 @@ class State(object):
                 raise ValueError('{} is not a member of {}'.format(name, cls))
             new_attrs[name] = val
         return cls(**new_attrs)
+
+
+class StatefulInterface:
+    """An interface that an object must implement to be Stateful."""
+
+    @classmethod
+    def from_state(cls, state):
+        raise NotImplementedError
+
+    def state(self):
+        raise NotImplementedError
+
+@attr.s
+class IPoint(State, ImmutableMixin):
+    '''An example state representing a point in a 2D plane.'''
+    x: int = attr.ib()
+    y: int = attr.ib()

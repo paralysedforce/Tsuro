@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod, abstractclassmethod
 from enum import Enum
-from dataclasses import dataclass
 from typing import List, Optional  # noqa: F401
 
+import attr
+
 from board import PathTile, Position, TilePlacement
+from _stateful import State
 
 
 class Color(Enum):
@@ -17,13 +19,13 @@ class Color(Enum):
     BLACK = 7
 
 
-@dataclass  # a dataclass is a "mutable NamedTuple"
-class PlayerABC(ABC):
-    name: str
-    position: Optional[Position]
-    tiles: List[PathTile]
-    color: Color = Color.GRAY
-    has_moved: bool = False
+@attr.s
+class PlayerABC(State, ABC):
+    name: str = attr.ib()
+    position: Optional[Position] = attr.ib()
+    tiles: List[PathTile] = attr.ib()
+    color: Color = attr.ib(default=Color.GRAY)
+    has_moved: bool = attr.ib(default=False)
 
     @abstractclassmethod
     def initialize(cls, color):
