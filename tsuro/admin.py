@@ -2,6 +2,7 @@ from collections import deque
 from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 from enum import Enum
 
+from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
 import default_config
@@ -19,18 +20,42 @@ class Color(Enum):
     YELLOW = 6
     BLACK = 7
 
-
-
-# A dataclass is a "mutable NamedTuple".
-@dataclass
-class Player:
+@dataclass  # a dataclass is a "mutable NamedTuple"
+class PlayerABC(ABC):
     name: str
     position: Optional[Position]
     tiles: List[PathTile]
     color: Color
 
+    @abstractclassmethod
+    def initialize(cls, color):
+        pass
+
+    @abstractmethod
+    def place_pawn(game: 'TsuroGame') -> Position:
+        pass
+
+    @abstractmethod
+    def play_turn(game: 'TsuroGame') -> TilePlacement:
+        pass
+
+    @abstractmethod
+    def end_game(game: 'TsuroGame'):
+        pass
 
 
+class Player(PlayerABC):
+    def initialize(cls, color):
+        pass
+
+    def place_pawn(game: 'TsuroGame') -> Position:
+        pass
+
+    def play_turn(game: 'TsuroGame') -> TilePlacement:
+        pass
+
+    def end_game(game: 'TsuroGame'):
+        pass
 
 
 class GameState(NamedTuple):
@@ -64,18 +89,6 @@ def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
     return path
 
-
-def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
-    """Moves the active_players that are in square along their paths and returns
-        the players that should be eliminated"""
-    to_eliminate = []
-    for player in active_players:
-        if player.position.coordinate == square:
-            path = board.traverse_path(player.position)
-            player.position = path[-1]
-            if board.is_on_edge(player.position):
-                to_eliminate.append(player)
-    return to_eliminate
 
 
 def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
@@ -166,8 +179,18 @@ class TsuroGame:
         self.board._board[i][j] = None
         return path
 
-    def peek_path_list(self, players: List[Player], path_tile: PathTile) -> List[Tuple[Player, List[Position]]]:
-        pass
+    @staticmethod
+    def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
+        """Moves the active_players that are in square along their paths and returns
+            the players that should be eliminated"""
+        to_eliminate = []
+        for player in active_players:
+            if player.position.coordinate == square:
+                path = board.traverse_path(player.position)
+                player.position = path[-1]
+                if board.is_on_edge(player.position):
+                    to_eliminate.append(player)
+        return to_eliminate
 
     @staticmethod
     def play_a_turn(
@@ -182,7 +205,7 @@ class TsuroGame:
 
         # Place the tile and move the players
         game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        to_eliminate = move_players(game.players, game.board, tile_placement.coordinate)
+        to_eliminate = TsuroGame.move_players(game.players, game.board, tile_placement.coordinate)
 
         # Deal to the current player and put it last in line
         current_player = game.players.popleft()
@@ -209,7 +232,7 @@ class TsuroGame:
                 # Eliminate the player
                 game.players.remove(player)
                 game.eliminated_players.append(player)
-
+#
                 # Draw cards if dragon card is held
                 if game.dragon_tile_holder is not None:
                     player_index = game.players.index(game.dragon_tile_holder)
