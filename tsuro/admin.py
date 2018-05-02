@@ -3,7 +3,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 
 import attr
 
-import default_config
+import defaults
 from _stateful import ImmutableMixin, State, StatefulInterface
 from board import Board, BoardState, PathTile, TilePlacement
 from deck import Deck
@@ -141,10 +141,10 @@ class TsuroGame(StatefulInterface):
         pass
 
     def board_factory(self) -> Board:
-        return Board(default_config.DEFAULT_WIDTH, default_config.DEFAULT_HEIGHT)
+        return Board(defaults.DEFAULT_WIDTH, defaults.DEFAULT_HEIGHT)
 
     def deck_factory(self) -> Deck:
-        return Deck.from_connections(default_config.DEFAULT_CARDS)
+        return Deck.from_connections(defaults.DEFAULT_CARDS)
 
     def state(self) -> GameState:
         return GameState(
