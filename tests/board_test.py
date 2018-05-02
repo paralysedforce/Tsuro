@@ -199,8 +199,6 @@ def test_rotate_tile_asymmetric():
     tile1 = PathTile([(0, 1), (2, 5), (3, 4), (6, 7)])
     tile2 = PathTile([(0, 1), (2, 5), (3, 4), (6, 7)])
     tile2.rotate()
-    print(tile1)
-    print(tile2)
     assert not (tile1 == tile2)
 
 def test_symmetric_tile():

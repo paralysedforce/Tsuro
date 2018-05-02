@@ -198,9 +198,10 @@ class TsuroGame(Stateful):
         game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
         to_eliminate = TsuroGame.move_players(game.players, game.board, tile_placement.coordinate)
 
-        # Deal to the current player and put it last in line
+        # If the current player did not eliminate itself, deal & put it last in line
         current_player = game.players.popleft()
-        game.deal_to(current_player)
+        if current_player not in to_eliminate:
+            game.deal_to(current_player)
         game.players.append(current_player)
 
         # Eliminate players on the edge
@@ -209,20 +210,22 @@ class TsuroGame(Stateful):
 
                 # Return cards to deck
                 game.deck.replace_tiles(player.tiles)
+                player.tiles = []
+
+                player_index = game.players.index(player)
+                # Eliminate the player
+                game.players.remove(player)
+                game.eliminated_players.append(player)
 
                 if game.dragon_tile_holder is not None:
                     # If the recently-eliminated player was the holder, pass it
                     # along. (note: if next player has full hand, everyone does)
                     if game.dragon_tile_holder == player:
                         game.dragon_tile_holder = None
-                        player_index = game.players.index(player)
-                        candidate = game.players[(player_index + 1) % len(game.players)]
+                        candidate = game.players[(player_index) % len(game.players)]
                         if len(candidate.tiles) < 3:
                             game.dragon_tile_holder = candidate
 
-                # Eliminate the player
-                game.players.remove(player)
-                game.eliminated_players.append(player)
 #
                 # Draw cards if dragon card is held
                 if game.dragon_tile_holder is not None:
@@ -230,11 +233,16 @@ class TsuroGame(Stateful):
                     game.dragon_tile_holder = None
                     # Let all players draw until dragon card is held again,
                     # starting with dragon holder.
-                    for i in range(len(game.players)):
-                        drawer = game.players[(player_index + i) % len(game.players)]
-                        if game.dragon_tile_holder is not None or len(drawer.tiles) == 3:
-                            break
-                        game.deal_to(drawer)
+                    keep_drawing = True
+                    while keep_drawing:
+                        for i in range(len(game.players)):
+                            drawer = game.players[(player_index + i) % len(game.players)]
+                            if game.dragon_tile_holder is not None or len(drawer.tiles) == 3:
+                                keep_drawing = False
+                                break
+                            game.deal_to(drawer)
+
+
 
         # Game ends if there are no more active players,
         # or all of the tiles have been placed
