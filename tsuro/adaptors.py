@@ -1,7 +1,21 @@
 from admin import TsuroGame, GameState
 
 
-class PlayerAdaptor:
+class CPlayerInterface:
+    def initialize(cls, color, other_colors):
+        raise NotImplementedError
+
+    def place_pawn(self, board):
+        raise NotImplementedError
+
+    def play_turn(self, board, tiles, tile_count):
+        raise NotImplementedError
+
+    def end_game(self, board, color):
+        raise NotImplementedError
+
+
+class PlayerAdaptor(CPlayerInterface):
     """An adaptor class to adapt our Player to the class's Player."""
     def __init__(self, player):
         self.player = player

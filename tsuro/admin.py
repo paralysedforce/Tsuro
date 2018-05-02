@@ -4,33 +4,15 @@ from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 import attr
 
 import default_config
-from board import Board, PathTile, Position, TilePlacement, BoardState
+from board import Board, PathTile, TilePlacement, BoardState
 from deck import Deck
-from player import Color, PlayerABC
+from player import Player
 from _stateful import State, ImmutableMixin, StatefulInterface
-
-
-class Player(PlayerABC):
-    """Placeholder to keep old tests compiling.
-
-    ...Until we replace instances of Player with other implemented Players.
-    """
-    def initialize(cls, color):
-        pass
-
-    def place_pawn(game: 'TsuroGame') -> Position:
-        pass
-
-    def play_turn(game: 'TsuroGame') -> TilePlacement:
-        pass
-
-    def end_game(game: 'TsuroGame'):
-        pass
 
 
 @attr.s
 class GameState(State, ImmutableMixin):
-    """A named tuple representing the state of a game.
+    """The state of the game.
 
     Example:
         >>> game.state()

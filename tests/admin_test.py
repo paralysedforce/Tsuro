@@ -1,9 +1,7 @@
-import pytest
-
-from admin import Player, TsuroGame, GameState, Color
-from board import Board, BoardState, Position, TilePlacement
+from admin import TsuroGame, GameState
+from player import Color, Player
+from board import BoardState, Position, TilePlacement
 from deck import Deck, PathTile
-from default_config import DEFAULT_WIDTH, DEFAULT_HEIGHT
 
 
 def start_game_state():
