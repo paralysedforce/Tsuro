@@ -5,6 +5,7 @@ from board import PathTile
 
 # TODO: Make Deck stateful and add DeckState
 
+
 class Deck:
     """A deck of PathTiles.
 
