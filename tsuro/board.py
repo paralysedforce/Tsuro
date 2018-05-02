@@ -255,12 +255,24 @@ class PathTile:
     def rotate(self):
         """Rotates the tile clockwise once."""
         # Create a copy of _connections, but rotated clockwise once
-        connections = [((path[0] + 2) %7, (path[1] + 2) %7) for path in self._connections]
+        connections = [((path[0] + 2) %8, (path[1] + 2) %8) for path in self._connections]
 
         self._paths = PathTile.create_paths_dict(connections)
         self._connections = connections
 
-    def __copy__(self):
+    def unique_rotations(self) -> int:
+        """Calculates the number of unique rotations the tile has"""
+        copy = self.make_copy()
+        rotations = []
+        for _ in range(4):
+            copy.rotate()
+            rotation = copy.make_copy()
+            if rotation not in rotations:
+                rotations.append(rotation)
+
+        return len(rotations)
+
+    def make_copy(self):
         return PathTile(self._connections)
 
     def __getitem__(self, tile_spot: TileSpot) -> TileSpot:

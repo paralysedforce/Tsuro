@@ -43,10 +43,6 @@ class PlayerABC(ABC):
     def end_game(game: 'TsuroGame'):
         pass
 
-    def determine_symmetry(tile: PathTile) -> int:
-        """Calculates the number of unique rotations the tile has"""
-        # rotation0 =
-        return -1
 
 
 class Player(PlayerABC):
