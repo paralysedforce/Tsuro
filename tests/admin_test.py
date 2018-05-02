@@ -181,7 +181,7 @@ def test_dragon_player_eliminates_other():
 def test_dragon_player_eliminated_other_dragon_tile_behavior():
     state = start_game_state()
     # Player C is the dragon holder, and Player D comes right after C
-    additional_player = state.active_players + [Player('D', Position((3, 3), 3), [], color=Color.RED)]
+    additional_player = state.active_players + [Player('D', Position((3, 3), 3), [])]
     state = state.update(
         active_players=additional_player,
         dragon_holder=2,
@@ -250,7 +250,7 @@ class TsuroGameOneCard(TsuroGame):
 
 
 def test_deal_to():
-    player = Player(name='A', position=None, tiles=[], color=Color.RED)
+    player = Player(name='A', position=None, tiles=[])
     game = TsuroGameOneCard([player])
 
     assert player.tiles == [], 'start with no tiles'
@@ -261,8 +261,8 @@ def test_deal_to():
 
 
 def test_dragon_tile():
-    p0 = Player(name='A', position=None, tiles=[], color=Color.GREEN)
-    p1 = Player(name='B', position=None, tiles=[], color=Color.BLUE)
+    p0 = Player(name='A', position=None, tiles=[])
+    p1 = Player(name='B', position=None, tiles=[])
 
     game = TsuroGameOneCard([p0, p1])
     assert game.dragon_tile_holder is None, "dragon tile isn't held at start of game"
@@ -275,36 +275,3 @@ def test_dragon_tile():
 
     game.deal_to(p1)
     assert game.dragon_tile_holder is p0, "don't reassign dragon card if it's held"
-
-
-def test_place_tile():
-    # (0, 0, 0) -> (0, 0, 5)
-    p0 = Player(name='A', position=P(0, 0, 0), tiles=[], color=Color.RED)
-    game = TsuroGame([p0])
-    tile = PathTile([(0, 5)])
-    assert game.peek_path(player=p0, path_tile=tile) == [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0)]
-
-
-def test_place_two_tiles():
-    # Place a tile at (0,1) and peek path at (0,0)
-    tile0 = PathTile([(0, 5)])
-    tile1 = PathTile([(0, 5)])
-
-    p0 = Player('p0', P(0, 0, 0), [], color=Color.RED)
-
-    game = TsuroGame([p0])
-    game.board.place_tile((1, 0), tile0)
-
-    expected_path = [P(0, 0, 0), P(0, 0, 5), P(1, 0, 0), P(1, 0, 5), P(2, 0, 0)]
-    assert game.peek_path(player=p0, path_tile=tile1) == expected_path
-    assert not game.board[0][1].has_tile(), 'does not modify state of the board'
-
-
-# def test_illegal_move():
-#     player = Player(Deck([[(0, 1), (2, 3), (4, 5), (6, 7), ]]), DragonCard())
-#     token = Token(player)
-
-#     board = Board()
-#     board.place_token_start(0, token)
-
-#     assert not (Administrator.is_legal_play(board, player._hand[0], player))

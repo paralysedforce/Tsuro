@@ -22,12 +22,14 @@ class Color(Enum):
     YELLOW = 6
     BLACK = 7
 
+
 @dataclass  # a dataclass is a "mutable NamedTuple"
 class PlayerABC(ABC):
     name: str
     position: Optional[Position]
     tiles: List[PathTile]
-    color: Color
+    color: Color = Color.GRAY
+    has_moved: bool = False
 
     @abstractclassmethod
     def initialize(cls, color):
@@ -46,7 +48,6 @@ class PlayerABC(ABC):
         pass
 
 
-
 class Player(PlayerABC):
     """Placeholder to keep old tests compiling until we TODO: replace instances
         of Player with other implemented Players"""
@@ -61,37 +62,6 @@ class Player(PlayerABC):
 
     def end_game(game: 'TsuroGame'):
         pass
-
-
-def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
-    """Return the path from a tile placement, given a board state and a position."""
-    (i, j), _ = player.position
-    board.place_tile((i, j), tile)
-    path = board.traverse_path(player.position)
-    board._board[i][j].path_tile = None  # This 'undoing' isn't the cleanest.
-    return path
-
-
-
-def move_eliminates_player(player: Player, board: Board, tile: PathTile) -> bool:
-    path = peek_path(player, board, tile)
-    landing_position = path[-1]
-    return board.is_on_edge(landing_position)
-
-
-def legal_play(player: Player, board: Board, placement: TilePlacement) -> bool:
-    tile = placement.tile
-
-    # Not valid if attempting to place where the player is not
-    if not placement.coordinate == player.position.coordinate:
-        return False
-
-    # not valid if placement of the tile eliminates the player, unless all tiles eliminate player
-    all_moves_eliminate_player = all([move_eliminates_player(player, board, tile) for tile in player.tiles])
-    if move_eliminates_player(player, board, tile) and not all_moves_eliminate_player:
-        return False
-
-    return True
 
 
 @attr.s
@@ -170,92 +140,83 @@ class TsuroGame(Stateful):
         self.board._board[i][j] = None
         return path
 
-    @staticmethod
-    def move_players(active_players: List[Player], board: Board, square: Tuple[int, int]) -> List[Player]:
-        """Moves the active_players that are in square along their paths and returns
-            the players that should be eliminated"""
-        to_eliminate = []
-        for player in active_players:
-            if player.position.coordinate == square:
-                path = board.traverse_path(player.position)
+    def move_players(self, coordinate: Tuple[int, int]):
+        for player in self.players:
+            if player.position.coordinate == coordinate:
+                path = self.board.traverse_path(player.position)
                 player.position = path[-1]
-                if board.is_on_edge(player.position):
-                    to_eliminate.append(player)
-        return to_eliminate
+                player.has_moved = True
 
-    @staticmethod
-    def play_a_turn(
-        state: GameState,
-        tile_placement: TilePlacement
-    ) -> Tuple[GameState, Optional[List[Player]]]:
-        """Compute the state of the game."""
-        # Assume the tile to be placed has already been removed from the
-        # player's hand and is being placed in the proper loction.
+    def to_eliminate(self) -> List[Player]:
+        return [p for p in self.players if self.board.is_on_edge(p.position) and p.has_moved]
 
-        game = TsuroGame.from_state(state)
+    def eliminate_player(self, player: Player):
+        # Return cards to deck
+        self.deck.replace_tiles(player.tiles)
+        player.tiles = []
 
+        player_index = self.players.index(player)
+        self.players.remove(player)
+        self.eliminated_players.append(player)
+
+        if self.dragon_tile_holder is player:
+            # If the recently-eliminated player was the holder, pass it
+            # along. (note: if next player has full hand, everyone does)
+            self.dragon_tile_holder = None
+            candidate = self.players[(player_index) % len(self.players)]
+            if len(candidate.tiles) < 3:
+                self.dragon_tile_holder = candidate
+
+        # Draw cards if dragon card is held
+        if self.dragon_tile_holder is not None:
+            player_index = self.players.index(self.dragon_tile_holder)
+            self.dragon_tile_holder = None
+            # Let all players draw until dragon card is held again, starting with dragon holder.
+            i = 0
+            while True:
+                drawer = self.players[(player_index + i) % len(self.players)]
+                if self.dragon_tile_holder is not None or len(drawer.tiles) == 3:
+                    break
+                self.deal_to(drawer)
+                i += 1
+
+    def ended(self) -> bool:
+        # Game ends if there are no more active players,
+        # or all of the tiles have been placed
+        one_player_left = len(self.players) < 2
+        no_cards_left = len(self.deck) == (self.board._height * self.board._width) - 1
+        return one_player_left or no_cards_left
+
+    def play_turn(self, tile_placement: TilePlacement):
         # Place the tile and move the players
-        game.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        to_eliminate = TsuroGame.move_players(game.players, game.board, tile_placement.coordinate)
+        self.board.place_tile(tile_placement.coordinate, tile_placement.tile)
+        self.move_players(tile_placement.coordinate)
+        to_eliminate = self.to_eliminate()
 
         # If the current player did not eliminate itself, deal & put it last in line
-        current_player = game.players.popleft()
+        current_player = self.players[0]
         if current_player not in to_eliminate:
-            game.deal_to(current_player)
-        game.players.append(current_player)
+            self.deal_to(current_player)
+            self.players.append(self.players.popleft())
 
         # Eliminate players on the edge
         for player in to_eliminate:
-            if game.board.is_on_edge(player.position):
+            self.eliminate_player(player)
 
-                # Return cards to deck
-                game.deck.replace_tiles(player.tiles)
-                player.tiles = []
+    @staticmethod
+    def play_a_turn(state: GameState, tile_placement: TilePlacement) -> Tuple[GameState, Optional[List[Player]]]:
+        """Compute the state of the game."""
+        game = TsuroGame.from_state(state)
+        game.play_turn(tile_placement)
 
-                player_index = game.players.index(player)
-                # Eliminate the player
-                game.players.remove(player)
-                game.eliminated_players.append(player)
-
-                if game.dragon_tile_holder is not None:
-                    # If the recently-eliminated player was the holder, pass it
-                    # along. (note: if next player has full hand, everyone does)
-                    if game.dragon_tile_holder == player:
-                        game.dragon_tile_holder = None
-                        candidate = game.players[(player_index) % len(game.players)]
-                        if len(candidate.tiles) < 3:
-                            game.dragon_tile_holder = candidate
-
-#
-                # Draw cards if dragon card is held
-                if game.dragon_tile_holder is not None:
-                    player_index = game.players.index(game.dragon_tile_holder)
-                    game.dragon_tile_holder = None
-                    # Let all players draw until dragon card is held again,
-                    # starting with dragon holder.
-                    keep_drawing = True
-                    while keep_drawing:
-                        for i in range(len(game.players)):
-                            drawer = game.players[(player_index + i) % len(game.players)]
-                            if game.dragon_tile_holder is not None or len(drawer.tiles) == 3:
-                                keep_drawing = False
-                                break
-                            game.deal_to(drawer)
-
-
-
-        # Game ends if there are no more active players,
-        # or all of the tiles have been placed
-        end_state = game.state()
-        game_did_end = False
-        game_did_end = game_did_end or len(end_state.active_players) < 2
-        game_did_end = game_did_end or len(end_state.deck_state) ==\
-            (end_state.board_state.height * end_state.board_state.width)-1
-
-        if game_did_end:
-            return (end_state, end_state.active_players)
+        if game.ended():
+            return (game.state(), list(game.players))
         else:
-            return (game.state(), False)
+            return (game.state(), None)
+
+    @staticmethod
+    def legal_play(player: Player, board: Board, placement: TilePlacement) -> bool:
+        pass
 
     def board_factory(self) -> Board:
         return Board(default_config.DEFAULT_WIDTH, default_config.DEFAULT_HEIGHT)
