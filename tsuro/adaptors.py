@@ -1,4 +1,4 @@
-from admin import GameState, TsuroGame
+from admin import TsuroGame, GameState
 
 
 class CPlayerInterface:

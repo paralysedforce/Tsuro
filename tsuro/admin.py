@@ -125,21 +125,6 @@ class TsuroGame(StatefulInterface):
         for player in to_eliminate:
             self.eliminate_player(player)
 
-    @staticmethod
-    def play_a_turn(state: GameState, tile_placement: TilePlacement) -> Tuple[GameState, Optional[List[Player]]]:
-        """Compute the state of the game."""
-        game = TsuroGame.from_state(state)
-        game.play_turn(tile_placement)
-
-        if game.ended():
-            return (game.state(), list(game.players))
-        else:
-            return (game.state(), None)
-
-    @staticmethod
-    def legal_play(player: Player, board: Board, placement: TilePlacement) -> bool:
-        pass
-
     def board_factory(self) -> Board:
         return Board(defaults.DEFAULT_WIDTH, defaults.DEFAULT_HEIGHT)
 
