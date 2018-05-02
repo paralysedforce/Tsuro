@@ -43,8 +43,14 @@ class PlayerABC(ABC):
     def end_game(game: 'TsuroGame'):
         pass
 
+    def determine_symmetry(tile: PathTile) -> int:
+        """Calculates the number of unique rotations the tile has"""
+        return -1
+
 
 class Player(PlayerABC):
+    """Placeholder to keep old tests compiling until we TODO: replace instances
+        of Player with other implemented Players"""
     def initialize(cls, color):
         pass
 
@@ -56,6 +62,8 @@ class Player(PlayerABC):
 
     def end_game(game: 'TsuroGame'):
         pass
+
+
 
 
 class GameState(NamedTuple):

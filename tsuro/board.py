@@ -252,11 +252,27 @@ class PathTile:
             paths[c1] = c0
         return paths
 
+    def rotate(self):
+        """Rotates the tile clockwise once."""
+        # Create a copy of _connections, but rotated clockwise once
+        connections = [((path[0] + 2) %7, (path[1] + 2) %7) for path in self._connections]
+
+        self._paths = PathTile.create_paths_dict(connections)
+        self._connections = connections
+
     def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
         """Given a tile_spot, return the connecting path."""
         return self._paths[tile_spot]
 
     def __eq__(self, other):
+        # Copy to compare all rotations
+        # copy = PathTile(self._connections)
+        # for _ in range(4):
+        #     copy.rotate()
+        #     if copy._paths == other._paths:
+        #         return True
+
+        # return False
         return self._paths == other._paths
 
     def __repr__(self):
