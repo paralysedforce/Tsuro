@@ -162,11 +162,11 @@ def test_board_square():
 
 
 def test_path_tile():
-    # invalid TileSpot
-    with pytest.raises(ValueError):
+    # providing invalid TileSpot throws
+    with pytest.raises(IndexError):
         PathTile([(9, 10)])
 
-    # non-unique paths
+    # providing non-unique paths throws
     with pytest.raises(AssertionError):
         PathTile([(0, 1), (0, 2)])
 
@@ -174,6 +174,10 @@ def test_path_tile():
     tile = PathTile([(0, 1)])
     assert tile[0] == 1
     assert tile[1] == 0
+
+    # indexing using an invalid TileSpot throws
+    with pytest.raises(IndexError):
+        tile[-1]
 
     tile = PathTile([(0, 1), (2, 3)])
     assert tile[0] == 1

@@ -5,7 +5,8 @@ import attr
 from _stateful import State, Stateful
 
 
-# A type for representing one of the 8 possible positions on a tile.
+# A type alias representing one of the 8 possible positions on a tile.
+TileSpot = int
 """
            0   1
         +---------+
@@ -15,7 +16,6 @@ from _stateful import State, Stateful
         +---------+
            5   4
 """
-TileSpot = int
 
 
 class Position(NamedTuple):
@@ -23,24 +23,19 @@ class Position(NamedTuple):
 
     A position on the board is defined by the index of its BoardSquare (x, y),
     and the TileSpot on that BoardSquare. This is an immutable algebraic datatype.
+
+    Example:
+        >>> p = Position(coordinate=(0, 0), tile_spot=8)
     """
     coordinate: Tuple[int, int]
     tile_spot: TileSpot
 
-    def __repr__(self):
-        return 'Position({}, {}, {})'.format(self.i, self.j, self.tile_spot)
-
-    @property
-    def i(self):
-        return self.coordinate[0]
-
-    @property
-    def j(self):
-        return self.coordinate[1]
-
 
 class TilePlacement(NamedTuple):
-    """The placement of a tile."""
+    """The placement of a tile.
+
+    TilePlacement consists of a tile and the intended coordinates/rotation for its placement.
+    """
     tile: 'PathTile'
     coordinate: Tuple[int, int]
     rotation: int
@@ -48,6 +43,11 @@ class TilePlacement(NamedTuple):
 
 @attr.s
 class BoardState(State):
+    """The state of the board.
+
+    A unique board state is defined by a list of TilePlacements and the
+    dimensions of the board.
+    """
     tile_placements: List[TilePlacement] = attr.ib()
     height: int = attr.ib()
     width: int = attr.ib()
@@ -73,33 +73,30 @@ class Board(Stateful):
         _width (int)
         _height (int)
         _edge_positions (List[Position])
+
+    Example:
+        >>> board = Board(3, 3)
+        >>> tile = PathTile([(0, 5)])
+        >>> board.place_tile((0, 0), tile)
+        >>> board.traverse_path(Position(coordinate=(0, 0), tile_spot=0))
+        [Position((0, 0), 0), Position((0, 0), 5), Position((1, 0), 0)]
     """
     # The (row, column) offset needed to get to the connecting square, given a TileSpot.
     TILE_SPOT_OFFSET = {
         # top
-        0: (-1, 0),
-        1: (-1, 0),
+        0: (-1, 0), 1: (-1, 0),
         # right
-        2: (0, 1),
-        3: (0, 1),
+        2: (0, 1), 3: (0, 1),
         # bottom
-        4: (1, 0),
-        5: (1, 0),
+        4: (1, 0), 5: (1, 0),
         # left
-        6: (0, -1),
-        7: (0, -1),
+        6: (0, -1), 7: (0, -1),
     }
 
     # The adjacent tilespot on the connecting square.
     ADJACENT_TILE_SPOT = {
-        0: 5,
-        1: 4,
-        2: 7,
-        3: 6,
-        4: 1,
-        5: 0,
-        6: 3,
-        7: 2,
+        0: 5, 1: 4, 2: 7, 3: 6,
+        4: 1, 5: 0, 6: 3, 7: 2,
     }
 
     def __init__(self, height: int, width: int) -> None:
@@ -107,7 +104,10 @@ class Board(Stateful):
         self._width = width
         self._height = height
 
-    def state(self) -> BoardState:
+    @property
+    def tile_placements(self):
+        """The list of tile placements existing on the board."""
+        # TODO: Once place_tile() is refactored to take a TilePlacement, we'll just maintain this as a list.
         tile_placements = []
         for i in range(self._width):
             for j in range(self._height):
@@ -115,22 +115,11 @@ class Board(Stateful):
                 if square.has_tile():
                     tp = TilePlacement(square.path_tile, (i, j), square.rotation)
                     tile_placements.append(tp)
-
-        return BoardState(
-            tile_placements=tile_placements,
-            height=self._height,
-            width=self._width,
-        )
-
-    @classmethod
-    def from_state(cls, state: BoardState) -> 'Board':
-        board = cls(state.height, state.width)
-        for tile, coordinate, rotation in state.tile_placements:
-            board.place_tile(coordinate, tile)
-        return board
+        return tile_placements
 
     @property
     def edge_positions(self) -> List[Position]:
+        """The list of Positions along the board's edge."""
         # Memoized, since it only needs to be calculated once.
         if not hasattr(self, '_edge_positions'):
             posns = []  # type: List[Position]
@@ -146,13 +135,16 @@ class Board(Stateful):
 
     def place_tile(self, coordinate: Tuple[int, int], path_tile: 'PathTile'):
         i, j = coordinate
-        self._check_bounds(i, j)
+        if not self._in_bounds(i, j):
+            raise IndexError('({},{}) is out of bounds.'.format(i, j))
         self._board[i][j].path_tile = path_tile
 
     def traverse_path(self, p: Position) -> List[Position]:
-        self._check_bounds(p.i, p.j)
+        i, j = p.coordinate
+        if not self._in_bounds(i, j):
+            raise IndexError('({},{}) is out of bounds.'.format(i, j))
 
-        if not self._board[p.i][p.j].has_tile():
+        if not self._board[i][j].has_tile():
             return []
 
         path = []
@@ -162,12 +154,12 @@ class Board(Stateful):
 
             # First, append the movement within the square.
             path.append(p)
-            path.append(Position((p.i, p.j), next_ts_within_square))
+            path.append(Position((i, j), next_ts_within_square))
 
             # Now, traverse to the next square if possible.
             i_offset, j_offset = self.TILE_SPOT_OFFSET[next_ts_within_square]
-            next_i = p.i + i_offset
-            next_j = p.j + j_offset
+            next_i = i + i_offset
+            next_j = j + j_offset
 
             if not self._in_bounds(next_i, next_j):
                 break
@@ -188,15 +180,26 @@ class Board(Stateful):
         """
         return p in self.edge_positions
 
-    def _check_bounds(self, i: int, j: int):
-        if not self._in_bounds(i, j):
-            raise IndexError('({},{}) is out of bounds.'.format(i, j))
-
     def _in_bounds(self, i: int, j: int) -> bool:
         return 0 <= i < self._height and 0 <= j < self._width
 
     def __getitem__(self, index):
         return self._board[index]
+
+    # implement the Stateful interface
+    def state(self) -> BoardState:
+        return BoardState(
+            tile_placements=self.tile_placements,
+            height=self._height,
+            width=self._width,
+        )
+
+    @classmethod
+    def from_state(cls, state: BoardState) -> 'Board':
+        board = cls(state.height, state.width)
+        for tile, coordinate, rotation in state.tile_placements:
+            board.place_tile(coordinate, tile)
+        return board
 
 
 # TODO: Use an enum to represent the 8 possible TileSpots?
@@ -204,11 +207,20 @@ class Board(Stateful):
 
 
 class BoardSquare:
-    """A square on the map.
+    """A square on the map. This is a wrapper around PathTile implementing rotation.
 
     Attributes:
         path_tile: Optional[PathTile]
         _rotation: int
+
+    Example:
+        >>> bs = BoardSquare()
+        >>> bs.path_tile = PathTile([(0, 1)])
+        >>> bs[0]
+        1
+        >>> bs.rotation = 1
+        >>> bs[2]
+        3
     """
     def __init__(self):
         self.path_tile = None  # Using the Strategy Pattern with path tiles.
@@ -239,12 +251,25 @@ class BoardSquare:
 
 
 class PathTile:
-    """A tile that connects TileSpots."""
-    def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
-        if not all([0 <= c0 < 8 and 0 <= c1 < 8 for c0, c1 in connections]):
-            raise ValueError('Tile spots must be values in the range 0-7.')
+    """A object representing paths that connect TileSpots.
 
-        self._paths = PathTile.create_paths_dict(connections)  # type: Dict[int, int]
+    Index into PathTiles to get the connecting TileSpots.
+
+    Example:
+        >>> p = PathTile([(0, 1), (2, 6)])
+        >>> p[0]
+        1
+        >>> p[1]
+        0
+        >>> p[2]
+        6
+    """
+    def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
+        for c0, c1 in connections:
+            self._check_tile_spot(c0)
+            self._check_tile_spot(c1)
+
+        self._paths = self.create_paths_dict(connections)  # type: Dict[int, int]
         self._connections = connections
 
     @staticmethod
@@ -256,6 +281,25 @@ class PathTile:
             paths[c1] = c0
         return paths
 
+    @staticmethod
+    def _check_tile_spot(ts):
+        if not 0 <= ts < 8:
+            raise IndexError('Tile spots must be values from 0 through 7.')
+
+    def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
+        """Given a tile_spot, return the connecting path."""
+        self._check_tile_spot(tile_spot)
+        return self._paths[tile_spot]
+
+    def __eq__(self, other):
+        return self._paths == other._paths
+
+    def __repr__(self):
+        paths = ', '.join(['({}, {})'.format(x, y) for x, y in self._connections])
+        return "PathTile([{}])".format(paths)
+
+    # TODO: This rotation information should be moved to BoardSquare since PathTile has no knowledge
+    # of rotation, or we can refactor PathTile to handle all rotation. Right now rotation info is in two places.
     def rotate(self):
         """Rotates the tile clockwise once."""
         # Create a copy of _connections, but rotated clockwise once
@@ -278,22 +322,3 @@ class PathTile:
 
     def make_copy(self):
         return PathTile(self._connections)
-
-    def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
-        """Given a tile_spot, return the connecting path."""
-        return self._paths[tile_spot]
-
-    def __eq__(self, other):
-        # Copy to compare all rotations
-        # copy = PathTile(self._connections)
-        # for _ in range(4):
-        #     copy.rotate()
-        #     if copy._paths == other._paths:
-        #         return True
-
-        # return False
-        return self._paths == other._paths
-
-    def __repr__(self):
-        paths = ', '.join(['({}, {})'.format(x, y) for x, y in self._connections])
-        return "PathTile([{}])".format(paths)
