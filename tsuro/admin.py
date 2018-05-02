@@ -4,10 +4,10 @@ from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 import attr
 
 import default_config
-from board import Board, PathTile, TilePlacement, BoardState
+from _stateful import ImmutableMixin, State, StatefulInterface
+from board import Board, BoardState, PathTile, TilePlacement
 from deck import Deck
 from player import Player
-from _stateful import State, ImmutableMixin, StatefulInterface
 
 
 @attr.s
@@ -35,6 +35,7 @@ class TsuroGame(StatefulInterface):
         players: Deque[Player]
         positions: Dict[Player, Position]
     """
+
     def __init__(self, players: List[Player]) -> None:
         """Default constructor.
 

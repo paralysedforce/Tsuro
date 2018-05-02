@@ -1,7 +1,7 @@
-from admin import TsuroGame, GameState
-from player import Color, Player
+from admin import GameState, TsuroGame
 from board import BoardState, Position, TilePlacement
 from deck import Deck, PathTile
+from player import Color, Player
 
 
 def start_game_state():
@@ -88,7 +88,7 @@ def test_move_multiple_players():
     initial_state = start_game_state()
     placement = TilePlacement(
         tile=PathTile([(0, 5), (6, 3)]),
-        coordinate=(0,0),
+        coordinate=(0, 0),
         rotation=0
     )
     (final_state, _) = TsuroGame.play_a_turn(initial_state, placement)
@@ -103,11 +103,16 @@ def test_eliminate_multiple():
     pass
 
 # making a move where the tile is not placed in its original position (i.e., it is rotated)
+
+
 def test_test_place_rotation():
     # TODO: Implement some sort of rotation scheme.
     pass
 
-# making an illegal move, specifically where the move is an elimination move, but there are non-elimination moves available
+# making an illegal move, specifically where the move is an elimination
+# move, but there are non-elimination moves available
+
+
 def test_elimination_move():
     # This test is covered in test_eliminate_multiple. The player should detect
     # if its own move will eliminate itself before playing.
@@ -139,7 +144,7 @@ def test_never_dragon():
 
     placement = TilePlacement(
         tile=PathTile([(0, 1), (6, 7)]),
-        coordinate=(0,0),
+        coordinate=(0, 0),
         rotation=0
     )
 
@@ -149,6 +154,8 @@ def test_never_dragon():
     assert after_state.dragon_holder is None
 
 # moving where one player has the dragon tile before and no one gets any new tiles
+
+
 def test_no_new_tiles():
     initial_state = start_game_state()
 
@@ -175,7 +182,10 @@ def test_no_new_tiles():
 def test_dragon_player_eliminates_other():
     pass
 
-# moving where a player that does not have the dragon tile makes a move and it causes an elimination of the player that has the dragon tile
+# moving where a player that does not have the dragon tile makes a move
+# and it causes an elimination of the player that has the dragon tile
+
+
 def test_dragon_player_eliminated_other_dragon_tile_behavior():
     state = start_game_state()
     # Player C is the dragon holder, and Player D comes right after C
@@ -241,6 +251,7 @@ def test_dragon_player_self_elimination_deck_behavior():
     assert new_state.active_players[0].tiles == [tile0, tile2], 'Card drawing rotates to front of queue'
 
 # OLD TESTS
+
 
 class TsuroGameOneCard(TsuroGame):
     def deck_factory(self):

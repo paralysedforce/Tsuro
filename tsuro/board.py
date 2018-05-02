@@ -2,8 +2,7 @@ from typing import Dict, List, NamedTuple, Tuple
 
 import attr
 
-from _stateful import State, ImmutableMixin, StatefulInterface
-
+from _stateful import ImmutableMixin, State, StatefulInterface
 
 # A type alias representing one of the 8 possible positions on a tile.
 TileSpot = int
@@ -125,10 +124,10 @@ class Board(StatefulInterface):
             posns = []  # type: List[Position]
             w = self._width
             h = self._height
-            posns += [Position((0, j), ts)     for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
+            posns += [Position((0, j), ts) for j in range(w) for ts in (0, 1)]  # top edge     # noqa: E272
             posns += [Position((i, w - 1), ts) for i in range(h) for ts in (2, 3)]  # right edge   # noqa: E272
             posns += [Position((h - 1, j), ts) for j in range(w) for ts in (4, 5)]  # bottom edge  # noqa: E272
-            posns += [Position((i, 0), ts)     for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
+            posns += [Position((i, 0), ts) for i in range(h) for ts in (6, 7)]  # left edge    # noqa: E272
             self._edge_positions = posns
 
         return self._edge_positions
@@ -222,6 +221,7 @@ class BoardSquare:
         >>> bs[2]
         3
     """
+
     def __init__(self):
         self.path_tile = None  # Using the Strategy Pattern with path tiles.
         self.rotation = 0
@@ -264,6 +264,7 @@ class PathTile:
         >>> p[2]
         6
     """
+
     def __init__(self, connections: List[Tuple[TileSpot, TileSpot]]) -> None:
         for c0, c1 in connections:
             self._check_tile_spot(c0)
@@ -303,7 +304,7 @@ class PathTile:
     def rotate(self):
         """Rotates the tile clockwise once."""
         # Create a copy of _connections, but rotated clockwise once
-        connections = [((path[0] + 2) %8, (path[1] + 2) %8) for path in self._connections]
+        connections = [((path[0] + 2) % 8, (path[1] + 2) % 8) for path in self._connections]
 
         self._paths = PathTile.create_paths_dict(connections)
         self._connections = connections

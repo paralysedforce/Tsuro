@@ -3,8 +3,8 @@ from typing import List, Optional  # noqa: F401
 
 import attr
 
-from board import PathTile, Position
 from _stateful import State
+from board import PathTile, Position
 
 
 class Color(Enum):

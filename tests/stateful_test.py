@@ -3,7 +3,7 @@ from typing import List
 import attr
 import pytest
 
-from _stateful import State, ImmutableMixin, StatefulInterface
+from _stateful import ImmutableMixin, State, StatefulInterface
 
 
 @attr.s

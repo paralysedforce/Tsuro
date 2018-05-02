@@ -1,9 +1,8 @@
 from collections import deque
 from typing import List, Optional, Tuple
 
+from _stateful import ImmutableMixin, State, StatefulInterface
 from board import PathTile
-
-from _stateful import State, ImmutableMixin, StatefulInterface
 
 # TODO: Make Deck stateful and add DeckState
 

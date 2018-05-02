@@ -1,4 +1,4 @@
-from admin import TsuroGame, GameState
+from admin import GameState, TsuroGame
 
 
 class CPlayerInterface:
@@ -17,6 +17,7 @@ class CPlayerInterface:
 
 class PlayerAdaptor(CPlayerInterface):
     """An adaptor class to adapt our Player to the class's Player."""
+
     def __init__(self, player):
         self.player = player
         self.other_colors =

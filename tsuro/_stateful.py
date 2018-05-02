@@ -1,7 +1,7 @@
-from typing import NamedTuple, List
+import json
+from typing import List, NamedTuple
 
 import attr
-import json
 
 
 @attr.s
@@ -31,6 +31,7 @@ class State:
             "y": 2
         }
     """
+
     def to_dict(self):
         return attr.asdict(self)
 
@@ -59,6 +60,7 @@ class ImmutableMixin:
         >>> p.update(x=99)
         IPoint(x=99, y=2)
     """
+
     def update(self, **replacement_attrs):
         """Return a new instance of State with the arguments overwritten, shallow copying all mutable members."""
         cls = type(self)

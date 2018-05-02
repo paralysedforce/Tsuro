@@ -193,11 +193,13 @@ def test_path_tile_equality():
     assert not PathTile([(0, 1)]) == PathTile([(0, 1), (2, 3)])
     assert PathTile([(2, 3), (0, 1)]) == PathTile([(0, 1), (2, 3)])
 
+
 def test_rotate_tile_symmetric():
     tile1 = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
     tile2 = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
     tile2.rotate()
     assert tile1 == tile2
+
 
 def test_rotate_tile_asymmetric():
     tile1 = PathTile([(0, 1), (2, 5), (3, 4), (6, 7)])
@@ -205,9 +207,11 @@ def test_rotate_tile_asymmetric():
     tile2.rotate()
     assert not (tile1 == tile2)
 
+
 def test_symmetric_tile():
     tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
     assert tile.unique_rotations() == 1
+
 
 def test_asymmetric_tile():
     tile = PathTile([(0, 5), (1, 3), (2, 6), (4, 7)])
