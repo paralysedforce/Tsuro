@@ -43,7 +43,6 @@ class ImmutableMixin:
 
         @attr.s
         class IPoint(State, ImmutableMixin):
-            '''An example state representing a point in a 2D plane.'''
             x: int = attr.ib()
             y: int = attr.ib()
 
@@ -67,7 +66,10 @@ class ImmutableMixin:
 
 
 class StatefulInterface:
-    """An interface that an object must implement to be Stateful."""
+    """An interface that an object must implement to be Stateful.
+
+    To be stateful, an object must be able to return its state and reconstruct itself from a state.
+    """
 
     @classmethod
     def from_state(cls, state):
@@ -75,9 +77,3 @@ class StatefulInterface:
 
     def state(self):
         raise NotImplementedError
-
-@attr.s
-class IPoint(State, ImmutableMixin):
-    '''An example state representing a point in a 2D plane.'''
-    x: int = attr.ib()
-    y: int = attr.ib()
