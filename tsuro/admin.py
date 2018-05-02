@@ -1,5 +1,6 @@
 from collections import deque
 from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
+from enum import Enum
 
 from dataclasses import dataclass
 
@@ -8,12 +9,28 @@ from board import Board, PathTile, Position, TilePlacement, BoardState
 from deck import Deck
 
 
+class Color(Enum):
+    GRAY = 0
+    GREEN = 1
+    RED = 2
+    ORANGE = 3
+    BLUE = 4
+    WHITE = 5
+    YELLOW = 6
+    BLACK = 7
+
+
+
 # A dataclass is a "mutable NamedTuple".
 @dataclass
 class Player:
     name: str
     position: Optional[Position]
     tiles: List[PathTile]
+    color: Color
+
+
+
 
 
 class GameState(NamedTuple):
