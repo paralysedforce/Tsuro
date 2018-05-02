@@ -1,5 +1,10 @@
 from typing import Dict, List, NamedTuple, Tuple
 
+import attr
+
+from _stateful import State, Stateful
+
+
 # A type for representing one of the 8 possible positions on a tile.
 """
            0   1
@@ -41,15 +46,14 @@ class TilePlacement(NamedTuple):
     rotation: int
 
 
-# TODO: Add a Stateful interface and a State base class. Add type annotations to
-# TsuroGame, Board, and Deck.
-class BoardState(NamedTuple):
-    tile_placements: List[TilePlacement]
-    height: int
-    width: int
+@attr.s
+class BoardState(State):
+    tile_placements: List[TilePlacement] = attr.ib()
+    height: int = attr.ib()
+    width: int = attr.ib()
 
 
-class Board:
+class Board(Stateful):
     """The Tsuro game board.
 
          0  1  2  3
