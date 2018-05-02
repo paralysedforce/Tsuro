@@ -45,6 +45,7 @@ class PlayerABC(ABC):
 
     def determine_symmetry(tile: PathTile) -> int:
         """Calculates the number of unique rotations the tile has"""
+        # rotation0 =
         return -1
 
 

@@ -260,6 +260,9 @@ class PathTile:
         self._paths = PathTile.create_paths_dict(connections)
         self._connections = connections
 
+    def __copy__(self):
+        return PathTile(self._connections)
+
     def __getitem__(self, tile_spot: TileSpot) -> TileSpot:
         """Given a tile_spot, return the connecting path."""
         return self._paths[tile_spot]
