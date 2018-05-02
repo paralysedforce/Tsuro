@@ -1,13 +1,15 @@
+from abc import ABC, abstractmethod, abstractclassmethod
 from collections import deque
 from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 from enum import Enum
 
-from abc import ABC, abstractmethod, abstractclassmethod
+import attr
 from dataclasses import dataclass
 
 import default_config
 from board import Board, PathTile, Position, TilePlacement, BoardState
 from deck import Deck
+from _stateful import State, Stateful
 
 
 class Color(Enum):
@@ -61,31 +63,6 @@ class Player(PlayerABC):
         pass
 
 
-
-
-class GameState(NamedTuple):
-    active_players: List[Player]
-    eliminated_players: List[Player]
-    dragon_holder: Optional[int]
-    board_state: BoardState
-    deck_state: List[PathTile]
-
-    # TODO: derive this from the State base class
-    def update(self,
-               active_players=None,
-               eliminated_players=None,
-               dragon_holder=None,
-               board_state=None,
-               deck_state=None):
-        return GameState(
-            active_players=active_players if active_players is not None else self.active_players,
-            eliminated_players=eliminated_players if eliminated_players is not None else self.eliminated_players,
-            dragon_holder=dragon_holder if dragon_holder is not None else self.dragon_holder,
-            board_state=board_state if board_state is not None else self.board_state,
-            deck_state=deck_state if deck_state is not None else self.deck_state,
-        )
-
-
 def peek_path(player: Player, board: Board, tile: PathTile) -> List[Position]:
     """Return the path from a tile placement, given a board state and a position."""
     (i, j), _ = player.position
@@ -117,7 +94,16 @@ def legal_play(player: Player, board: Board, placement: TilePlacement) -> bool:
     return True
 
 
-class TsuroGame:
+@attr.s
+class GameState(State):
+    active_players: List[Player] = attr.ib()
+    eliminated_players: List[Player] = attr.ib()
+    dragon_holder: Optional[int] = attr.ib()
+    board_state: BoardState = attr.ib()
+    deck_state: List[PathTile] = attr.ib()
+
+
+class TsuroGame(Stateful):
     """Controller / administrator for Tsuro.
 
     Attributes:

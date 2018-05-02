@@ -72,6 +72,7 @@ def test_move_across_multiple():
         coordinate=(1, 2),
         rotation=0
     )
+
     placement1 = TilePlacement(
         tile=PathTile([(0, 5), (6, 3)]),
         coordinate=(0, 2),
@@ -82,6 +83,7 @@ def test_move_across_multiple():
     (final_state, _) = TsuroGame.play_a_turn(mid_state, placement1)
 
     assert final_state.active_players[0].position == P(2, 2, 0)
+
 
 # making a move where multiple players move at once
 def test_move_multiple_players():
@@ -222,8 +224,22 @@ def test_dragon_player_self_elimination_deck_behavior():
     )
 
     tile0 = PathTile([(0, 1)])
+    tile1 = PathTile([(2, 3)])
+    tile2 = PathTile([(4, 5)])
 
-    state = start_game_state()
+    one_card = start_game_state().update(dragon_holder=0, deck_state=[tile0])
+    two_cards = start_game_state().update(dragon_holder=0, deck_state=[tile0, tile1])
+    three_cards = start_game_state().update(dragon_holder=0, deck_state=[tile0, tile1, tile2])
+
+    new_state, _ = TsuroGame.play_a_turn(one_card, eliminate_player_A)
+    assert new_state.active_players[0].tiles == [tile0], 'Player to move draws the single tile from the deck'
+
+    new_state, _ = TsuroGame.play_a_turn(two_cards, eliminate_player_A)
+    assert new_state.active_players[0].tiles == [tile0]
+    assert new_state.active_players[1].tiles == [tile1], 'Next player in queue draws second tile'
+
+    new_state, _ = TsuroGame.play_a_turn(three_cards, eliminate_player_A)
+    assert new_state.active_players[0].tiles == [tile0, tile2], 'Card drawing rotates to front of queue'
 
     full_deck = state.update(
         active_players= [

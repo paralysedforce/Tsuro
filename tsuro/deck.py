@@ -3,10 +3,12 @@ from typing import List, Optional, Tuple
 
 from board import PathTile
 
+from _stateful import State, Stateful
+
 # TODO: Make Deck stateful and add DeckState
 
 
-class Deck:
+class Deck(Stateful):
     """A deck of PathTiles.
 
     Attributes:
