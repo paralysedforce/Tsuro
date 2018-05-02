@@ -35,11 +35,11 @@ class GameState(State, ImmutableMixin):
     Example:
         >>> game.state()
     """
-    active_players: List[Player] = attr.ib()
-    eliminated_players: List[Player] = attr.ib()
-    dragon_holder: Optional[int] = attr.ib()
-    board_state: BoardState = attr.ib()
-    deck_state: List[PathTile] = attr.ib()
+    active_players: List[Player]      = attr.ib()
+    eliminated_players: List[Player]  = attr.ib()
+    dragon_holder: Optional[int]      = attr.ib()
+    board_state: BoardState           = attr.ib()
+    deck_state: List[PathTile]        = attr.ib()
 
 
 class TsuroGame(StatefulInterface):

@@ -20,17 +20,22 @@ class State:
             y: int = attr.ib()
 
         >>> p = Point(1, 2)
-        >>> p  # derived __repr___
+        >>> p
         Point(x=1, y=2)
-        >>> x, y = p  # tuple unpacking
-        >>> p.to_dict()
+        >>> x, y = p            # tuple unpacking
+        >>> p.to_dict()         # dictionary representation
         {'x': 1, 'y': 2}
+        >>> print(p.to_json())  # json serialization
+        {
+            "x": 1,
+            "y": 2
+        }
     """
     def to_dict(self):
         return attr.asdict(self)
 
     def to_json(self):
-        json.dumps(self.to_dict(), indent=4)
+        return json.dumps(self.to_dict(), indent=4)
 
 
 @attr.s(frozen=True)
@@ -50,7 +55,7 @@ class ImmutableMixin:
         >>> p
         IPoint(x=1, y=2)
         >>> p.x = 99
-        attr.exceptions.FrozenInstanceError
+        "attr.exceptions.FrozenInstanceError"
         >>> p.update(x=99)
         IPoint(x=99, y=2)
     """

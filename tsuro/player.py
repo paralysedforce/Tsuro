@@ -21,11 +21,11 @@ class Color(Enum):
 
 @attr.s
 class PlayerABC(State, ABC):
-    name: str = attr.ib()
-    position: Optional[Position] = attr.ib()
-    tiles: List[PathTile] = attr.ib()
-    color: Color = attr.ib(default=Color.GRAY)
-    has_moved: bool = attr.ib(default=False)
+    name: str                     = attr.ib()
+    position: Optional[Position]  = attr.ib()
+    tiles: List[PathTile]         = attr.ib()
+    color: Color                  = attr.ib(default=Color.GRAY)
+    has_moved: bool               = attr.ib(default=False)
 
     @abstractclassmethod
     def initialize(cls, color):

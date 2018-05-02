@@ -48,9 +48,9 @@ class BoardState(State, ImmutableMixin):
     A unique board state is defined by a list of TilePlacements and the
     dimensions of the board.
     """
-    tile_placements: List[TilePlacement] = attr.ib()
-    height: int = attr.ib()
-    width: int = attr.ib()
+    tile_placements: List[TilePlacement]  = attr.ib()
+    height: int                           = attr.ib()
+    width: int                            = attr.ib()
 
 
 class Board(StatefulInterface):
