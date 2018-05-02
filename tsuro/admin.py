@@ -1,51 +1,13 @@
-from abc import ABC, abstractmethod, abstractclassmethod
 from collections import deque
 from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
-from enum import Enum
 
 import attr
-from dataclasses import dataclass
 
 import default_config
 from board import Board, PathTile, Position, TilePlacement, BoardState
 from deck import Deck
+from player import Color, PlayerABC
 from _stateful import State, Stateful
-
-
-class Color(Enum):
-    GRAY = 0
-    GREEN = 1
-    RED = 2
-    ORANGE = 3
-    BLUE = 4
-    WHITE = 5
-    YELLOW = 6
-    BLACK = 7
-
-
-@dataclass  # a dataclass is a "mutable NamedTuple"
-class PlayerABC(ABC):
-    name: str
-    position: Optional[Position]
-    tiles: List[PathTile]
-    color: Color = Color.GRAY
-    has_moved: bool = False
-
-    @abstractclassmethod
-    def initialize(cls, color):
-        pass
-
-    @abstractmethod
-    def place_pawn(game: 'TsuroGame') -> Position:
-        pass
-
-    @abstractmethod
-    def play_turn(game: 'TsuroGame') -> TilePlacement:
-        pass
-
-    @abstractmethod
-    def end_game(game: 'TsuroGame'):
-        pass
 
 
 class Player(PlayerABC):
