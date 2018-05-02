@@ -11,8 +11,10 @@ from _stateful import State, Stateful
 
 
 class Player(PlayerABC):
-    """Placeholder to keep old tests compiling until we TODO: replace instances
-        of Player with other implemented Players"""
+    """Placeholder to keep old tests compiling.
+
+    ... Until we replace instances of Player with other implemented Players.
+    """
     def initialize(cls, color):
         pass
 
@@ -28,6 +30,7 @@ class Player(PlayerABC):
 
 @attr.s
 class GameState(State):
+    """A named tuple representing the state of a game."""
     active_players: List[Player] = attr.ib()
     eliminated_players: List[Player] = attr.ib()
     dragon_holder: Optional[int] = attr.ib()
@@ -66,43 +69,8 @@ class TsuroGame(Stateful):
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
-    def state(self) -> GameState:
-        return GameState(
-            active_players=list(self.players),
-            eliminated_players=self.eliminated_players,
-            dragon_holder=self.players.index(self.dragon_tile_holder) if self.dragon_tile_holder else None,
-            board_state=self.board.state(),
-            deck_state=self.deck.state(),
-        )
-
-    @classmethod
-    def from_state(cls, game_state: GameState):
-        game = cls([])
-        game.players = deque(game_state.active_players)
-        game.eliminated_players = game_state.eliminated_players
-        game.deck = Deck.from_state(game_state.deck_state)
-        game.board = Board.from_state(game_state.board_state)
-
-        if game_state.dragon_holder is None:
-            game.dragon_tile_holder = None
-        else:
-            holder_index = game_state.dragon_holder
-            game.dragon_tile_holder = game.players[holder_index]
-
-        return game
-
-    def peek_path(self, player: Player, path_tile: PathTile) -> List[Position]:
-        """Return the resulting path from a certain tile placement.
-
-        Does not mutate the board.
-        """
-        (i, j), _ = player.position
-        self.board.place_tile((i, j), path_tile)
-        path = self.board.traverse_path(player.position)
-        self.board._board[i][j] = None
-        return path
-
     def move_players(self, coordinate: Tuple[int, int]):
+        """Move the players on a certain square on the map."""
         for player in self.players:
             if player.position.coordinate == coordinate:
                 path = self.board.traverse_path(player.position)
@@ -110,10 +78,18 @@ class TsuroGame(Stateful):
                 player.has_moved = True
 
     def to_eliminate(self) -> List[Player]:
+        """Return a list of players to be eliminated.
+
+        A player is to be eliminated if it has not moved, and if it is on the edge.
+        """
         return [p for p in self.players if self.board.is_on_edge(p.position) and p.has_moved]
 
     def eliminate_player(self, player: Player):
-        # Return cards to deck
+        """Eliminate a player.
+
+        Return the player's card to the deck, reset dragon tile holder, and
+        deal cards to remaining players if needed.
+        """
         self.deck.replace_tiles(player.tiles)
         player.tiles = []
 
@@ -122,14 +98,11 @@ class TsuroGame(Stateful):
         self.eliminated_players.append(player)
 
         if self.dragon_tile_holder is player:
-            # If the recently-eliminated player was the holder, pass it
-            # along. (note: if next player has full hand, everyone does)
             self.dragon_tile_holder = None
             candidate = self.players[(player_index) % len(self.players)]
             if len(candidate.tiles) < 3:
                 self.dragon_tile_holder = candidate
 
-        # Draw cards if dragon card is held
         if self.dragon_tile_holder is not None:
             player_index = self.players.index(self.dragon_tile_holder)
             self.dragon_tile_holder = None
@@ -185,3 +158,29 @@ class TsuroGame(Stateful):
 
     def deck_factory(self) -> Deck:
         return Deck.from_connections(default_config.DEFAULT_CARDS)
+
+    def state(self) -> GameState:
+        return GameState(
+            active_players=list(self.players),
+            eliminated_players=self.eliminated_players,
+            dragon_holder=self.players.index(self.dragon_tile_holder) if self.dragon_tile_holder else None,
+            board_state=self.board.state(),
+            deck_state=self.deck.state(),
+        )
+
+    @classmethod
+    def from_state(cls, game_state: GameState):
+        game = cls([])
+        game.players = deque(game_state.active_players)
+        game.eliminated_players = game_state.eliminated_players
+        game.deck = Deck.from_state(game_state.deck_state)
+        game.board = Board.from_state(game_state.board_state)
+
+        if game_state.dragon_holder is None:
+            game.dragon_tile_holder = None
+        else:
+            holder_index = game_state.dragon_holder
+            game.dragon_tile_holder = game.players[holder_index]
+
+        return game
+
