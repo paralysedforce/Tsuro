@@ -3,44 +3,15 @@ import pytest
 from board import (Board, BoardSquare, BoardState, PathTile, Position,
                    TilePlacement)
 
-from _helpers import P
+from _helpers import PositionAlias as P
+from _helpers import TileAlias as Tile
+from _helpers import TilePlacementAlias as TP
 
 
-def test_board_state():
-    b = Board(2, 2)
-    tile0 = PathTile([(0, 1)])
-    b.place_tile((0, 0), tile0)
-    assert b.state() == BoardState(
-        [TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0)],
-        2,
-        2,
-    )
-
-    tile1 = PathTile([(2, 3)])
-    b.place_tile((1, 1), tile1)
-    assert b.state() == BoardState(
-        tile_placements=[
-            TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
-            TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
-        ],
-        height=2,
-        width=2,
-    )
-
-
-def test_board_from_state():
-    state = BoardState(
-        tile_placements=[
-            TilePlacement(tile=PathTile([(0, 1)]), coordinate=(0, 0), rotation=0),
-            TilePlacement(tile=PathTile([(2, 3)]), coordinate=(1, 1), rotation=0)
-        ],
-        height=2,
-        width=2,
-    )
-
-    b = Board.from_state(state)
-    assert b._board[0][0].path_tile == PathTile([(0, 1)])
-    assert b._board[1][1].path_tile == PathTile([(2, 3)])
+@pytest.fixture
+def tile():
+    """A simple path tile for testing."""
+    return PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
 
 
 def test_board_edge_positions():
@@ -55,52 +26,34 @@ def test_board_edge_positions():
         P(0, 0, 6),
         P(0, 0, 7),
     ]
-    assert b.edge_positions == expected
+    assert b.edge_positions == expected, 'all positions on a 1x1 board are edge positions'
 
     b = Board(2, 2)
     expected = [
-        P(0, 0, 0),
-        P(0, 0, 1),
-        P(0, 1, 0),
-        P(0, 1, 1),
-
-        P(0, 1, 2),
-        P(0, 1, 3),
-        P(1, 1, 2),
-        P(1, 1, 3),
-
-        P(1, 0, 4),
-        P(1, 0, 5),
-        P(1, 1, 4),
-        P(1, 1, 5),
-
-        P(0, 0, 6),
-        P(0, 0, 7),
-        P(1, 0, 6),
-        P(1, 0, 7),
+        P(0, 0, 0), P(0, 0, 1), P(0, 1, 0), P(0, 1, 1),
+        P(0, 1, 2), P(0, 1, 3), P(1, 1, 2), P(1, 1, 3),
+        P(1, 0, 4), P(1, 0, 5), P(1, 1, 4), P(1, 1, 5),
+        P(0, 0, 6), P(0, 0, 7), P(1, 0, 6), P(1, 0, 7),
     ]
-    assert expected == b.edge_positions
+    assert expected == b.edge_positions, '2x2 test'
 
 
-def test_board_open_squares():
-    tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
+def test_board_open_squares(tile):
     b = Board(2, 2)
     assert b.open_squares == [(0, 0), (0, 1), (1, 0), (1, 1)], 'all squares are open at the start'
 
-    b.place_tile((0, 0), tile)
+    b.place_tile(TP(tile, 0, 0))
     assert b.open_squares == [(0, 1), (1, 0), (1, 1)], 'occupied square at (0, 0) is excluded'
 
 
-def test_board_place_tile():
-    tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
-
+def test_board_place_tile(tile):
     b = Board(3, 3)
-    b.place_tile((1, 1), tile)
+    b.place_tile(TP(tile, 1, 1))
     assert b._board[1][1].path_tile == tile
 
     with pytest.raises(IndexError):
-        b.place_tile((-1, 0), tile)
-        b.place_tile((3, 0), tile)
+        b.place_tile(TP(tile, -1, 0))
+        b.place_tile(TP(tile, 3, 0))
 
 
 def test_board_traverse_path_no_tiles():
@@ -115,26 +68,25 @@ def test_board_traverse_path_no_tiles():
 
 def test_board_traverse_path_2x2():
     b = Board(2, 2)
-    b.place_tile((0, 0), PathTile([(7, 2)]))
+    b.place_tile(TP(Tile(7, 2), 0, 0))
     assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7)], 'path to middle'
     assert b.traverse_path(P(0, 0, 2)) == [P(0, 0, 2), P(0, 0, 7)], 'path to left edge'
 
-    b.place_tile((0, 1), PathTile([(7, 2)]))
+    b.place_tile(TP(Tile(7, 2), 0, 1))
     assert b.traverse_path(P(0, 0, 7)) == [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2)], 'path to right edge'
 
 
 def test_board_traverse_path_three_tiles():
     b = Board(3, 3)
-    b.place_tile((0, 0), PathTile([(7, 2)]))
-    b.place_tile((0, 1), PathTile([(7, 2)]))
+    b.place_tile(TP(Tile(7, 2), 0, 0))
+    b.place_tile(TP(Tile(7, 2), 0, 1))
 
     start = P(0, 0, 7)
-
     expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7)]
     assert b.traverse_path(start) == expected, 'traverse in a straight line across the top of the board'
 
     # Connect a path straight across the top edge of the board.
-    b.place_tile((0, 2), PathTile([(7, 2)]))
+    b.place_tile(TP(Tile(7, 2), 0, 2))
 
     expected = [P(0, 0, 7), P(0, 0, 2), P(0, 1, 7), P(0, 1, 2), P(0, 2, 7), P(0, 2, 2)]
     actual = b.traverse_path(start)
@@ -142,7 +94,44 @@ def test_board_traverse_path_three_tiles():
     assert b.is_on_edge(actual[-1]), 'the path terminates on the edge of the board'
 
 
-def test_board_square():
+def test_board_state():
+    b = Board(2, 2)
+    tile0 = Tile(0, 1)
+    b.place_tile(TP(tile0, 0, 0))
+    assert b.state() == BoardState(
+        [TilePlacement(tile=Tile(0, 1), coordinate=(0, 0), rotation=0)],
+        2,
+        2,
+    )
+
+    tile1 = Tile(2, 3)
+    b.place_tile(TP(tile1, 1, 1))
+    assert b.state() == BoardState(
+        tile_placements=[
+            TilePlacement(tile=Tile(0, 1), coordinate=(0, 0), rotation=0),
+            TilePlacement(tile=Tile(2, 3), coordinate=(1, 1), rotation=0)
+        ],
+        height=2,
+        width=2,
+    )
+
+
+def test_board_from_state():
+    state = BoardState(
+        tile_placements=[
+            TP(Tile(0, 1), 0, 0),
+            TP(Tile(2, 3), 1, 1)
+        ],
+        height=2,
+        width=2,
+    )
+
+    b = Board.from_state(state)
+    assert b._board[0][0].path_tile == Tile(0, 1)
+    assert b._board[1][1].path_tile == Tile(2, 3)
+
+
+def test_board_square(tile):
     square = BoardSquare()
 
     # Raises exception before a PathTile is placed.
@@ -150,7 +139,7 @@ def test_board_square():
         square.next(0)
 
     assert not square.has_tile()
-    square.path_tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
+    square.path_tile = tile
     assert square.has_tile()
 
     # top
@@ -170,7 +159,7 @@ def test_board_square():
 def test_path_tile():
     # providing invalid TileSpot throws
     with pytest.raises(IndexError):
-        PathTile([(9, 10)])
+        Tile(9, 10)
 
     # providing non-unique paths throws
     with pytest.raises(AssertionError):

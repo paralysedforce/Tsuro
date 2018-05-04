@@ -62,7 +62,7 @@ class TsuroGame(StatefulInterface):
 
     def play_turn(self, tile_placement: TilePlacement):
         """Given a tile placement, play a turn, moving and eliminating players as needed."""
-        self.board.place_tile(tile_placement.coordinate, tile_placement.tile)
+        self.board.place_tile(tile_placement)
         self._move_players(tile_placement.coordinate)
 
         current_player = self.players[0]

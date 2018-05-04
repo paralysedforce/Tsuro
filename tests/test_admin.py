@@ -5,7 +5,7 @@ from board import BoardState, Position, TilePlacement
 from deck import PathTile
 from player import Color, Player
 
-from _helpers import P
+from _helpers import PositionAlias as P
 
 
 @pytest.fixture

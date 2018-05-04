@@ -1,11 +1,17 @@
-from board import PathTile, Position
+from board import PathTile, Position, TilePlacement
 
 
-def P(i, j, tile_spot):
-    # Just for readability.
+# Aliases for readability.
+
+
+def PositionAlias(i, j, tile_spot):
     return Position((i, j), tile_spot)
 
 
-def Tile(i, j):
+def TileAlias(i, j):
     """Create a PathTile with a single connection."""
     return PathTile([(i, j)])
+
+
+def TilePlacementAlias(tile, i, j, rotation=0):
+    return TilePlacement(tile=tile, coordinate=(i, j), rotation=rotation)
