@@ -305,7 +305,7 @@ class PathTile:
     def unique_rotations(self) -> int:
         """Calculates the number of unique rotations the tile has"""
         copy = self.make_copy()
-        rotations = []
+        rotations = []  # type: List[int]
         for _ in range(4):
             copy.rotate()
             rotation = copy.make_copy()
