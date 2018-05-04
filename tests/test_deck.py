@@ -1,11 +1,7 @@
 from board import PathTile
 from deck import Deck
 
-
-def Tile(i, j):
-    """Create a PathTile with a single connection."""
-    # Just using this to make the tests read a bit easier.
-    return PathTile([(i, j)])
+from _helpers import Tile
 
 
 def test_deck_equality():

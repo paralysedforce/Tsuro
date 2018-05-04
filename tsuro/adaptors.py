@@ -1,47 +1,19 @@
+from abc import ABC, abstractmethod
 from admin import GameState, TsuroGame
 
 
-class CPlayerInterface:
-    def initialize(cls, color, other_colors):
-        raise NotImplementedError
-
-    def place_pawn(self, board):
-        raise NotImplementedError
-
-    def play_turn(self, board, tiles, tile_count):
-        raise NotImplementedError
-
-    def end_game(self, board, color):
-        raise NotImplementedError
-
-
-class PlayerAdaptor(CPlayerInterface):
-    """An adaptor class to adapt our Player to the class's Player."""
-
-    def __init__(self, player):
-        self.player = player
-
-    def get_name(self):
-        return self.player.name
-
-    def initialize(self, color, other_colors):
-        self.player.color = color
-
-    def place_pawn(self, board):
+class AdminAdaptorInterface(ABC):
+    @abstractmethod
+    def play_a_turn(self, deck, active_players, eliminated_players, board, tile_placement):
         pass
 
-    def play_turn(self, board, tiles, tile_count):
-        pass
-
-    def end_game(self, board, color):
+    @abstractmethod
+    def legal_play(self):
         pass
 
 
-class AdministratorAdaptor:
-    """An adaptor class to adapt our TsuroGame to the class's Administrator."""
-
-    def __init__(self):
-        pass
+class AdminAdaptor(AdminAdaptorInterface):
+    """An adaptor class to adapt our TsuroGame to the class's standard Administrator interface."""
 
     def play_a_turn(self, deck, active_players, eliminated_players, board, tile_placement):
         state = self._convert_to_game_state(deck, active_players, eliminated_players, board, tile_placement)
@@ -61,7 +33,6 @@ class AdministratorAdaptor:
     def legal_play(self):
         pass
 
-    # To convert to and from different interfaces, override _convert_to_{state} methods in a subclass.
     def _convert_to_game_state(self, deck, active_players, eliminated_players, board, tile_placement):
         return GameState(
             active_players=active_players,
@@ -76,3 +47,21 @@ class AdministratorAdaptor:
 
     def _convert_to_board_state(self, board):
         return board
+
+
+class PlayerAdaptorInterface(ABC):
+    @abstractmethod
+    def initialize(cls, color, other_colors):
+        raise NotImplementedError
+
+    @abstractmethod
+    def place_pawn(self, board):
+        raise NotImplementedError
+
+    @abstractmethod
+    def play_turn(self, board, tiles, tile_count):
+        raise NotImplementedError
+
+    @abstractmethod
+    def end_game(self, board, color):
+        raise NotImplementedError

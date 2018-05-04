@@ -125,6 +125,12 @@ class Board(StatefulInterface):
 
         return self._edge_positions
 
+    @property
+    def open_squares(self) -> List[Tuple[int, int]]:
+        """Return a list of coordinate indicating open squares on the board."""
+        coordinates = [(i, j) for i in range(self._width) for j in range(self._height)]
+        return [(i, j) for i, j in coordinates if not self._board[i][j].has_tile()]
+
     def place_tile(self, coordinate: Tuple[int, int], path_tile: 'PathTile'):
         i, j = coordinate
         if not self._in_bounds(i, j):

@@ -5,6 +5,8 @@ from board import BoardState, Position, TilePlacement
 from deck import PathTile
 from player import Color, Player
 
+from _helpers import P
+
 
 @pytest.fixture
 def initial_state():
@@ -51,11 +53,6 @@ def initial_state():
 def game(initial_state):
     """An instance of TsuroGame, instantiated with inital_state. For testing."""
     return TsuroGame.from_state(initial_state)
-
-
-def P(i, j, tile_spot):
-    # For readability
-    return Position((i, j), tile_spot)
 
 
 def test_move_from_edge(game):
@@ -218,9 +215,6 @@ def test_dragon_player_self_elimination_dragon_tile_behavior(initial_state):
 
 
 def test_dragon_player_self_elimination_deck_behavior(initial_state):
-    # TODO: remove the need for deepcopy here. Put it in update.
-    from copy import deepcopy
-
     eliminate_player_A = TilePlacement(
         tile=PathTile([(0, 1), (6, 5)]),
         coordinate=(0, 0),
@@ -231,12 +225,9 @@ def test_dragon_player_self_elimination_deck_behavior(initial_state):
     tile1 = PathTile([(2, 3)])
     tile2 = PathTile([(4, 5)])
 
-    one_card = TsuroGame.from_state(deepcopy(initial_state).update(dragon_holder=0, deck_state=[tile0]))
-    two_cards = TsuroGame.from_state(deepcopy(initial_state).update(dragon_holder=0, deck_state=[tile0, tile1]))
-    three_cards = TsuroGame.from_state(
-        deepcopy(initial_state).update(
-            dragon_holder=0, deck_state=[
-                tile0, tile1, tile2]))
+    one_card = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0]))
+    two_cards = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0, tile1]))
+    three_cards = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0, tile1, tile2]))
 
     one_card.play_turn(eliminate_player_A)
     assert one_card.state().active_players[0].tiles == [tile0], 'Player to move draws the single tile from the deck'

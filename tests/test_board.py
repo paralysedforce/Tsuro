@@ -3,10 +3,7 @@ import pytest
 from board import (Board, BoardSquare, BoardState, PathTile, Position,
                    TilePlacement)
 
-
-# For readability
-def P(i, j, tile_spot):
-    return Position((i, j), tile_spot)
+from _helpers import P
 
 
 def test_board_state():
@@ -83,6 +80,15 @@ def test_board_edge_positions():
         P(1, 0, 7),
     ]
     assert expected == b.edge_positions
+
+
+def test_board_open_squares():
+    tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
+    b = Board(2, 2)
+    assert b.open_squares == [(0, 0), (0, 1), (1, 0), (1, 1)], 'all squares are open at the start'
+
+    b.place_tile((0, 0), tile)
+    assert b.open_squares == [(0, 1), (1, 0), (1, 1)], 'occupied square at (0, 0) is excluded'
 
 
 def test_board_place_tile():
