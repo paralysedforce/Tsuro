@@ -60,6 +60,25 @@ class TsuroGame(StatefulInterface):
         self.players = deque(players)      # type: Deque[Player]
         self.eliminated_players = list()   # type: List[Player]
 
+    def play_turn(self, tile_placement: TilePlacement):
+        """Given a tile placement, play a turn, moving and eliminating players as needed."""
+        self.board.place_tile(tile_placement.coordinate, tile_placement.tile)
+        self._move_players(tile_placement.coordinate)
+
+        current_player = self.players[0]
+        if current_player not in self._to_eliminate():
+            self.deal_to(current_player)
+            self.players.append(self.players.popleft())
+
+        for player in self._to_eliminate():
+            self._eliminate_player(player)
+
+    def ended(self) -> bool:
+        """Return a boolean indicated if the game has ended."""
+        one_player_left = len(self.players) < 2
+        no_cards_left = len(self.deck) == (self.board._height * self.board._width) - 1
+        return one_player_left or no_cards_left
+
     def deal_to(self, player: Player):
         """Deal from the deck to a player. Assign the dragon card if needed."""
         tile = self.deck.draw()
@@ -68,7 +87,7 @@ class TsuroGame(StatefulInterface):
         elif not self.dragon_tile_holder:
             self.dragon_tile_holder = player
 
-    def move_players(self, coordinate: Tuple[int, int]):
+    def _move_players(self, coordinate: Tuple[int, int]):
         """Move the players on a certain square on the map."""
         for player in self.players:
             if player.position.coordinate == coordinate:
@@ -76,14 +95,14 @@ class TsuroGame(StatefulInterface):
                 player.position = path[-1]
                 player.has_moved = True
 
-    def to_eliminate(self) -> List[Player]:
+    def _to_eliminate(self) -> List[Player]:
         """Return a list of players to be eliminated.
 
-        A player is to be eliminated if it has not moved, and if it is on the edge.
+        A player is to be eliminated if it is on the edge of the board, and it has moved.
         """
         return [p for p in self.players if self.board.is_on_edge(p.position) and p.has_moved]
 
-    def eliminate_player(self, player: Player):
+    def _eliminate_player(self, player: Player):
         """Eliminate a player.
 
         Return the player's card to the deck, reset dragon tile holder, and
@@ -94,18 +113,17 @@ class TsuroGame(StatefulInterface):
 
         player_index = self.players.index(player)
         self.players.remove(player)
-        self.eliminated_players.append(player)
 
         if self.dragon_tile_holder is player:
             self.dragon_tile_holder = None
-            candidate = self.players[(player_index) % len(self.players)]
+            candidate = self.players[(player_index) % len(self.players)]  # TODO: + 1 to index
             if len(candidate.tiles) < 3:
                 self.dragon_tile_holder = candidate
 
+        # Let all players draw until dragon card is held again, starting with dragon holder.
         if self.dragon_tile_holder is not None:
             player_index = self.players.index(self.dragon_tile_holder)
             self.dragon_tile_holder = None
-            # Let all players draw until dragon card is held again, starting with dragon holder.
             i = 0
             while True:
                 drawer = self.players[(player_index + i) % len(self.players)]
@@ -114,28 +132,7 @@ class TsuroGame(StatefulInterface):
                 self.deal_to(drawer)
                 i += 1
 
-    def ended(self) -> bool:
-        # Game ends if there are no more active players,
-        # or all of the tiles have been placed
-        one_player_left = len(self.players) < 2
-        no_cards_left = len(self.deck) == (self.board._height * self.board._width) - 1
-        return one_player_left or no_cards_left
-
-    def play_turn(self, tile_placement: TilePlacement):
-        # Place the tile and move the players
-        self.board.place_tile(tile_placement.coordinate, tile_placement.tile)
-        self.move_players(tile_placement.coordinate)
-        to_eliminate = self.to_eliminate()
-
-        # If the current player did not eliminate itself, deal & put it last in line
-        current_player = self.players[0]
-        if current_player not in to_eliminate:
-            self.deal_to(current_player)
-            self.players.append(self.players.popleft())
-
-        # Eliminate players on the edge
-        for player in to_eliminate:
-            self.eliminate_player(player)
+        self.eliminated_players.append(player)
 
     def board_factory(self) -> Board:
         return Board(defaults.DEFAULT_WIDTH, defaults.DEFAULT_HEIGHT)
