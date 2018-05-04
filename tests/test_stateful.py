@@ -2,14 +2,15 @@ from typing import List
 
 import attr
 import pytest
+from attr import attrib, attrs
 
 from _stateful import ImmutableMixin, State, StatefulInterface
 
 
-@attr.s
+@attrs
 class TestState(State):
-    x: int = attr.ib()
-    y: int = attr.ib()
+    x: int = attrib()
+    y: int = attrib()
 
 
 def test_state():
@@ -20,16 +21,16 @@ def test_state():
     assert t.x == 99, 'fields are mutable'
 
 
-@attr.s
+@attrs
 class TestImmutableState(State, ImmutableMixin):
-    x: int = attr.ib()
-    y: int = attr.ib()
+    x: int = attrib()
+    y: int = attrib()
 
 
-@attr.s
+@attrs
 class TestImmutableStateWithMutableAttr(State, ImmutableMixin):
-    x: List = attr.ib(default=[])
-    y: int = attr.ib(default=0)
+    x: List = attrib(default=[])
+    y: int = attrib(default=0)
 
 
 def test_immutable_mixin():
@@ -47,7 +48,7 @@ def test_immutable_mixin():
     assert t0.x is original_list, 'state maintains a reference to the original list'
 
     t1 = t0.update(y=2)
-    # assert t1.x is not original_list, 'update() performs a shallow copy of any mutable members'
+    assert t1.x is not original_list, 'update() performs a deep copy of any mutable members'
 
 
 class TestStatefulClass(StatefulInterface):

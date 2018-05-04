@@ -1,7 +1,7 @@
 from collections import deque
-from typing import Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
+from typing import Deque, Dict, List, NamedTuple, Optional, Tuple  # noqa: F401
 
-import attr
+from attr import attrib, attrs
 
 import defaults
 from _stateful import ImmutableMixin, State, StatefulInterface
@@ -10,18 +10,36 @@ from deck import Deck
 from player import Player
 
 
-@attr.s
+@attrs
 class GameState(State, ImmutableMixin):
-    """The state of the game.
+    """The serialized state of the game.
+
+    Returned by TsuroGame.state(). Reconstruct Tsuro games using this object.
 
     Example:
+        >>> state = GameState(
+                active_players=[
+                    Player('A', Position((0, 0), 0), [], Color.GRAY),
+                    Player('B', Position((0, 0), 6), [], Color.GREEN),
+                ],
+                eliminated_players=[],
+                dragon_holder=None,
+                board_state=BoardState(
+                    tile_placements=[],
+                    height=3,
+                    width=3,
+                ),
+                deck_state=[],
+            )
+        >>> game = TsuroGame.from_state(state)
         >>> game.state()
+        GameState(active_players=[Player(name='A', position=Position(coordinate=(0, 0)...
     """
-    active_players: List[Player]      = attr.ib()
-    eliminated_players: List[Player]  = attr.ib()
-    dragon_holder: Optional[int]      = attr.ib()
-    board_state: BoardState           = attr.ib()
-    deck_state: List[PathTile]        = attr.ib()
+    active_players: List[Player]      = attrib()
+    eliminated_players: List[Player]  = attrib()
+    dragon_holder: Optional[int]      = attrib()
+    board_state: BoardState           = attrib()
+    deck_state: List[PathTile]        = attrib()
 
 
 class TsuroGame(StatefulInterface):
@@ -30,22 +48,16 @@ class TsuroGame(StatefulInterface):
     Attributes:
         board: Board
         deck: Deck
-        # TODO: Match this representation of dragon tile holder with GameState.
-        dragon_tile_holder: Optional[Player]
+        dragon_tile_holder: Optional[Player]  # TODO: Match this representation of dragon tile holder with GameState.
         players: Deque[Player]
         positions: Dict[Player, Position]
     """
 
     def __init__(self, players: List[Player]) -> None:
-        """Default constructor.
-
-        Args:
-            num_players (int): Count players to instantiate the Admin with.
-        """
         self.board = self.board_factory()  # type: Board
         self.deck = self.deck_factory()    # type: Deck
         self.dragon_tile_holder = None     # type: Optional[Player]
-        self.players = deque(players)
+        self.players = deque(players)      # type: Deque[Player]
         self.eliminated_players = list()   # type: List[Player]
 
     def deal_to(self, player: Player):

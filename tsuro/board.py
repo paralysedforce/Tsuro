@@ -1,6 +1,6 @@
 from typing import Dict, List, NamedTuple, Tuple
 
-import attr
+from attr import attrib, attrs
 
 from _stateful import ImmutableMixin, State, StatefulInterface
 
@@ -40,16 +40,16 @@ class TilePlacement(NamedTuple):
     rotation: int
 
 
-@attr.s
+@attrs
 class BoardState(State, ImmutableMixin):
     """The state of the board.
 
     A unique board state is defined by a list of TilePlacements and the
     dimensions of the board.
     """
-    tile_placements: List[TilePlacement]  = attr.ib()
-    height: int                           = attr.ib()
-    width: int                            = attr.ib()
+    tile_placements: List[TilePlacement]  = attrib()
+    height: int                           = attrib()
+    width: int                            = attrib()
 
 
 class Board(StatefulInterface):
@@ -82,21 +82,14 @@ class Board(StatefulInterface):
     """
     # The (row, column) offset needed to get to the connecting square, given a TileSpot.
     TILE_SPOT_OFFSET = {
-        # top
-        0: (-1, 0), 1: (-1, 0),
-        # right
-        2: (0, 1), 3: (0, 1),
-        # bottom
-        4: (1, 0), 5: (1, 0),
-        # left
-        6: (0, -1), 7: (0, -1),
+        0: (-1, 0), 1: (-1, 0),  # top
+        2: (0, 1), 3: (0, 1),    # right
+        4: (1, 0), 5: (1, 0),    # bottom
+        6: (0, -1), 7: (0, -1),  # left
     }
 
     # The adjacent tilespot on the connecting square.
-    ADJACENT_TILE_SPOT = {
-        0: 5, 1: 4, 2: 7, 3: 6,
-        4: 1, 5: 0, 6: 3, 7: 2,
-    }
+    ADJACENT_TILE_SPOT = {0: 5, 1: 4, 2: 7, 3: 6, 4: 1, 5: 0, 6: 3, 7: 2}
 
     def __init__(self, height: int, width: int) -> None:
         self._board = [[BoardSquare() for _ in range(width)] for _ in range(height)]

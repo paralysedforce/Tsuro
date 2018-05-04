@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional  # noqa: F401
 
-import attr
+from attr import attrib, attrs
 
 from _stateful import State
 from board import PathTile, Position
@@ -18,7 +18,7 @@ class Color(Enum):
     BLACK = 7
 
 
-@attr.s
+@attrs
 class Player(State):
     """Representation of a Player.
 
@@ -27,8 +27,8 @@ class Player(State):
     Example:
         >>>
     """
-    name: str                     = attr.ib()
-    position: Optional[Position]  = attr.ib()
-    tiles: List[PathTile]         = attr.ib()
-    color: Color                  = attr.ib(default=Color.GRAY)
-    has_moved: bool               = attr.ib(default=False)
+    name: str                     = attrib()
+    position: Optional[Position]  = attrib()
+    tiles: List[PathTile]         = attrib()
+    color: Color                  = attrib(default=Color.GRAY)
+    has_moved: bool               = attrib(default=False)
