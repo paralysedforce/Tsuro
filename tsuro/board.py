@@ -37,7 +37,7 @@ class TilePlacement(NamedTuple):
     """
     tile: 'PathTile'
     coordinate: Tuple[int, int]
-    rotation: int
+    rotation: int = 0
 
 
 @attrs
@@ -125,11 +125,17 @@ class Board(StatefulInterface):
 
         return self._edge_positions
 
-    def place_tile(self, coordinate: Tuple[int, int], path_tile: 'PathTile'):
-        i, j = coordinate
+    @property
+    def open_squares(self) -> List[Tuple[int, int]]:
+        """Return a list of coordinate indicating open squares on the board."""
+        coordinates = [(i, j) for i in range(self._width) for j in range(self._height)]
+        return [(i, j) for i, j in coordinates if not self._board[i][j].has_tile()]
+
+    def place_tile(self, placement: TilePlacement):
+        (i, j) = placement.coordinate
         if not self._in_bounds(i, j):
             raise IndexError('({},{}) is out of bounds.'.format(i, j))
-        self._board[i][j].path_tile = path_tile
+        self._board[i][j].path_tile = placement.tile
 
     def traverse_path(self, p: Position) -> List[Position]:
         i, j = p.coordinate
@@ -189,8 +195,8 @@ class Board(StatefulInterface):
     @classmethod
     def from_state(cls, state: BoardState) -> 'Board':
         board = cls(state.height, state.width)
-        for tile, coordinate, rotation in state.tile_placements:
-            board.place_tile(coordinate, tile)
+        for tp in state.tile_placements:
+            board.place_tile(tp)
         return board
 
 
