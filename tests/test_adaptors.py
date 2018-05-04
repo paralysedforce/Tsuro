@@ -1,9 +1,9 @@
-from admin import GameState, TsuroGame
-from adaptors import AdministratorAdaptor
-from board import BoardState, Position, TilePlacement, PathTile
-from player import Color, Player
-
 import pytest
+
+from adaptors import AdministratorAdaptor
+from admin import GameState, TsuroGame
+from board import BoardState, PathTile, Position, TilePlacement
+from player import Color, Player
 
 
 # TODO: don't copy this from admin_test

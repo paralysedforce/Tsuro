@@ -1,9 +1,9 @@
+import pytest
+
 from admin import GameState, TsuroGame
 from board import BoardState, Position, TilePlacement
 from deck import PathTile
 from player import Color, Player
-
-import pytest
 
 
 @pytest.fixture
