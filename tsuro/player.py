@@ -8,14 +8,14 @@ from board import PathTile, Position
 
 
 class Color(Enum):
-    GRAY = 0
-    GREEN = 1
-    RED = 2
-    ORANGE = 3
-    BLUE = 4
-    WHITE = 5
-    YELLOW = 6
-    BLACK = 7
+    GRAY = 1  # enum numbering starts at 1 so all values are truthy
+    GREEN = 2
+    RED = 3
+    ORANGE = 4
+    BLUE = 5
+    WHITE = 6
+    YELLOW = 7
+    BLACK = 8
 
 
 @attrs

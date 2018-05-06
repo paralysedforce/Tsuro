@@ -7,11 +7,9 @@ install:
 - pip install -r requirements.txt
 
 script:
-- isort -c tsuro/*.py tests/*.py                      # Import order checking.
-# We may need the --ignore-missing-imports flag to make mypy play nice with pytest.
-# mypy type checking throws when importing modules without stub files, including pytest.
 - MYPYPATH=tsuro mypy tsuro --ignore-missing-imports  # Static type checking.
-- pytest --cov=tsuro                                  # Unit tests.
+- isort -c tsuro/*.py tests/*.py                      # Import order checking.
+- pytest -vvv --cov=tsuro                             # Unit tests.
 
 after_success:
 - codecov --token=$CODECOV_KEY

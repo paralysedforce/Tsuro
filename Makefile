@@ -1,13 +1,10 @@
-TEST_PATH = .
+all: test typecheck lint
 
-init :
-	pip install -r requirements.txt
+test:
+	pytest -v
 
-init-pytest :
-	pip install -U pytest
+typecheck:
+	MYPYPATH=tsuro mypy tsuro -v --ignore-missing-imports
 
-test :
-	pytest --verbose --color=yes --rootdir=. $(TEST_PATH)
-	MYPYPATH=tsuro mypy tsuro       # Static type checking
-	isort -c tsuro/*.py tests/*.py  # Import order checking
-
+lint:
+	isort -c tsuro/*.py tests/*.py -v
