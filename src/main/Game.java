@@ -1,5 +1,11 @@
 package main;
 
+import javafx.util.Pair;
+import main.Players.APlayer;
+import main.Players.LeastSymmetricPlayer;
+import main.Players.MostSymmetricPlayer;
+import main.Players.RandomPlayer;
+
 import java.util.*;
 
 public class Game {
@@ -89,6 +95,7 @@ public class Game {
     public boolean isLegalMove(Tile tile, SPlayer player){
         if(!player.holdsTile(tile))
             return false;
+
         if(player.hasSafeMove() && board.willKillPlayer(tile, player))
             return false;
 
@@ -136,12 +143,18 @@ public class Game {
 
     // Main game loop: EXPERIMENTAL!!!
     public void playGame(){
+        for (SPlayer player: remainingPlayers) {
+            Pair<BoardSpace, Integer> startingLocation = player.getStartingLocation();
+            BoardSpace boardSpace = startingLocation.getKey();
+            int tokenSpace = startingLocation.getValue();
+
+            player.placeToken(boardSpace, tokenSpace);
+        }
+
         while (remainingPlayers.size() > 1) {
             for (SPlayer player : remainingPlayers) {
-                if  (player.hasSafeMove()) {
-                    Tile tile = player.chooseTile();
-                    playTurn(tile, player);
-                }
+                Tile tile = player.chooseTile();
+                playTurn(tile, player);
             }
         }
     }
@@ -213,13 +226,7 @@ public class Game {
         System.out.println("Welcome to Tsuro!");
 
         for (String player: args) {
-            System.out.println(player + ": Please input [row] [col] [tokenspace]");
-            String line = scanner.nextLine();
-            int row = Integer.decode(line.substring(0, 1));
-            int col = Integer.decode(line.substring(2, 3));
-            int tokenSpace = Integer.decode(line.substring(4, 5));
-            //need to add human player for this maybe or this turns into the human player
-//            game.registerPlayer(player, game.board.getBoardSpace(row, col), tokenSpace);
+            game.registerPlayer(player, Color.BLACK, PlayerType.RANDOM);
         }
         game.playGame();
     }

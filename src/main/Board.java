@@ -53,6 +53,7 @@ public class Board {
     }
 
     // Returns true if placing the tile in front of the token will lead to the player's death
+    // Does not actually place the tile
     public boolean willKillPlayer(Tile tile, SPlayer player) {
         Token token = player.getToken();
         BoardSpace curSpace = token.getBoardSpace();
@@ -100,14 +101,6 @@ public class Board {
         return eliminatedPlayers;
     }
 
-    // Places a token on the board at a row, col, and token space.
-    //  throws an IllegalArgumentException if a token is attempted to be placed not on an edge
-    public void startPlayer(Token token, int row, int col, int tokenSpace) {
-        if (!isOnEdge(row, col, tokenSpace))
-            throw new IllegalArgumentException("Token must start on edge");
-
-        spaces[row][col].addToken(token, tokenSpace);
-    }
 
     //================================================================================
     // Private Helpers
@@ -116,12 +109,11 @@ public class Board {
     // Gets the adjacent space of an arbitrary board space and token space.
     //  Returns null if the
     private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace) {
-        // TODO: Duplicated code from Token.java: fix somehow
         int row = boardSpace.getRow();
         int col = boardSpace.getCol();
         int direction = tokenSpace / 2;
 
-        if (direction == 0) row--; // Move up
+        if      (direction == 0) row--; // Move up
         else if (direction == 1) col++; // Move right
         else if (direction == 2) row++; // Move down
         else if (direction == 3) col--; // Move left
@@ -142,7 +134,6 @@ public class Board {
 
         int nextTokenSpace = token.findNextTokenSpace();
         BoardSpace nextSpace = getNextSpace(token);
-
         token.moveToken(nextSpace, nextTokenSpace);
     }
 

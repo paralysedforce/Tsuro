@@ -164,6 +164,5 @@ public class GameTest {
         Assert.assertTrue(christos.hasFullHand());
 
         verify(tilePileMock, times(15)).drawFromDeck();
-
     }
 }

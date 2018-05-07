@@ -1,6 +1,8 @@
 package test;
 
 import main.*;
+import main.Players.APlayer;
+import main.Players.LeastSymmetricPlayer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

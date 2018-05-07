@@ -1,6 +1,7 @@
-package main;
+package main.Players;
 
 import javafx.util.Pair;
+import main.*;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public abstract class APlayer {
     private String name;
     private Color color;
     private boolean isTurn;
-    protected SPlayer splayer;
+    public SPlayer splayer;
     private List<Token> otherPlayers;
 
     //================================================================================
@@ -51,7 +52,7 @@ public abstract class APlayer {
     //================================================================================
     // Abstract methods
     //================================================================================
-    abstract protected Pair<BoardSpace, Integer> getStartingLocation();
+    abstract public Pair<BoardSpace, Integer> getStartingLocation();
 
     abstract public Tile chooseTile();
 

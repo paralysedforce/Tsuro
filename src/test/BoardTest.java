@@ -1,8 +1,7 @@
 package test;
 
 import main.*;
-import org.junit.After;
-import org.junit.Before;
+import main.Players.RandomPlayer;
 import org.junit.Test;
 import org.junit.Assert;
 

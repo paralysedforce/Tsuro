@@ -1,5 +1,8 @@
 package main;
-import java.util.Scanner;
+import javafx.util.Pair;
+import main.Players.APlayer;
+
+import java.util.*;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -12,7 +15,7 @@ public class SPlayer {
     //================================================================================
     private final int MAX_TILES_IN_BANK = 3;
     private Token token;
-    private Tile[] hand;
+    private List<Tile> hand;
     private TilePile tilePile;
     private APlayer aplayer;
 
@@ -23,22 +26,22 @@ public class SPlayer {
     public SPlayer(BoardSpace startingLocation, int startingTokenSpace, APlayer aplayer){
         this.aplayer = aplayer;
         token = new Token(startingLocation, startingTokenSpace, this);
-        hand = new Tile[MAX_TILES_IN_BANK];
+        hand = new ArrayList<>();
         this.tilePile = Game.getGame().getTilePile();
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            hand[i] = tilePile.drawFromDeck();
+            drawFromPile();
         }
     }
 
     public SPlayer(APlayer aplayer, Color color){
         this.aplayer = aplayer;
         token = null;
-        hand = new Tile[MAX_TILES_IN_BANK];
+        hand = new ArrayList<>();
         this.tilePile = Game.getGame().getTilePile();
 
         for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            hand[i] = tilePile.drawFromDeck();
+            drawFromPile();
         }
     }
 
@@ -50,62 +53,56 @@ public class SPlayer {
     }
 
     public Tile getTile(int i){
-        return hand[i];
+        if (0 <= i && i < 3) {
+            if (i > hand.size() - 1)
+                return null;
+
+            return hand.get(i);
+        }
+        else
+            throw new IndexOutOfBoundsException("Illegal Hand Access");
     }
 
     //================================================================================
     // Public Methods
     //================================================================================
     public boolean holdsTile(Tile tile){
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (hand[i] != null && hand[i].equals(tile)) {
-                return true;
-            }
-        }
-        return false;
+        return hand.contains(tile);
     }
 
     public void drawFromPile() {
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (hand[i] == null) {
-                hand[i] = tilePile.drawFromDeck();
-                if (hand[i] == null)
-                    requestDragonTile();
-                break;
-            }
+
+        if (!hasFullHand() && !tilePile.isEmpty()) {
+            Tile drawnTile = tilePile.drawFromDeck();
+
+           // TODO: This check exists only for the benefit of our tests. Refactor tests to render it unneccesary
+            if (drawnTile != null)
+                hand.add(drawnTile);
         }
+        else
+            requestDragonTile();
     }
 
     public boolean hasFullHand() {
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (hand[i] == null)
-                return false;
-        }
-        return true;
+
+        return hand.size() == MAX_TILES_IN_BANK;
     }
 
     public void removeTileFromHand(Tile tile){
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if (hand[i].equals(tile)) {
-                hand[i] = null;
-                break;
-            }
-        }
+        hand.remove(tile);
     }
 
     public void returnTilesToPile(){
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            if(hand[i] != null) {
-                tilePile.returnToDeck(hand[i]);
-                hand[i] = null;
-            }
+        for (Tile tile: hand) {
+            tilePile.returnToDeck(tile);
         }
+
+        hand = new LinkedList<>();
     }
 
     public void placeToken(BoardSpace startingLocation, int startingTokenSpace){
         token = new Token(startingLocation, startingTokenSpace, this);
     }
-
 
     public boolean isSafeMove(Tile tile){
         return !Game.getGame().getBoard().willKillPlayer(tile, this);
@@ -115,79 +112,40 @@ public class SPlayer {
         Board board = Game.getGame().getBoard();
 
         for (Tile tile: hand){
-            if(tile == null)
+            if (tile == null)
                 continue;
 
             Tile copy = new Tile(tile);
             for (int i = 0; i < 4; i++){
                 copy.rotateClockwise();
-                if (!board.willKillPlayer(copy, this))
+                if (isSafeMove(copy))
                     return true;
             }
         }
         return false;
     }
 
-    /* A command line UI for a player to play their tiles
-    *  EXPERIMENTAL */
-    public Tile chooseTile(){
-//        System.out.println("It is " + name + "'s turn.");
-        System.out.println("Type help to see commands");
-        /* For input */
-        Scanner scanner = new Scanner(System.in);
+    public Set<Tile> getLegalMoves(){
+        Set<Tile> legalMoves = new HashSet<>();
+        boolean hasSafeMoves = hasSafeMove();
 
-        while (true) {
-            String command = scanner.nextLine();
-            if (command.startsWith("help")){
-                System.out.println("Available Commands are:");
-                System.out.println("\tchoose [tile] - Try to place the chosen tile");
-                System.out.println("\trotate [tile] - Rotate tile");
-                System.out.println("\tdisplay       - Display tiles currently in hand");
-            }
-
-            else if (command.startsWith("choose")){
-                Tile tile = null;
-                if      (command.endsWith("1")) tile = hand[0];
-                else if (command.endsWith("2")) tile = hand[1];
-                else if (command.endsWith("3")) tile = hand[2];
-
-                if (tile == null || !Game.getGame().isLegalMove(tile, this))
-                    System.err.println("Error: choose a valid tile");
-                else
-                    return tile;
-            }
-
-            else if (command.startsWith("rotate")){
-                try {
-                    if      (command.endsWith("1")) hand[0].rotateClockwise();
-                    else if (command.endsWith("2")) hand[1].rotateClockwise();
-                    else if (command.endsWith("3")) hand[2].rotateClockwise();
-                    else                         throw new NullPointerException();
-
-                    System.out.println("Tile Rotated");
-                }
-                catch (NullPointerException e){
-                    System.err.println("Error: No tile found");
-                }
-            }
-
-            else if (command.startsWith("display")){
-                System.out.println("Displaying tiles in hand...");
-                for (int i = 0; i < MAX_TILES_IN_BANK; i++){
-                    String line = "\t" + (i+1) + ": ";
-                    if (hand[i] != null)
-                        line += hand[i].toString();
-                    else
-                        line += "No tile present";
-
-                    System.out.println(line);
-                }
-            }
-            else {
-                System.out.println("Command not understood");
+        for (Tile tile: hand){
+            for (int rotation = 0; rotation < 4; rotation++){
+                if (!hasSafeMoves || isSafeMove(tile))
+                    legalMoves.add(new Tile (tile));
+                tile.rotateClockwise();
             }
         }
 
+        return legalMoves;
+    }
+
+    public Tile chooseTile(){
+        return aplayer.chooseTile();
+    }
+
+    public Pair<BoardSpace, Integer> getStartingLocation(){
+        return aplayer.getStartingLocation();
     }
 
     //================================================================================

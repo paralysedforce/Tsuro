@@ -1,10 +1,14 @@
-package main;
+package main.Players;
 
+import apple.laf.JRSUIConstants;
 import javafx.util.Pair;
+import main.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class RandomPlayer extends APlayer {
 
@@ -33,8 +37,29 @@ public class RandomPlayer extends APlayer {
     //================================================================================
     // Override methods
     //================================================================================
-    protected Pair<BoardSpace, Integer> getStartingLocation(){
+    public Pair<BoardSpace, Integer> getStartingLocation(){
+        return getRandomStartingLocation();
+    }
+
+    public Tile chooseTile() {
+        Set<Tile> legalMoves =  splayer.getLegalMoves();
+        Tile[] legalMovesArr = legalMoves.toArray(new Tile[legalMoves.size()]);
+        int randomIndex = random.nextInt(legalMovesArr.length);
+        return legalMovesArr[randomIndex];
+    }
+
+    public void endGame() {
+        //does nothing now but will do something for human player most likely
+    }
+
+
+    //================================================================================
+    // Public Static Methods
+    //================================================================================
+
+    public static Pair<BoardSpace, Integer> getRandomStartingLocation(){
         Board board = Game.getGame().getBoard();
+        Random random = new Random();
 
         int edgeNumber = random.nextInt(4);
         int indexOfEdge = random.nextInt(6);
@@ -54,28 +79,5 @@ public class RandomPlayer extends APlayer {
         else{
             return new Pair<>(board.getBoardSpace(indexOfEdge, 0), tokenSpace);
         }
-    }
-
-    public Tile chooseTile() {
-        List<Tile> legalMoves = new ArrayList<>();
-        boolean hasSafeMove = splayer.hasSafeMove();
-
-        for(int i = 0; i < 3; i++){
-            Tile tile = splayer.getTile(i);
-
-            for(int r = 0; r < 4; r++){
-                tile.rotateClockwise();
-                if(!hasSafeMove || splayer.isSafeMove(tile)){
-                    legalMoves.add(new Tile(tile));
-                }
-            }
-        }
-
-        int randomIndex = random.nextInt(legalMoves.size());
-        return legalMoves.get(randomIndex);
-    }
-
-    public void endGame() {
-        //does nothing now but will do something for human player most likely
     }
 }
