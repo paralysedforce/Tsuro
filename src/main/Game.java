@@ -112,49 +112,58 @@ public class Game {
     /* TODO: MAKE PRIVATE WHEN NOT DEBUGGING */
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
-    public Set<SPlayer> playTurn(Tile tile, SPlayer player){
-        Set<Token> failedTokens = board.placeTile(tile, player);
-        Set<SPlayer> failedPlayers = new HashSet<>();
-        for(Token failedToken : failedTokens)
-            failedPlayers.add(failedToken.getPlayer());
+    public Set<SPlayer> playTurn(Tile tile, SPlayer player) throws ContractException{
+            if (!isLegalMove(tile, player)) {
+                throw new ContractException("Player made an illegal move");
+            }
 
-        if(failedPlayers.containsAll(remainingPlayers))
-            return new HashSet<>();
+            Set<Token> failedTokens = board.placeTile(tile, player);
+            Set<SPlayer> failedPlayers = new HashSet<>();
+            for (Token failedToken : failedTokens)
+                failedPlayers.add(failedToken.getPlayer());
 
-        player.removeTileFromHand(tile);
-        player.drawFromPile();
+            if (failedPlayers.containsAll(remainingPlayers))
+                return new HashSet<>();
 
-        if (!failedPlayers.isEmpty())
-        {
-            for(SPlayer failedPlayer : failedPlayers)
-                failedPlayer.returnTilesToPile();
+            player.removeTileFromHand(tile);
+            player.drawFromPile();
 
-            SPlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
+            if (!failedPlayers.isEmpty()) {
+                for (SPlayer failedPlayer : failedPlayers)
+                    failedPlayer.returnTilesToPile();
 
-            for(SPlayer failedPlayer : failedPlayers)
-                eliminatePlayer(failedPlayer);
+                SPlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
+
+                for (SPlayer failedPlayer : failedPlayers)
+                    eliminatePlayer(failedPlayer);
 
 
-            drawAfterElimination(playerToDrawFirst);
-        }
+                drawAfterElimination(playerToDrawFirst);
+            }
 
-        return failedPlayers;
+            return failedPlayers;
     }
 
-    // Main game loop: EXPERIMENTAL!!!
+    // Main game loop
     public void playGame(){
         for (SPlayer player: remainingPlayers) {
             Pair<BoardSpace, Integer> startingLocation = player.getStartingLocation();
             BoardSpace boardSpace = startingLocation.getKey();
             int tokenSpace = startingLocation.getValue();
-
             player.placeToken(boardSpace, tokenSpace);
         }
 
         while (remainingPlayers.size() > 1) {
             for (SPlayer player : remainingPlayers) {
                 Tile tile = player.chooseTile();
-                playTurn(tile, player);
+                try {
+                    playTurn(tile, player);
+                }
+                catch (ContractException e){
+                    blamePlayer(player);
+                    tile = player.chooseTile();
+                    playTurn(tile, player);
+                }
             }
         }
     }
@@ -211,6 +220,11 @@ public class Game {
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
     }
+
+    private void blamePlayer(SPlayer splayer){
+        splayer.convertToRandom();
+    }
+
 
 
     //================================================================================

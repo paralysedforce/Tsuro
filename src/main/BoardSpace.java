@@ -63,7 +63,7 @@ public class BoardSpace {
         if (!hasTile())
             this.tile = tile;
         else
-            throw new IllegalArgumentException("main.BoardSpace already occupied");
+            throw new IllegalArgumentException("BoardSpace already occupied");
     }
 
     //================================================================================
@@ -75,21 +75,14 @@ public class BoardSpace {
     }
 
     // Move all tokens on the tile to their opposite endpoints
-    public Set<Token> advanceTokens(){
-        Set<Token> tokensAdvanced = new HashSet<>();
-
-        Map <Token, Integer> advancedTokenSpaces = new HashMap<>();
-        for (Map.Entry<Token, Integer> pair: tokenSpaces.entrySet()){
-            Token token = pair.getKey();
-            int newTokenSpace = tile.findMatch(pair.getValue());
-
-            tokensAdvanced.add(token);
-            advancedTokenSpaces.put(token, newTokenSpace);
+    public void advanceTokens(){
+        Set<Token> tokensOnSpace = getTokensOnSpace();
+        for (Token token: tokensOnSpace){
+            advanceToken(token);
         }
-        this.tokenSpaces = advancedTokenSpaces;
-        return tokensAdvanced;
     }
 
+    // Move
     public void advanceToken(Token token){
         if (hasTile()) {
             int endpoint = findToken(token);

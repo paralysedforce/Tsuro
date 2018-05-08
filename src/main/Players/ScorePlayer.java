@@ -15,7 +15,7 @@ public abstract class ScorePlayer extends APlayer {
     }
 
     @Override
-    public Tile chooseTile(){
+    protected Tile chooseTileHelper(){
         Set<Tile> legalMoves = splayer.getLegalMoves();
         Tile bestTile = null;
         int bestScore = Integer.MIN_VALUE;

@@ -1,6 +1,7 @@
 package main;
 import javafx.util.Pair;
 import main.Players.APlayer;
+import main.Players.RandomPlayer;
 
 import java.util.*;
 
@@ -97,7 +98,7 @@ public class SPlayer {
             tilePile.returnToDeck(tile);
         }
 
-        hand = new LinkedList<>();
+        hand = new ArrayList<>();
     }
 
     public void placeToken(BoardSpace startingLocation, int startingTokenSpace){
@@ -109,11 +110,7 @@ public class SPlayer {
     }
 
     public boolean hasSafeMove(){
-        Board board = Game.getGame().getBoard();
-
         for (Tile tile: hand){
-            if (tile == null)
-                continue;
 
             Tile copy = new Tile(tile);
             for (int i = 0; i < 4; i++){
@@ -148,6 +145,29 @@ public class SPlayer {
         return aplayer.getStartingLocation();
     }
 
+    public void convertToRandom(){
+        this.aplayer = new RandomPlayer(aplayer.getName(), aplayer.getColor());
+    }
+
+    public boolean isValidHand(){
+        if (hand.size() <= 3)
+            return false;
+
+        for (Tile tile: hand){
+            if (Game.getGame().getBoard().findLocationOfTile(tile) != null)
+                return false;
+        }
+
+        for (int i = 0; i < hand.size(); i++){
+            for (int j = i + 1; j < hand.size(); j++ ){
+                if (hand.get(i).equals(hand.get(j)))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
     //================================================================================
     // Private Helpers
     //================================================================================
@@ -155,5 +175,9 @@ public class SPlayer {
         Game game = Game.getGame();
         game.requestDragonTile(this);
     }
+
+    //================================================================================
+    // Private Class
+    //================================================================================
 
 }

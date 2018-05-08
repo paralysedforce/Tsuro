@@ -41,15 +41,11 @@ public class RandomPlayer extends APlayer {
         return getRandomStartingLocation();
     }
 
-    public Tile chooseTile() {
+    protected Tile chooseTileHelper() {
         Set<Tile> legalMoves =  splayer.getLegalMoves();
         Tile[] legalMovesArr = legalMoves.toArray(new Tile[legalMoves.size()]);
         int randomIndex = random.nextInt(legalMovesArr.length);
         return legalMovesArr[randomIndex];
-    }
-
-    public void endGame() {
-        //does nothing now but will do something for human player most likely
     }
 
 

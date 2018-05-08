@@ -45,7 +45,7 @@ public class UserPlayer extends APlayer{
         }
     }
 
-    public Tile chooseTile(){
+    protected Tile chooseTileHelper(){
         System.out.println("It is " + getName() + "'s turn.");
         System.out.println("Type help to see commands");
         /* For input */

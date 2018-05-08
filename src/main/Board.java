@@ -37,6 +37,7 @@ public class Board {
     public BoardSpace getBoardSpace(int row, int col) {
         if (!isValidCoordinate(row, col))
             throw new IllegalArgumentException("Invalid Tile Access");
+
         return spaces[row][col];
     }
 
@@ -46,10 +47,7 @@ public class Board {
 
     // Returns true if there is a tile on the row and col
     public boolean isOccupied(int row, int col) {
-        if (isValidCoordinate(row, col))
-            return spaces[row][col].hasTile();
-
-        throw new IllegalArgumentException("Invalid Tile Access");
+        return getBoardSpace(row, col).hasTile();
     }
 
     // Returns true if placing the tile in front of the token will lead to the player's death
@@ -84,14 +82,19 @@ public class Board {
     //   Returns the Set of tokens driven off the board
     public Set<Token> placeTile(Tile tile, SPlayer player) {
 
+        // Place the tile on the space
         BoardSpace space = player.getToken().getBoardSpace();
         space.setTile(tile);
 
+        // Gather every token currently on the space
         Set<Token> tokensToMove = space.getTokensOnSpace();
         Set<Token> eliminatedPlayers = new HashSet<>();
 
+        // Advance each token to the end of their path
         for (Token token: tokensToMove){
             advanceToEnd(token);
+
+            // Eliminate the token if necessary
             if (isOnEdge(token)) {
                 eliminatedPlayers.add(token);
                 token.removeFromBoard();
@@ -101,13 +104,23 @@ public class Board {
         return eliminatedPlayers;
     }
 
+    public BoardSpace findLocationOfTile(Tile tile){
+        for (int row = 0; row < BOARD_LENGTH; row++) {
+            for (int col = 0; col < BOARD_LENGTH; col++) {
+                BoardSpace space = getBoardSpace(row, col);
+                if (space.hasTile() && space.getTile().equals(tile))
+                    return space;
+            }
+        }
+
+        return null;
+    }
 
     //================================================================================
     // Private Helpers
     //================================================================================
 
     // Gets the adjacent space of an arbitrary board space and token space.
-    //  Returns null if the
     private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace) {
         int row = boardSpace.getRow();
         int col = boardSpace.getCol();
@@ -139,8 +152,12 @@ public class Board {
 
     private void advanceToEnd(Token token){
         BoardSpace curSpace = token.getBoardSpace();
+
         while (curSpace.hasTile()){
+            // Move the token to the other side of the tile
             curSpace.advanceToken(token);
+
+            // Check before we transfer
             if (isOnEdge(token)) {
                 break;
             }
