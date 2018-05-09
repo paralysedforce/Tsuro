@@ -19,33 +19,43 @@ class Color(Enum):
     YELLOW = 7
     BLACK = 8
 
+class Strategy(Enum):
+    RANDOM=1
+    LEAST_SYMMETRIC=2
+    MOST_SYMMETRIC = 3
 
-@attrs
-class Player(State):
-    """Representation of a Player.
+# @attrs
+# class Player(State):
+#     """Representation of a Player.
 
-    We treat Players as mutable named tuples.
+#     We treat Players as mutable named tuples.
 
-    Example:
-        >>>
-    """
-    name: str                     = attrib()
-    position: Optional[Position]  = attrib()
-    tiles: List[PathTile]         = attrib()
-    color: Color                  = attrib(default=Color.GRAY)
-    has_moved: bool               = attrib(default=False)
+#     Example:
+#         >>>
+#     """
+#     name: str                     = attrib()
+#     position: Optional[Position]  = attrib()
+#     tiles: List[PathTile]         = attrib()
+#     color: Color                  = attrib(default=Color.GRAY)
+#     has_moved: bool               = attrib(default=False)
 
 
 # TODO: Our current player is actually a PlayerState.
-# class Player:
-#     def __init__(self):
-#         self.move_strategy = self.move_strategy_factory()
+class Player:
+    def __init__(self, name="", position=None, tiles=[], color=Color.GRAY, has_moved=False):
+        self.name=name
+        self.position=position
+        self.tiles = tiles
+        self.color = color
+        self.has_moved = has_moved
 
-#     def play_turn(board):
-#         return self.strategy.choose_move(board, self.tiles)
+        self.move_strategy = self.move_strategy_factory()
 
-#     def move_strategy_factory(self):
-#         return None
+    def play_turn(board):
+        return self.strategy.choose_move(board, self.tiles)
+
+    def move_strategy_factory(self):
+        return None
 
 
 class MoveStrategyInterface(ABC):
