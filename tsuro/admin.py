@@ -61,17 +61,12 @@ class TsuroGame(StatefulInterface):
         self.eliminated_players = list()   # type: List[Player]
 
     def play_turn(self, tile_placement: TilePlacement):
-        """Given a tile placement, play a turn,
-            removing the tile from the player's hand,
-            and moving/eliminating players as needed."""
-        # Assert that the playe is legal.
+        """Given a tile placement, play a turn, remove the tile from the player's hand, and move/eliminate players."""
+        # Assert that the player is legal.
         player = self.players[0]
         self.is_placement_legal(tile_placement, player)
 
-
-        # Remove the tile from the player's hand.
         player.tiles.remove(tile_placement.tile)
-
         self.board.place_tile(tile_placement)
         self._move_players(tile_placement.coordinate)
 
@@ -176,22 +171,24 @@ class TsuroGame(StatefulInterface):
         return game
 
     def unsafe_does_eliminate_player(self, placement: TilePlacement, player: Player) -> bool:
-        """Checks to see if placing the placement will eliminate the player.
-            NOTE: This will mutate game state, so create a copy of the game before
-            calling this."""
+        """Check to see if the tile placement will eliminate the player.
+
+        NOTE: This will mutate game state, so create a copy of the game before calling this.
+        """
         self.board.place_tile(placement)
         self._move_players(placement.coordinate)
         return player in self._to_eliminate()
 
     def is_placement_legal(self, placement: TilePlacement, player: Player):
         """Checks that the tile placement is legal according to the following rules
-            WITHOUT mutating game state:
+
+        A tile placement is legal if:
             - The tile is in the player's hand
             - The tile does not already exist on the board
             - The placement does not lead to the player's elimination if the
                 player has other legal tiles to place.
 
-            raises: RulesViolatedError if the placement is illegal.
+        Raises RulesViolatedError if the placement is illegal.
         """
         # Check if is tile of player
         if placement.tile not in player.tiles:
@@ -209,16 +206,9 @@ class TsuroGame(StatefulInterface):
                     copy = TsuroGame.from_state(state)
                     if not copy.unsafe_does_eliminate_player(placement_attempt, player):
                         # Other move doesn't eliminate, so this move is illegal.
-                        raise RulesViolatedError("Move eliminates player when other, \
-                        legal moves are available.")
+                        raise RulesViolatedError("Move eliminates player when other legal moves are available.")
+
 
 class RulesViolatedError(Exception):
     def __init__(self, message=""):
         self.message = message
-
-
-
-
-
-
-

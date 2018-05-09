@@ -1,7 +1,7 @@
 import pytest
 
 from _helpers import PositionAlias as P
-from admin import GameState, TsuroGame, RulesViolatedError
+from admin import GameState, RulesViolatedError, TsuroGame
 from board import BoardState, Position, TilePlacement
 from deck import PathTile
 from player import Color, Player
@@ -87,6 +87,7 @@ def test_move_across_multiple(game):
     state = game.state()
     assert state.active_players[0].position == P(2, 2, 0)
 
+
 def test_move_multiple_players(game):
     """making a move where multiple players move at once"""
     placement = TilePlacement(
@@ -102,9 +103,10 @@ def test_move_multiple_players(game):
     assert state.active_players[2].position == P(1, 0, 0)
     assert state.active_players[0].position == P(0, 1, 6)
 
+
 def test_self_elimination_other_options_illegal():
-    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
-    loops = PathTile([(0,1), (2,3), (4,5), (6,7)])
+    straight_edge = PathTile([(0, 5), (1, 4), (2, 7), (3, 6)])
+    loops = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
     state = GameState(
         active_players=[
             Player('A', Position((0, 0), 0), [straight_edge, loops], Color.GRAY),
@@ -119,20 +121,17 @@ def test_self_elimination_other_options_illegal():
             width=3,
         ),
         deck_state=[],
-    ) # Initial state, but with cards in A's hand
-    placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
+    )
+    placement = TilePlacement(tile=loops, coordinate=(0, 0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
-    success = False
-    try:
+    with pytest.raises(RulesViolatedError):
         game.is_placement_legal(placement, player)
-    except RulesViolatedError:
-        success = True
-    assert success
+
 
 def test_self_elimination_no_other_options_legal():
-    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
-    loops = PathTile([(0,1), (2,3), (4,5), (6,7)])
+    straight_edge = PathTile([(0, 5), (1, 4), (2, 7), (3, 6)])
+    loops = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
     state = GameState(
         active_players=[
             Player('A', Position((0, 0), 0), [loops], Color.GRAY),
@@ -147,24 +146,22 @@ def test_self_elimination_no_other_options_legal():
             width=3,
         ),
         deck_state=[],
-    ) # Initial state, but with cards in A's hand
-    placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
+    )  # Initial state, but with cards in A's hand
+    placement = TilePlacement(tile=loops, coordinate=(0, 0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
     game.is_placement_legal(placement, player)
 
+
 def test_card_not_in_hand_illegal():
-    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
+    straight_edge = PathTile([(0, 5), (1, 4), (2, 7), (3, 6)])
     state = initial_state()
-    placement = TilePlacement(tile=straight_edge, coordinate=(0,0), rotation=0)
+    placement = TilePlacement(tile=straight_edge, coordinate=(0, 0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
-    success = False
-    try:
+
+    with pytest.raises(RulesViolatedError):
         game.is_placement_legal(placement, player)
-    except RulesViolatedError:
-        success = True
-    assert success
 
 
 def test_eliminate_multiple():
@@ -210,7 +207,6 @@ def test_never_dragon(initial_state):
         coordinate=(0, 0),
         rotation=0
     )
-
 
     assert game.state().dragon_holder is None
     game.play_turn(placement)

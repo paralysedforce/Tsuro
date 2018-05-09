@@ -19,27 +19,21 @@ class Color(Enum):
     YELLOW = 7
     BLACK = 8
 
-class Strategy(Enum):
-    RANDOM=1
-    LEAST_SYMMETRIC=2
-    MOST_SYMMETRIC = 3
 
+class Strategy(Enum):
+    RANDOM = 1
+    LEAST_SYMMETRIC = 2
+    MOST_SYMMETRIC = 3
 
 
 # TODO: Add PlayerState
 class Player:
-    def __init__(self, name="",
-        position=None,
-        tiles=[],
-        color=Color.GRAY,
-        has_moved=False,
-        strategy=Strategy.RANDOM):
-        self.name=name
-        self.position=position
+    def __init__(self, name="", position=None, tiles=[], color=Color.GRAY, has_moved=False, strategy=Strategy.RANDOM):
+        self.name = name
+        self.position = position
         self.tiles = tiles
         self.color = color
         self.has_moved = has_moved
-
         self.move_strategy = self.move_strategy_factory(strategy)
 
     def play_turn(board):
@@ -54,7 +48,6 @@ class Player:
             self.move_strategy = LeastSymmetricStrategy()
         else:
             raise Exception("Move strategy was undefined.")
-
 
 
 class MoveStrategyInterface(ABC):
