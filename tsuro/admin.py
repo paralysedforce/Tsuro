@@ -61,7 +61,11 @@ class TsuroGame(StatefulInterface):
         self.eliminated_players = list()   # type: List[Player]
 
     def play_turn(self, tile_placement: TilePlacement):
-        """Given a tile placement, play a turn, moving and eliminating players as needed."""
+        """Given a tile placement, play a turn,
+            removing the tile from the player's hand,
+            and moving/eliminating players as needed."""
+        # Todo: Assert that the playe is legal.
+        # Todo: Remove the tile from the player's hand.
         self.board.place_tile(tile_placement)
         self._move_players(tile_placement.coordinate)
 
@@ -164,3 +168,46 @@ class TsuroGame(StatefulInterface):
             game.dragon_tile_holder = game.players[holder_index]
 
         return game
+
+    def unsafe_does_eliminate_player(self, placement: TilePlacement, player: Player) -> bool:
+        """Checks to see if placing the placement will eliminate the player.
+            NOTE: This will mutate game state, so create a copy of the game before
+            calling this."""
+        self.board.place_tile(placement)
+        self._move_players(placement.coordinate)
+        return player in self._to_eliminate()
+
+    def is_placement_legal(self, placement: TilePlacement, player: Player) -> bool:
+        """Checks that the tile placement is legal according to the following rules
+            WITHOUT mutating game state:
+            - The tile is in the player's hand
+            - The tile does not already exist on the board
+            - The placement does not lead to the player's elimination if the
+                player has other legal tiles to place.
+        """
+        # Check if is tile of player
+        if placement.tile not in player.tiles:
+            return False
+
+        # Check if the move eliminates the player
+        state = self.to_state()
+        copy = TsuroGame.from_state(state)
+        # Check elimination move
+        if copy.unsafe_does_eliminate_player(placement, player):
+            # Check if all moves other would eliminate the player.
+            for tile in player.tiles:
+                for rotation in range(4):
+                    placement_attempt = TilePlacement(tile, placement.coordinate, rotation)
+                    copy = TsuroGame.from_state(state)
+                    if not copy.unsafe_does_eliminate_player(placement_attempt, player):
+                        # Other move doesn't eliminate, so this move is illegal.
+                        return False
+        return True
+
+
+
+
+
+
+
+
