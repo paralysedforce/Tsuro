@@ -1,7 +1,7 @@
 import pytest
 
 from _helpers import PositionAlias as P
-from admin import GameState, TsuroGame
+from admin import GameState, TsuroGame, RulesViolatedError
 from board import BoardState, Position, TilePlacement
 from deck import PathTile
 from player import Color, Player
@@ -60,6 +60,7 @@ def test_move_from_edge(game):
         coordinate=(0, 2),
         rotation=0
     )
+    game.players[0].tiles.append(placement.tile)
     game.play_turn(placement)
     assert game.state().active_players[1].position == P(1, 2, 0)
 
@@ -78,12 +79,13 @@ def test_move_across_multiple(game):
         rotation=0
     )
 
+    game.players[0].tiles.append(placement0.tile)
     game.play_turn(placement0)
+    game.players[0].tiles.append(placement1.tile)
     game.play_turn(placement1)
 
     state = game.state()
     assert state.active_players[0].position == P(2, 2, 0)
-
 
 def test_move_multiple_players(game):
     """making a move where multiple players move at once"""
@@ -92,6 +94,7 @@ def test_move_multiple_players(game):
         coordinate=(0, 0),
         rotation=0
     )
+    game.players[0].tiles.append(placement.tile)
     game.play_turn(placement)
     state = game.state()
 
@@ -120,14 +123,19 @@ def test_self_elimination_other_options_illegal():
     placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
-    assert not game.is_placement_legal(placement, player)
+    success = False
+    try:
+        game.is_placement_legal(placement, player)
+    except RulesViolatedError:
+        success = True
+    assert success
 
 def test_self_elimination_no_other_options_legal():
     straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
     loops = PathTile([(0,1), (2,3), (4,5), (6,7)])
     state = GameState(
         active_players=[
-            Player('A', Position((0, 0), 0), [straight_edge, loops], Color.GRAY),
+            Player('A', Position((0, 0), 0), [loops], Color.GRAY),
             Player('B', Position((0, 0), 6), [], Color.GREEN),
             Player('C', Position((0, 2), 0), [], Color.RED),
         ],
@@ -143,7 +151,7 @@ def test_self_elimination_no_other_options_legal():
     placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
-    assert not game.is_placement_legal(placement, player)
+    game.is_placement_legal(placement, player)
 
 def test_card_not_in_hand_illegal():
     straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
@@ -151,7 +159,12 @@ def test_card_not_in_hand_illegal():
     placement = TilePlacement(tile=straight_edge, coordinate=(0,0), rotation=0)
     game = TsuroGame.from_state(state)
     player = game.players[0]
-    assert not game.is_placement_legal(placement, player)
+    success = False
+    try:
+        game.is_placement_legal(placement, player)
+    except RulesViolatedError:
+        success = True
+    assert success
 
 
 def test_eliminate_multiple():
@@ -176,15 +189,15 @@ def test_never_dragon(initial_state):
     """moving where no player has the dragon tile before or after"""
     # Update the deck state so that nobody takes the dragon
     game = TsuroGame.from_state(initial_state.update(deck_state=[
-        PathTile([(6, 0)]),
-        PathTile([]),
-        PathTile([]),
-        PathTile([]),
-        PathTile([(6, 0)]),
-        PathTile([]),
-        PathTile([]),
-        PathTile([]),
-        PathTile([(6, 0)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
+        PathTile([(0, 1), (6, 7)]),
     ]))
 
     for player in game.players:
@@ -197,6 +210,7 @@ def test_never_dragon(initial_state):
         coordinate=(0, 0),
         rotation=0
     )
+
 
     assert game.state().dragon_holder is None
     game.play_turn(placement)
@@ -216,8 +230,10 @@ def test_no_new_tiles(game):
         rotation=0
     )
 
+    game.players[0].tiles.append(placement0.tile)
     game.play_turn(placement0)
     assert game.state().dragon_holder == 2, 'the last player should be the dragon holder'
+    game.players[0].tiles.append(placement1.tile)
     game.play_turn(placement1)
     assert game.state().dragon_holder == 1, 'All that has changed is that the holder is further up in the queue'
 
@@ -246,6 +262,7 @@ def test_dragon_player_eliminated_other_dragon_tile_behavior(initial_state):
     state = game.state()
     assert state.active_players[state.dragon_holder].name == 'C', 'Player C is the original dragon tile holder'
 
+    game.players[0].tiles.append(eliminate_A.tile)
     game.play_turn(eliminate_A)
     new_state = game.state()
     assert new_state.active_players[new_state.dragon_holder].name == 'D', 'Player D is now the dragon tile holder'
@@ -262,6 +279,7 @@ def test_dragon_player_self_elimination_dragon_tile_behavior(initial_state):
         rotation=0,
     )
 
+    game.players[0].tiles.append(eliminate_player_A.tile)
     game.play_turn(eliminate_player_A)
     assert game.state().active_players[0].name == 'B', 'A was eliminated'
     assert game.state().dragon_holder == 0, 'B is now the dragon tile holder'
@@ -281,6 +299,9 @@ def test_dragon_player_self_elimination_deck_behavior(initial_state):
     one_card = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0]))
     two_cards = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0, tile1]))
     three_cards = TsuroGame.from_state(initial_state.update(dragon_holder=0, deck_state=[tile0, tile1, tile2]))
+    one_card.players[0].tiles.append(eliminate_player_A.tile)
+    two_cards.players[0].tiles.append(eliminate_player_A.tile)
+    three_cards.players[0].tiles.append(eliminate_player_A.tile)
 
     one_card.play_turn(eliminate_player_A)
     assert one_card.state().active_players[0].tiles == [tile0], 'Player to move draws the single tile from the deck'

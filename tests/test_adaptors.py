@@ -61,6 +61,7 @@ def test_administrator_adaptor_move_from_edge(initial_state):
         coordinate=(0, 2),
         rotation=0
     )
+    active_players[0].tiles.append(placement.tile)
 
     aa = AdminAdaptor()
     result = aa.play_a_turn(deck, active_players, eliminated_players, board, placement)

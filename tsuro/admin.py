@@ -64,8 +64,14 @@ class TsuroGame(StatefulInterface):
         """Given a tile placement, play a turn,
             removing the tile from the player's hand,
             and moving/eliminating players as needed."""
-        # Todo: Assert that the playe is legal.
-        # Todo: Remove the tile from the player's hand.
+        # Assert that the playe is legal.
+        player = self.players[0]
+        self.is_placement_legal(tile_placement, player)
+
+
+        # Remove the tile from the player's hand.
+        player.tiles.remove(tile_placement.tile)
+
         self.board.place_tile(tile_placement)
         self._move_players(tile_placement.coordinate)
 
@@ -177,17 +183,19 @@ class TsuroGame(StatefulInterface):
         self._move_players(placement.coordinate)
         return player in self._to_eliminate()
 
-    def is_placement_legal(self, placement: TilePlacement, player: Player) -> bool:
+    def is_placement_legal(self, placement: TilePlacement, player: Player):
         """Checks that the tile placement is legal according to the following rules
             WITHOUT mutating game state:
             - The tile is in the player's hand
             - The tile does not already exist on the board
             - The placement does not lead to the player's elimination if the
                 player has other legal tiles to place.
+
+            raises: RulesViolatedError if the placement is illegal.
         """
         # Check if is tile of player
         if placement.tile not in player.tiles:
-            return False
+            raise RulesViolatedError("Player attempted to place a tile that is not in its hand.")
 
         # Check if the move eliminates the player
         state = self.state()
@@ -201,9 +209,12 @@ class TsuroGame(StatefulInterface):
                     copy = TsuroGame.from_state(state)
                     if not copy.unsafe_does_eliminate_player(placement_attempt, player):
                         # Other move doesn't eliminate, so this move is illegal.
-                        return False
-        return True
+                        raise RulesViolatedError("Move eliminates player when other, \
+                        legal moves are available.")
 
+class RulesViolatedError(Exception):
+    def __init__(self, message=""):
+        self.message = message
 
 
 
