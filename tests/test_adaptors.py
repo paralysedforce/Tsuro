@@ -1,6 +1,6 @@
 import pytest
 
-from adaptors import AdministratorAdaptor
+from adaptors import AdminAdaptor
 from admin import GameState, TsuroGame
 from board import BoardState, PathTile, Position, TilePlacement
 from player import Color, Player
@@ -62,6 +62,6 @@ def test_administrator_adaptor_move_from_edge(initial_state):
         rotation=0
     )
 
-    aa = AdministratorAdaptor()
+    aa = AdminAdaptor()
     result = aa.play_a_turn(deck, active_players, eliminated_players, board, placement)
     (deck, active_players, eliminated_players, board, end_indicator) = result
