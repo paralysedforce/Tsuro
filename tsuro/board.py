@@ -200,10 +200,6 @@ class Board(StatefulInterface):
         return board
 
 
-# TODO: Use an enum to represent the 8 possible TileSpots?
-# TODO: Use an enum to represent the 4 possible Rotations?
-
-
 class BoardSquare:
     """A square on the map. This is a wrapper around PathTile implementing rotation.
 
@@ -297,28 +293,3 @@ class PathTile:
     def __repr__(self):
         paths = ', '.join(['({}, {})'.format(x, y) for x, y in self._connections])
         return "PathTile([{}])".format(paths)
-
-    # TODO: This rotation information should be moved to BoardSquare since PathTile has no knowledge
-    # of rotation, or we can refactor PathTile to handle all rotation. Right now rotation info is in two places.
-    def rotate(self):
-        """Rotates the tile clockwise once."""
-        # Create a copy of _connections, but rotated clockwise once
-        connections = [((path[0] + 2) % 8, (path[1] + 2) % 8) for path in self._connections]
-
-        self._paths = PathTile.create_paths_dict(connections)
-        self._connections = connections
-
-    def unique_rotations(self) -> int:
-        """Calculates the number of unique rotations the tile has"""
-        copy = self.make_copy()
-        rotations = []
-        for _ in range(4):
-            copy.rotate()
-            rotation = copy.make_copy()
-            if rotation not in rotations:
-                rotations.append(rotation)
-
-        return len(rotations)
-
-    def make_copy(self):
-        return PathTile(self._connections)

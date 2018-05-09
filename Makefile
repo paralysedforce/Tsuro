@@ -1,13 +1,17 @@
-TEST_PATH = .
+all: setup test typecheck lint
 
-init :
+nosetup: test typecheck lint
+
+setup:
+	virtualenv -p python3 env && \
+	source env/bin/activate && \
 	pip install -r requirements.txt
 
-init-pytest :
-	pip install -U pytest
+test:
+	pytest -v
 
-test :
-	pytest --verbose --color=yes --rootdir=. $(TEST_PATH)
-	MYPYPATH=tsuro mypy tsuro       # Static type checking
-	isort -c tsuro/*.py tests/*.py  # Import order checking
+typecheck:
+	MYPYPATH=tsuro mypy tsuro --ignore-missing-imports -v
 
+lint:
+	isort -c tsuro/*.py tests/*.py -v

@@ -1,11 +1,10 @@
 import pytest
 
-from board import (Board, BoardSquare, BoardState, PathTile, Position,
-                   TilePlacement)
-
 from _helpers import PositionAlias as P
 from _helpers import TileAlias as Tile
 from _helpers import TilePlacementAlias as TP
+from board import (Board, BoardSquare, BoardState, PathTile, Position,
+                   TilePlacement)
 
 
 @pytest.fixture
@@ -187,27 +186,3 @@ def test_path_tile_equality():
     assert not PathTile([(0, 1)]) == PathTile([(0, 2)])
     assert not PathTile([(0, 1)]) == PathTile([(0, 1), (2, 3)])
     assert PathTile([(2, 3), (0, 1)]) == PathTile([(0, 1), (2, 3)])
-
-
-def test_rotate_tile_symmetric():
-    tile1 = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
-    tile2 = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
-    tile2.rotate()
-    assert tile1 == tile2
-
-
-def test_rotate_tile_asymmetric():
-    tile1 = PathTile([(0, 1), (2, 5), (3, 4), (6, 7)])
-    tile2 = PathTile([(0, 1), (2, 5), (3, 4), (6, 7)])
-    tile2.rotate()
-    assert not (tile1 == tile2)
-
-
-def test_symmetric_tile():
-    tile = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
-    assert tile.unique_rotations() == 1
-
-
-def test_asymmetric_tile():
-    tile = PathTile([(0, 5), (1, 3), (2, 6), (4, 7)])
-    assert tile.unique_rotations() == 4

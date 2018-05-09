@@ -1,7 +1,6 @@
+from _helpers import TileAlias as T
 from board import PathTile
 from deck import Deck
-
-from _helpers import TileAlias as T
 
 
 def test_deck_equality():
