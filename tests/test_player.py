@@ -34,7 +34,7 @@ def test_sort_symmetric_rotations(tiles_by_symmetry):
 
 def test_least_symmetric(board, tiles_by_symmetry):
     strategy = LeastSymmetricStrategy()
-    strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[0], 'choose the least symmetric tile'
+    assert strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[0], 'choose the least symmetric tile'
 
     # throws when called on a full board
     with pytest.raises(ValueError):
@@ -50,4 +50,4 @@ def test_least_symmetric(board, tiles_by_symmetry):
 
 def test_most_symmetric(board, tiles_by_symmetry):
     strategy = MostSymmetricStrategy()
-    strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[-1], 'choose the most symmetric tile'
+    assert strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[-1], 'choose the most symmetric tile'
