@@ -24,38 +24,37 @@ class Strategy(Enum):
     LEAST_SYMMETRIC=2
     MOST_SYMMETRIC = 3
 
-# @attrs
-# class Player(State):
-#     """Representation of a Player.
-
-#     We treat Players as mutable named tuples.
-
-#     Example:
-#         >>>
-#     """
-#     name: str                     = attrib()
-#     position: Optional[Position]  = attrib()
-#     tiles: List[PathTile]         = attrib()
-#     color: Color                  = attrib(default=Color.GRAY)
-#     has_moved: bool               = attrib(default=False)
 
 
-# TODO: Our current player is actually a PlayerState.
+# TODO: Add PlayerState
 class Player:
-    def __init__(self, name="", position=None, tiles=[], color=Color.GRAY, has_moved=False):
+    def __init__(self, name="",
+        position=None,
+        tiles=[],
+        color=Color.GRAY,
+        has_moved=False,
+        strategy=Strategy.RANDOM):
         self.name=name
         self.position=position
         self.tiles = tiles
         self.color = color
         self.has_moved = has_moved
 
-        self.move_strategy = self.move_strategy_factory()
+        self.move_strategy = self.move_strategy_factory(strategy)
 
     def play_turn(board):
-        return self.strategy.choose_move(board, self.tiles)
+        return self.move_strategy.choose_move(board, self.tiles)
 
-    def move_strategy_factory(self):
-        return None
+    def move_strategy_factory(self, strat: Strategy):
+        if strat == Strategy.RANDOM:
+            self.move_strategy = RandomStrategy()
+        elif strat == Strategy.MOST_SYMMETRIC:
+            self.move_strategy = MostSymmetricStrategy()
+        elif strat == Strategy.LEAST_SYMMETRIC:
+            self.move_strategy = LeastSymmetricStrategy()
+        else:
+            raise Exception("Move strategy was undefined.")
+
 
 
 class MoveStrategyInterface(ABC):
