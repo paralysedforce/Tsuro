@@ -1,10 +1,12 @@
 package test;
 
 import main.*;
+import main.Players.APlayer;
 import main.Players.RandomPlayer;
 import org.junit.Test;
 import org.junit.Assert;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -12,15 +14,16 @@ import java.util.Set;
  */
 public class BoardTest {
 
-
-
     @Test
     public void placeTile() throws Exception {
         Board board = new Board();
 
         Tile tile = new Tile(0, 2, 1, 3, 4, 5, 6, 7);
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer(space, 0, new RandomPlayer("Vyas", Color.BLUE));
+        APlayer player = new RandomPlayer("Vyas", Color.BLUE);
+
+        player.initialize(new ArrayList<>());
+        player.placeToken(space, 0);
 
         board.placeTile(tile, player);
         Assert.assertTrue(board.isOccupied(0, 0));
@@ -34,12 +37,16 @@ public class BoardTest {
         Board board = new Board();
 
         BoardSpace upperSpace = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer(upperSpace, 0, new RandomPlayer("Vyas", Color.BLUE));
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(upperSpace, 0);
         Tile vyasTile = new Tile(0, 4, 1, 5, 2, 3, 6, 7);
 
 
         BoardSpace lowerSpace = board.getBoardSpace(1, 0);
-        SPlayer keith = new SPlayer(lowerSpace, 7, new RandomPlayer("Keith", Color.BLACK));
+        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        keith.initialize(new ArrayList<>());
+        keith.placeToken(lowerSpace, 7);
         Tile keithTile = new Tile(7, 0, 1, 2, 3, 4, 5, 6);
 
 
@@ -105,7 +112,9 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer keith = new SPlayer(start, 0, new RandomPlayer("Keith", Color.BLACK));
+        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        keith.initialize(new ArrayList<>());
+        keith.placeToken(start, 0);
         Tile tile = new Tile(0, 7, 2, 6, 1, 3, 4, 5);
 
         /* Goal:
@@ -144,10 +153,18 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer(start, 0, new RandomPlayer("Vyas", Color.BLUE));
-        SPlayer keith = new SPlayer(start, 1, new RandomPlayer("Keith", Color.BLACK));
-        SPlayer robby = new SPlayer(start, 6, new RandomPlayer("Robby", Color.GREY));
-        SPlayer christos = new SPlayer(start, 7, new RandomPlayer("Christos", Color.GREEN));
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(start, 0);
+        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        keith.initialize(new ArrayList<>());
+        keith.placeToken(start, 1);
+        APlayer robby = new RandomPlayer("Robby", Color.GREY);
+        robby.initialize(new ArrayList<>());
+        robby.placeToken(start, 6);
+        APlayer christos = new RandomPlayer("Christos", Color.GREEN);
+        christos.initialize(new ArrayList<>());
+        christos.placeToken(start, 7);
 
         Tile tile = new Tile(0, 7, 1, 6, 2, 3, 4, 5);
 
@@ -177,7 +194,9 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        SPlayer vyas = new SPlayer(start, 7, new RandomPlayer("Vyas", Color.BLUE));
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(start, 7);
         Tile tileSchema = new Tile(7, 2, 6, 3, 4, 5, 0, 1);
         for (int i = 1; i < 6; i++){
             Tile tile = new Tile(tileSchema);

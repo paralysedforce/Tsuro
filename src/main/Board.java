@@ -1,6 +1,7 @@
 package main;
 
 import javafx.util.Pair;
+import main.Players.APlayer;
 
 import java.util.*;
 
@@ -52,20 +53,25 @@ public class Board {
 
     // Returns true if placing the tile in front of the token will lead to the player's death
     // Does not actually place the tile
-    public boolean willKillPlayer(Tile tile, SPlayer player) {
+    public boolean willKillPlayer(Tile tile, APlayer player) {
         Token token = player.getToken();
         BoardSpace curSpace = token.getBoardSpace();
-        int tokenSpace = token.getTokenSpace();
+        int curTokenSpace = token.getTokenSpace();
+
+       /* int nextTokenSpace = token.findNextTokenSpace();
+        BoardSpace nextSpace = getNextSpace(token);*/
 
         try {
             // Move to the space across the tile
-            int nextTokenSpace = tile.findMatch(tokenSpace);
-            BoardSpace nextSpace = getNextSpace(curSpace, nextTokenSpace);
+            curTokenSpace = tile.findMatch(curTokenSpace);
+            curSpace = getNextSpace(curSpace, curTokenSpace);
+            curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
 
             // Trace out a path by moving across spaces with tiles on them
-            while (nextSpace.hasTile()){
-                nextSpace = getNextSpace(nextSpace, nextTokenSpace);
-                nextTokenSpace = nextSpace.getTile().findMatch(nextTokenSpace);
+            while (curSpace.hasTile()){
+                curTokenSpace = curSpace.getTile().findMatch(curTokenSpace);
+                curSpace = getNextSpace(curSpace, curTokenSpace);
+                curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
             }
             // We've walked to a place on the board without a tile
             return false;
@@ -80,7 +86,7 @@ public class Board {
 
     // Places the tile in front of the player, regardless of whether it will kill the player
     //   Returns the Set of tokens driven off the board
-    public Set<Token> placeTile(Tile tile, SPlayer player) {
+    public Set<Token> placeTile(Tile tile, APlayer player) {
 
         // Place the tile on the space
         BoardSpace space = player.getToken().getBoardSpace();

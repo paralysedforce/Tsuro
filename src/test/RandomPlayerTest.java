@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -32,7 +34,8 @@ public class RandomPlayerTest {
     @Test
     public void RandomPlayerMakesUnsafeMovesOnlyWhenNecessaryTest(){
         when(tilePileMock.drawFromDeck())
-                .thenReturn(new Tile(0, 1, 2, 3, 4, 5, 6, 7));
+                .thenReturn(new Tile(0, 1, 2, 3, 4, 5, 6, 7))
+                .thenReturn(null);
 
         /*
         This tile will always kill a player on an edge.
@@ -48,9 +51,10 @@ public class RandomPlayerTest {
          */
 
         APlayer randomPlayer = new RandomPlayer("Vyas", Color.BLACK, 0);
+        randomPlayer.initialize(new ArrayList<>());
         randomPlayer.placeToken();
         Tile tile = randomPlayer.chooseTile();
-        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.getSplayer()));
+        Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer));
     }
 
     @Test
@@ -61,7 +65,8 @@ public class RandomPlayerTest {
 
         when(tilePileMock.drawFromDeck())
                 .thenReturn(tile2)
-                .thenReturn(tile1);
+                .thenReturn(tile1)
+                .thenReturn(null);
 
         /*
             Tile 1 will kill all player on any edge, while Tile 2 never will.
@@ -79,9 +84,10 @@ public class RandomPlayerTest {
          */
 
         APlayer randomPlayer = new RandomPlayer("Vyas", Color.BLACK, 0);
+        randomPlayer.initialize(new ArrayList<>());
         randomPlayer.placeToken();
         Tile tile = randomPlayer.chooseTile();
-        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer.getSplayer()));
+        Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, randomPlayer));
         Assert.assertTrue(tile.equals(new Tile(0, 5, 1, 4, 2, 7, 3, 6)));
     }
 

@@ -1,6 +1,6 @@
 package main.Players;
 
-import apple.laf.JRSUIConstants;
+//import apple.laf.JRSUIConstants;
 import javafx.util.Pair;
 import main.*;
 
@@ -23,7 +23,10 @@ public class RandomPlayer extends APlayer {
     public RandomPlayer(String name, Color color){
         super(name, color);
         random = new Random();
+    }
 
+    public RandomPlayer(APlayer other){
+        super(other);
     }
 
     //For testing
@@ -38,11 +41,11 @@ public class RandomPlayer extends APlayer {
     // Override methods
     //================================================================================
     public Pair<BoardSpace, Integer> getStartingLocation(){
-        return getRandomStartingLocation();
+        return getRandomStartingLocation(random);
     }
 
     protected Tile chooseTileHelper() {
-        Set<Tile> legalMoves =  splayer.getLegalMoves();
+        Set<Tile> legalMoves =  getLegalMoves();
         Tile[] legalMovesArr = legalMoves.toArray(new Tile[legalMoves.size()]);
         int randomIndex = random.nextInt(legalMovesArr.length);
         return legalMovesArr[randomIndex];
@@ -53,9 +56,8 @@ public class RandomPlayer extends APlayer {
     // Public Static Methods
     //================================================================================
 
-    public static Pair<BoardSpace, Integer> getRandomStartingLocation(){
+    public static Pair<BoardSpace, Integer> getRandomStartingLocation(Random random){
         Board board = Game.getGame().getBoard();
-        Random random = new Random();
 
         int edgeNumber = random.nextInt(4);
         int indexOfEdge = random.nextInt(6);
@@ -75,5 +77,7 @@ public class RandomPlayer extends APlayer {
         else{
             return new Pair<>(board.getBoardSpace(indexOfEdge, 0), tokenSpace);
         }
+
+
     }
 }

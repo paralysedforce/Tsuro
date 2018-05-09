@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * A collection of all Tiles in Tsuro
@@ -49,6 +47,17 @@ public class TilePile {
         }
     }
 
+    public void shuffleDeck(){
+        List<Tile> tileList = new ArrayList<Tile>(tiles);
+        Collections.shuffle(tileList);
+        tiles = new LinkedList<>(tileList);
+    }
+
+    public void shuffleDeck(int seed){
+        List<Tile> tileList = new ArrayList<Tile>(tiles);
+        Collections.shuffle(tileList, new Random(seed));
+        tiles = new LinkedList<>(tileList);
+    }
     public void returnToDeck(Tile tile){
         tiles.addLast(tile);
     }

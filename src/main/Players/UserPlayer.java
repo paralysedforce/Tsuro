@@ -62,11 +62,11 @@ public class UserPlayer extends APlayer{
 
             else if (command.startsWith("choose")){
                 Tile tile = null;
-                if      (command.endsWith("1")) tile = splayer.getTile(0);
-                else if (command.endsWith("2")) tile = splayer.getTile(1);
-                else if (command.endsWith("3")) tile = splayer.getTile(2);
+                if      (command.endsWith("1")) tile = getTile(0);
+                else if (command.endsWith("2")) tile = getTile(1);
+                else if (command.endsWith("3")) tile = getTile(2);
 
-                if (tile == null || !Game.getGame().isLegalMove(tile, splayer))
+                if (tile == null || !Game.getGame().isLegalMove(tile, this))
                     System.err.println("Error: choose a valid tile");
                 else
                     return tile;
@@ -75,9 +75,9 @@ public class UserPlayer extends APlayer{
             else if (command.startsWith("rotate")){
                 try {
                     Tile toRotate = null;
-                    if      (command.endsWith("1")) toRotate = splayer.getTile(0);
-                    else if (command.endsWith("2")) toRotate = splayer.getTile(1);
-                    else if (command.endsWith("3")) toRotate = splayer.getTile(2);
+                    if      (command.endsWith("1")) toRotate = getTile(0);
+                    else if (command.endsWith("2")) toRotate = getTile(1);
+                    else if (command.endsWith("3")) toRotate = getTile(2);
                     else                         throw new NullPointerException();
 
                     toRotate.rotateClockwise();
@@ -93,8 +93,8 @@ public class UserPlayer extends APlayer{
                 System.out.println("Displaying tiles in hand...");
                 for (int i = 0; i < 3; i++){
                     String line = "\t" + (i+1) + ": ";
-                    if (splayer.getTile(i) != null)
-                        line += splayer.getTile(i).toString();
+                    if (getTile(i) != null)
+                        line += getTile(i).toString();
                     else
                         line += "No tile present";
 

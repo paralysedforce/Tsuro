@@ -1,6 +1,7 @@
 package main;
 
 import javafx.util.Pair;
+import main.Players.APlayer;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -11,12 +12,12 @@ public class Token {
     // Instance Variables
     //================================================================================
     private BoardSpace space;
-    private SPlayer player;
+    private APlayer player;
 
     //================================================================================
     // Constructor
     //================================================================================
-    public Token(BoardSpace startingLocation, int startingTokenSpace, SPlayer player){
+    public Token(BoardSpace startingLocation, int startingTokenSpace, APlayer player){
         space = startingLocation;
         this.player = player;
         space.addToken(this, startingTokenSpace);
@@ -34,7 +35,7 @@ public class Token {
         return space.findToken(this);
     }
 
-    public SPlayer getPlayer(){
+    public APlayer getPlayer(){
         return player;
     }
 
@@ -61,7 +62,10 @@ public class Token {
     // Gets the tokenSpace on the adjacent tile bordering
     public int findNextTokenSpace(){
         int tokenSpace = getTokenSpace();
+        return getMirroredTokenSpace(tokenSpace);
+    }
 
+    public static int getMirroredTokenSpace(int tokenSpace){
         switch (tokenSpace){
             case 0: return 5;
             case 1: return 4;
@@ -74,5 +78,6 @@ public class Token {
         }
         throw new IllegalArgumentException("Invalid tokenSpace");
     }
+
 
 }

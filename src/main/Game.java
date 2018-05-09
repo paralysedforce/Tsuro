@@ -13,7 +13,7 @@ public class Game {
     //================================================================================
     // Singleton Model
     //================================================================================
-    static Game game;
+    private static Game game;
 
     // Default constructor
     private Game(){
@@ -37,10 +37,10 @@ public class Game {
     // Instance Variables
     //================================================================================
     private Board board;
-    private List<SPlayer> remainingPlayers;
-    private List<SPlayer> eliminatedPlayers;
+    private List<APlayer> remainingPlayers;
+    private List<APlayer> eliminatedPlayers;
     private TilePile tilePile;
-    private SPlayer dragonTileOwner;
+    private APlayer dragonTileOwner;
 
     //================================================================================
     // Getters
@@ -81,18 +81,18 @@ public class Game {
                 throw new IllegalArgumentException("player type given was not valid");
         }
 
-        remainingPlayers.add(aplayer.splayer);
+        remainingPlayers.add(aplayer);
     }
 
 
     // For testing purposes only
     // TODO: Remove in production
-    public void registerPlayer(SPlayer player){
+    public void registerPlayer(APlayer player){
         remainingPlayers.add(player);
     }
 
     // Determine whether a player has the ability to play the move.
-    public boolean isLegalMove(Tile tile, SPlayer player){
+    public boolean isLegalMove(Tile tile, APlayer player){
         if(!player.holdsTile(tile))
             return false;
 
@@ -103,7 +103,7 @@ public class Game {
     }
 
     // Let a player with an empty hand request the TilePile
-    public void requestDragonTile(SPlayer player){
+    public void requestDragonTile(APlayer player){
         if (dragonTileOwner == null && tilePile.isEmpty()) {
             dragonTileOwner = player;
         }
@@ -112,29 +112,29 @@ public class Game {
     /* TODO: MAKE PRIVATE WHEN NOT DEBUGGING */
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
-    public Set<SPlayer> playTurn(Tile tile, SPlayer player) throws ContractException{
+    public Set<APlayer> playTurn(Tile tile, APlayer player) throws ContractException{
             if (!isLegalMove(tile, player)) {
                 throw new ContractException("Player made an illegal move");
             }
 
             Set<Token> failedTokens = board.placeTile(tile, player);
-            Set<SPlayer> failedPlayers = new HashSet<>();
+            Set<APlayer> failedPlayers = new HashSet<>();
             for (Token failedToken : failedTokens)
                 failedPlayers.add(failedToken.getPlayer());
 
             if (failedPlayers.containsAll(remainingPlayers))
-                return new HashSet<>();
+                return failedPlayers;
 
             player.removeTileFromHand(tile);
             player.drawFromPile();
 
             if (!failedPlayers.isEmpty()) {
-                for (SPlayer failedPlayer : failedPlayers)
+                for (APlayer failedPlayer : failedPlayers)
                     failedPlayer.returnTilesToPile();
 
-                SPlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
+                APlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
 
-                for (SPlayer failedPlayer : failedPlayers)
+                for (APlayer failedPlayer : failedPlayers)
                     eliminatePlayer(failedPlayer);
 
 
@@ -144,28 +144,66 @@ public class Game {
             return failedPlayers;
     }
 
+    public void initializePlayers(){
+        List<Token> startingTokenList = new ArrayList<>();
+        for(APlayer player : remainingPlayers){
+            startingTokenList.add(player.getToken());
+        }
+        for(APlayer player : remainingPlayers){
+            player.initialize(startingTokenList);
+        }
+    }
+
+
     // Main game loop
-    public void playGame(){
-        for (SPlayer player: remainingPlayers) {
-            Pair<BoardSpace, Integer> startingLocation = player.getStartingLocation();
-            BoardSpace boardSpace = startingLocation.getKey();
-            int tokenSpace = startingLocation.getValue();
-            player.placeToken(boardSpace, tokenSpace);
+    public Set<APlayer> playGame(){
+        initializePlayers();
+
+        for (APlayer player: remainingPlayers) {
+            player.placeToken();
         }
 
-        while (remainingPlayers.size() > 1) {
-            for (SPlayer player : remainingPlayers) {
-                Tile tile = player.chooseTile();
-                try {
-                    playTurn(tile, player);
+        /*
+        for (int i = 0; remainingPlayers.size() <= 1; i = (i + 1) % remainingPlayers.size())
+         */
+
+//        int i = 0;
+        while (true) {
+            APlayer player = remainingPlayers.get(0);
+            Tile tile = player.chooseTile();
+            try {
+                Set<APlayer> losingPlayers = playTurn(tile, player);
+                if(losingPlayers.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
+                    break;
                 }
-                catch (ContractException e){
-                    blamePlayer(player);
-                    tile = player.chooseTile();
-                    playTurn(tile, player);
+                if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
+                    break;
                 }
             }
+            catch (ContractException e) {
+                remainingPlayers.remove(player);
+                player = blamePlayer(player);
+                remainingPlayers.add(0, player);
+                continue;
+            }
+
+            if(!eliminatedPlayers.contains(player)){
+                remainingPlayers.remove(player);
+                remainingPlayers.add(player);
+            }
+
+//            if (remainingPlayers.get(i).equals(player))
+//                i = (i + 1) % remainingPlayers.size();
         }
+
+        for (APlayer player : remainingPlayers){
+            player.endGame();
+        }
+        for (APlayer player : eliminatedPlayers){
+            player.endGame();
+        }
+
+        return new HashSet<>(remainingPlayers);
     }
 
 
@@ -182,16 +220,24 @@ public class Game {
 
     // Checks to see if all players still in the game have full hands
     private boolean areAllRemainingHandsFull() {
-       for(SPlayer player : remainingPlayers){
+       for(APlayer player : remainingPlayers){
            if (!player.hasFullHand())
                return false;
        }
        return true;
     }
 
+    private boolean areAllRemainingHandsEmpty() {
+        for(APlayer player : remainingPlayers){
+            if (!player.hasEmptyHand())
+                return false;
+        }
+        return true;
+    }
+
     // After a player has been eliminated, go around in a clockwise direction and have
     //   all players draw tiles if necessary
-    private void drawAfterElimination(SPlayer playerToDrawFirst){
+    private void drawAfterElimination(APlayer playerToDrawFirst){
         int playerToDrawIndex = remainingPlayers.indexOf(playerToDrawFirst);
         while(!tilePile.isEmpty() && !areAllRemainingHandsFull()){
             remainingPlayers.get(playerToDrawIndex).drawFromPile();
@@ -201,7 +247,7 @@ public class Game {
     }
 
     // Determine which player should draw first after a player has been eliminated
-    private SPlayer findPlayerToDrawFirst(Set<SPlayer> failedPlayers, SPlayer currentPlayer){
+    private APlayer findPlayerToDrawFirst(Set<APlayer> failedPlayers, APlayer currentPlayer){
         if (dragonTileOwner != null && !failedPlayers.contains(dragonTileOwner)){
             return dragonTileOwner;
         }
@@ -215,14 +261,17 @@ public class Game {
     }
 
     // Eliminates a player. To be called when a player token is forced off the edge
-    private void eliminatePlayer(SPlayer eliminatedPlayer){
+    private void eliminatePlayer(APlayer eliminatedPlayer){
+        if (dragonTileOwner == eliminatedPlayer){
+            resetDragonTile();
+        }
         eliminatedPlayer.returnTilesToPile();
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
     }
 
-    private void blamePlayer(SPlayer splayer){
-        splayer.convertToRandom();
+    private APlayer blamePlayer(APlayer splayer){
+        return new RandomPlayer(splayer);
     }
 
 

@@ -1,6 +1,8 @@
 package test;
 
 import main.*;
+import main.Players.APlayer;
+import main.Players.RandomPlayer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +43,9 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer(space, 0,null);
+        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        player.initialize(new ArrayList<>());
+        player.placeToken(space, 0);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTile, player));
@@ -57,7 +61,9 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer(space, 0, null);
+        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        player.initialize(new ArrayList<>());
+        player.placeToken(space, 0);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTile, player));
@@ -76,7 +82,9 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer(space, 0,null);
+        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        player.initialize(new ArrayList<>());
+        player.placeToken(space, 0);
         game.registerPlayer(player);
 
         Assert.assertTrue(game.isLegalMove(testTileCanMove, player));
@@ -95,7 +103,9 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        SPlayer player = new SPlayer(space, 0,null);
+        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        player.initialize(new ArrayList<>());
+        player.placeToken(space, 0);
         game.registerPlayer(player);
 
         Assert.assertFalse(game.isLegalMove(testTile, player));
@@ -103,20 +113,23 @@ public class GameTest {
 
     @Test
     public void playMoveEliminatesPlayersThatLose() {
-
-
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
 
+        when(tilePileMock.isEmpty())
+                .thenReturn(false)
+                .thenReturn(true);
         when(tilePileMock.drawFromDeck())
                 .thenReturn(testTile)
                 .thenReturn(null);
-        when(tilePileMock.isEmpty())
-                .thenReturn(true);
 
         BoardSpace spaceOne = board.getBoardSpace(0, 0);
         BoardSpace spaceTwo = board.getBoardSpace(3, 5);
-        SPlayer vyas = new SPlayer(spaceOne, 0, null);
-        SPlayer keith = new SPlayer(spaceTwo, 2, null);
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(spaceOne, 0);
+        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        keith.initialize(new ArrayList<>());
+        keith.placeToken(spaceTwo, 2);
 
         game.registerPlayer(vyas);
         game.registerPlayer(keith);
@@ -143,16 +156,27 @@ public class GameTest {
                 .thenReturn(null)
                 .thenReturn(testTile);
         when(tilePileMock.isEmpty())
-                .thenReturn(true)
+                .thenReturn(false, false, true)
+                .thenReturn(false, false, true)
+                .thenReturn(false, false, true)
+                .thenReturn(false, false, true)
                 .thenReturn(false);
 
         BoardSpace spaceOne = board.getBoardSpace(1, 0);
         BoardSpace spaceTwo = board.getBoardSpace(5, 5);
 
-        SPlayer vyas = new SPlayer(spaceOne, 7, null);
-        SPlayer keith =  new SPlayer(spaceOne, 6, null);
-        SPlayer robby =  new SPlayer(spaceTwo, 2, null);
-        SPlayer christos =  new SPlayer(spaceTwo, 5, null);
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(spaceOne, 7);
+        APlayer keith =  new RandomPlayer("Keith", Color.BLACK);
+        keith.initialize(new ArrayList<>());
+        keith.placeToken(spaceOne, 6);
+        APlayer robby =  new RandomPlayer("Robby", Color.GREY);
+        robby.initialize(new ArrayList<>());
+        robby.placeToken(spaceTwo, 2);
+        APlayer christos =  new RandomPlayer("Christos", Color.GREEN);
+        christos.initialize(new ArrayList<>());
+        christos.placeToken(spaceTwo, 5);
 
         game.registerPlayer(vyas);
         game.registerPlayer(keith);
@@ -163,6 +187,7 @@ public class GameTest {
         Assert.assertTrue(robby.hasFullHand());
         Assert.assertTrue(christos.hasFullHand());
 
-        verify(tilePileMock, times(15)).drawFromDeck();
+        verify(tilePileMock, times(14)).drawFromDeck();
     }
+
 }
