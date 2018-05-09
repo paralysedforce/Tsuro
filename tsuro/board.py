@@ -200,10 +200,6 @@ class Board(StatefulInterface):
         return board
 
 
-# TODO: Use an enum to represent the 8 possible TileSpots?
-# TODO: Use an enum to represent the 4 possible Rotations?
-
-
 class BoardSquare:
     """A square on the map. This is a wrapper around PathTile implementing rotation.
 

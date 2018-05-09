@@ -39,9 +39,9 @@ def test_least_symmetric(board, tiles_by_symmetry):
     with pytest.raises(ValueError):
         full_board = Board.from_state(
             BoardState(
-                tile_placements=TilePlacement(tile=tiles_by_symmetry[0], coordinate=(0, 0)),
-                height=3,
-                width=3,
+                tile_placements=[TilePlacement(tile=tiles_by_symmetry[0], coordinate=(0, 0))],
+                height=1,
+                width=1,
             )
         )
         strategy.choose_move(full_board, tiles_by_symmetry)
