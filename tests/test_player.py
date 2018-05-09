@@ -1,6 +1,6 @@
 import pytest
 
-from board import Board, BoardState, PathTile, TilePlacement, Position
+from board import Board, BoardState, PathTile, Position, TilePlacement
 from player import (LeastSymmetricStrategy, MostSymmetricStrategy,
                     num_symmetric_rotations, sort_tiles_by_symmetry)
 
