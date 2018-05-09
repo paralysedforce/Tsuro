@@ -100,6 +100,60 @@ def test_move_multiple_players(game):
     assert state.active_players[2].position == P(1, 0, 0)
     assert state.active_players[0].position == P(0, 1, 6)
 
+def test_self_elimination_other_options_illegal():
+    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
+    loops = PathTile([(0,1), (2,3), (4,5), (6,7)])
+    state = GameState(
+        active_players=[
+            Player('A', Position((0, 0), 0), [straight_edge, loops], Color.GRAY),
+            Player('B', Position((0, 0), 6), [], Color.GREEN),
+            Player('C', Position((0, 2), 0), [], Color.RED),
+        ],
+        eliminated_players=[],
+        dragon_holder=None,
+        board_state=BoardState(
+            tile_placements=[],
+            height=3,
+            width=3,
+        ),
+        deck_state=[],
+    ) # Initial state, but with cards in A's hand
+    placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
+    game = TsuroGame.from_state(state)
+    player = game.players[0]
+    assert not game.is_placement_legal(placement, player)
+
+def test_self_elimination_no_other_options_legal():
+    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
+    loops = PathTile([(0,1), (2,3), (4,5), (6,7)])
+    state = GameState(
+        active_players=[
+            Player('A', Position((0, 0), 0), [straight_edge, loops], Color.GRAY),
+            Player('B', Position((0, 0), 6), [], Color.GREEN),
+            Player('C', Position((0, 2), 0), [], Color.RED),
+        ],
+        eliminated_players=[],
+        dragon_holder=None,
+        board_state=BoardState(
+            tile_placements=[],
+            height=3,
+            width=3,
+        ),
+        deck_state=[],
+    ) # Initial state, but with cards in A's hand
+    placement = TilePlacement(tile=loops, coordinate=(0,0), rotation=0)
+    game = TsuroGame.from_state(state)
+    player = game.players[0]
+    assert not game.is_placement_legal(placement, player)
+
+def test_card_not_in_hand_illegal():
+    straight_edge = PathTile([(0,5), (1,4), (2,7), (3,6)])
+    state = initial_state()
+    placement = TilePlacement(tile=straight_edge, coordinate=(0,0), rotation=0)
+    game = TsuroGame.from_state(state)
+    player = game.players[0]
+    assert not game.is_placement_legal(placement, player)
+
 
 def test_eliminate_multiple():
     """making a move where multiple players are eliminated"""

@@ -190,7 +190,7 @@ class TsuroGame(StatefulInterface):
             return False
 
         # Check if the move eliminates the player
-        state = self.to_state()
+        state = self.state()
         copy = TsuroGame.from_state(state)
         # Check elimination move
         if copy.unsafe_does_eliminate_player(placement, player):
