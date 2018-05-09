@@ -36,8 +36,8 @@ class Player:
         self.has_moved = has_moved
         self.move_strategy = self.move_strategy_factory(strategy)
 
-    def play_turn(board):
-        return self.move_strategy.choose_move(board, self.tiles)
+    def play_turn(self, board: Board) -> TilePlacement:
+        return self.move_strategy.choose_move(self.position, board, self.tiles)
 
     def move_strategy_factory(self, strat: Strategy):
         if strat == Strategy.RANDOM:
@@ -53,18 +53,18 @@ class Player:
 class MoveStrategyInterface(ABC):
     """Encapsulation of a player's automatic move strategy."""
     @abstractmethod
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
+    def choose_move(self, position: Position, board: Board, tiles: List[PathTile]) -> TilePlacement:
         pass
 
 
 def validate_move_ability(func):
-    def decorated(self, board, tiles):
+    def decorated(self, positon, board, tiles):
         # Maybe this check should be in the Player class.
         if not board.open_squares:
             raise ValueError('Cannot choose move: Board is full.')
         if not tiles:
             raise ValueError('Cannot choose move: No tiles available.')
-        return func(self, board, tiles)
+        return func(self, positon, board, tiles)
     return decorated
 
 
@@ -85,17 +85,17 @@ def sort_tiles_by_symmetry(path_tiles: List[PathTile]) -> List[PathTile]:
 
 class RandomStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
-        return random.choice(tiles)
+    def choose_move(self, position: Position, board: Board, tiles: List[PathTile]) -> TilePlacement:
+        return TilePlacement(random.choice(tiles), position.coordinate, random.choice(range(4)))
 
 
 class LeastSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
-        return sort_tiles_by_symmetry(tiles)[0]
+    def choose_move(self, position: Position, board: Board, tiles: List[PathTile]) -> TilePlacement:
+        return TilePlacement(sort_tiles_by_symmetry(tiles)[0], position.coordinate, 0)
 
 
 class MostSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
-        return sort_tiles_by_symmetry(tiles)[-1]
+    def choose_move(self, position: Position, board: Board, tiles: List[PathTile]) -> TilePlacement:
+        return TilePlacement(sort_tiles_by_symmetry(tiles)[-1], position.coordinate, 0)
