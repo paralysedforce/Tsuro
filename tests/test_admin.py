@@ -104,7 +104,7 @@ def test_move_multiple_players(game):
     assert state.active_players[0].position == P(0, 1, 6)
 
 
-def test_self_elimination_other_options_illegal(initial_state):
+def test_is_placement_legal(initial_state):
     straight_edge = PathTile([(0, 5), (1, 4), (2, 7), (3, 6)])
     self_eliminate = PathTile([(0, 1), (2, 3), (4, 5), (6, 7)])
 
@@ -116,17 +116,14 @@ def test_self_elimination_other_options_illegal(initial_state):
     # throws because Player A plays a self-elimination with other options available
     with pytest.raises(RulesViolatedError):
         placement = TilePlacement(tile=self_eliminate, coordinate=(0, 0), rotation=0)
-        player = game.players[0]
-        game.is_placement_legal(placement, player)
+        game.is_placement_legal(placement=placement, player=game.players[0])
 
     state = initial_state.update(
         active_players=[Player('A', Position((0, 0), 0), [self_eliminate], Color.GRAY)],
     )
-
     game = TsuroGame.from_state(state)
-    player = game.players[0]
     placement = TilePlacement(tile=self_eliminate, coordinate=(0, 0), rotation=0)
-    game.is_placement_legal(placement, player)  # does not throw
+    game.is_placement_legal(placement=placement, player=game.players[0])  # does not throw
 
 
 def test_card_not_in_hand_illegal():
