@@ -66,6 +66,21 @@ def validate_move_ability(func):
     return decorated
 
 
+def num_symmetric_rotations(path_tile: PathTile) -> int:
+    """Return the number of rotations (0-3) that results in an identical path tile."""
+    n = 0
+    for i in range(1, 4):
+        rotated = PathTile([((x + 2 * i) % 8, (y + 2 * i) % 8) for x, y in path_tile._connections])
+        if rotated == path_tile:
+            n += 1
+    return n
+
+
+def sort_tiles_by_symmetry(path_tiles: List[PathTile]) -> List[PathTile]:
+    """Sort path tiles by symmetry in ascending order."""
+    return sorted(path_tiles, key=lambda pt: num_symmetric_rotations(pt))
+
+
 class RandomStrategy(MoveStrategyInterface):
     @validate_move_ability
     def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
@@ -79,10 +94,10 @@ class RandomStrategy(MoveStrategyInterface):
 class LeastSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
     def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
-        pass
+        return sort_tiles_by_symmetry(tiles)[0]
 
 
 class MostSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
     def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
-        pass
+        return sort_tiles_by_symmetry(tiles)[-1]
