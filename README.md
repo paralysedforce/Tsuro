@@ -11,10 +11,12 @@
 
 ```bash
 cd Tsuro
-virtualenv env --python=/path/to/python3.6/interpreter
+virtualenv -p python3 env
 source env/bin/activate
 pip install -r requirements.txt
 ```
+
+Note: `virtualenv` isn't installed on the T-Lab machines, but we need it to create a local python environment. This is a WIP.
 
 ### Tests
 
