@@ -1,6 +1,5 @@
 from board import PathTile, Position, TilePlacement
 
-
 # Aliases for readability.
 
 

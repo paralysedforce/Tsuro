@@ -51,7 +51,7 @@ class Player(State):
 class MoveStrategyInterface(ABC):
     """Encapsulation of a player's automatic move strategy."""
     @abstractmethod
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
+    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
         pass
 
 
@@ -83,21 +83,17 @@ def sort_tiles_by_symmetry(path_tiles: List[PathTile]) -> List[PathTile]:
 
 class RandomStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
-        return TilePlacement(
-            tile=random.choice(tiles),
-            coordinate=random.choice(board.open_squares),
-            rotation=random.choice(range(4)),
-        )
+    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
+        return random.choice(tiles)
 
 
 class LeastSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
+    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
         return sort_tiles_by_symmetry(tiles)[0]
 
 
 class MostSymmetricStrategy(MoveStrategyInterface):
     @validate_move_ability
-    def choose_move(self, board: Board, tiles: List[PathTile]) -> TilePlacement:
+    def choose_move(self, board: Board, tiles: List[PathTile]) -> PathTile:
         return sort_tiles_by_symmetry(tiles)[-1]

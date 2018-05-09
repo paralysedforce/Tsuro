@@ -1,11 +1,10 @@
 import pytest
 
-from board import (Board, BoardSquare, BoardState, PathTile, Position,
-                   TilePlacement)
-
 from _helpers import PositionAlias as P
 from _helpers import TileAlias as Tile
 from _helpers import TilePlacementAlias as TP
+from board import (Board, BoardSquare, BoardState, PathTile, Position,
+                   TilePlacement)
 
 
 @pytest.fixture

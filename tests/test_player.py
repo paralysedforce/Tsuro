@@ -1,7 +1,8 @@
 import pytest
 
 from board import Board, BoardState, PathTile, TilePlacement
-from player import MostSymmetricStrategy, LeastSymmetricStrategy, num_symmetric_rotations, sort_tiles_by_symmetry
+from player import (LeastSymmetricStrategy, MostSymmetricStrategy,
+                    num_symmetric_rotations, sort_tiles_by_symmetry)
 
 
 @pytest.fixture
@@ -25,7 +26,7 @@ def test_num_symmetric_rotations(tiles_by_symmetry):
     assert num_symmetric_rotations(tiles_by_symmetry[2]) == 3, 'entire pathtile is symmetric'
 
 
-def test_num_symmetric_rotations(tiles_by_symmetry):
+def test_sort_symmetric_rotations(tiles_by_symmetry):
     one_rot, two_rot, three_rot = tiles_by_symmetry
     path_tiles = [three_rot, one_rot, two_rot]
     assert sort_tiles_by_symmetry(path_tiles) == tiles_by_symmetry, 'sort in ascending order'
