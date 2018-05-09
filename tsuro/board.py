@@ -37,7 +37,7 @@ class TilePlacement(NamedTuple):
     """
     tile: 'PathTile'
     coordinate: Tuple[int, int]
-    rotation: int
+    rotation: int = 0
 
 
 @attrs
@@ -125,11 +125,17 @@ class Board(StatefulInterface):
 
         return self._edge_positions
 
-    def place_tile(self, coordinate: Tuple[int, int], path_tile: 'PathTile'):
-        i, j = coordinate
+    @property
+    def open_squares(self) -> List[Tuple[int, int]]:
+        """Return a list of coordinate indicating open squares on the board."""
+        coordinates = [(i, j) for i in range(self._width) for j in range(self._height)]
+        return [(i, j) for i, j in coordinates if not self._board[i][j].has_tile()]
+
+    def place_tile(self, placement: TilePlacement):
+        (i, j) = placement.coordinate
         if not self._in_bounds(i, j):
             raise IndexError('({},{}) is out of bounds.'.format(i, j))
-        self._board[i][j].path_tile = path_tile
+        self._board[i][j].path_tile = placement.tile
 
     def traverse_path(self, p: Position) -> List[Position]:
         i, j = p.coordinate
@@ -189,13 +195,9 @@ class Board(StatefulInterface):
     @classmethod
     def from_state(cls, state: BoardState) -> 'Board':
         board = cls(state.height, state.width)
-        for tile, coordinate, rotation in state.tile_placements:
-            board.place_tile(coordinate, tile)
+        for tp in state.tile_placements:
+            board.place_tile(tp)
         return board
-
-
-# TODO: Use an enum to represent the 8 possible TileSpots?
-# TODO: Use an enum to represent the 4 possible Rotations?
 
 
 class BoardSquare:
@@ -291,28 +293,3 @@ class PathTile:
     def __repr__(self):
         paths = ', '.join(['({}, {})'.format(x, y) for x, y in self._connections])
         return "PathTile([{}])".format(paths)
-
-    # TODO: This rotation information should be moved to BoardSquare since PathTile has no knowledge
-    # of rotation, or we can refactor PathTile to handle all rotation. Right now rotation info is in two places.
-    def rotate(self):
-        """Rotates the tile clockwise once."""
-        # Create a copy of _connections, but rotated clockwise once
-        connections = [((path[0] + 2) % 8, (path[1] + 2) % 8) for path in self._connections]
-
-        self._paths = PathTile.create_paths_dict(connections)
-        self._connections = connections
-
-    def unique_rotations(self) -> int:
-        """Calculates the number of unique rotations the tile has"""
-        copy = self.make_copy()
-        rotations = []  # type: List[int]
-        for _ in range(4):
-            copy.rotate()
-            rotation = copy.make_copy()
-            if rotation not in rotations:
-                rotations.append(rotation)
-
-        return len(rotations)
-
-    def make_copy(self):
-        return PathTile(self._connections)
