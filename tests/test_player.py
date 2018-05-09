@@ -1,6 +1,6 @@
 import pytest
 
-from board import Board, BoardState, PathTile, TilePlacement
+from board import Board, BoardState, PathTile, TilePlacement, Position
 from player import (LeastSymmetricStrategy, MostSymmetricStrategy,
                     num_symmetric_rotations, sort_tiles_by_symmetry)
 
@@ -33,8 +33,11 @@ def test_sort_symmetric_rotations(tiles_by_symmetry):
 
 
 def test_least_symmetric(board, tiles_by_symmetry):
+    posn = Position((0,0),0)
     strategy = LeastSymmetricStrategy()
-    assert strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[0], 'choose the least symmetric tile'
+    chosen = strategy.choose_move(posn, board, tiles_by_symmetry)
+    expected = TilePlacement(tiles_by_symmetry[0], posn.coordinate, 0)
+    assert chosen == expected, 'choose the least symmetric tile'
 
     # throws when called on a full board
     with pytest.raises(ValueError):
@@ -45,9 +48,14 @@ def test_least_symmetric(board, tiles_by_symmetry):
                 width=1,
             )
         )
-        strategy.choose_move(full_board, tiles_by_symmetry)
+        strategy.choose_move(posn, full_board, tiles_by_symmetry)
 
 
 def test_most_symmetric(board, tiles_by_symmetry):
+    posn = Position((0,0),0)
     strategy = MostSymmetricStrategy()
-    assert strategy.choose_move(board, tiles_by_symmetry) == tiles_by_symmetry[-1], 'choose the most symmetric tile'
+    chosen = strategy.choose_move(posn, board, tiles_by_symmetry)
+    expected = TilePlacement(tiles_by_symmetry[-1], posn.coordinate, 0)
+    print("{}", chosen)
+    print("{}", expected)
+    assert chosen == expected, 'choose the most symmetric tile'
