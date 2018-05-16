@@ -13,15 +13,16 @@ public abstract class APlayer {
     //================================================================================
     // Instance Variables
     //================================================================================
-    private final int MAX_TILES_IN_BANK = 3;
+
 
     private String name;
     private Color color;
-    private List<Token> otherPlayers;
+    private List<Color> otherPlayers;
     private State curState;
     private Token token;
-    private List<Tile> hand;
-    private TilePile tilePile;
+
+    protected PlayerType playerType;
+    protected PlayerHand hand;
 
     //================================================================================
     // Constructor
@@ -30,14 +31,8 @@ public abstract class APlayer {
         this.name = name;
         this.color = color;
         curState = State.UNINITIALIZED;
-
         token = null;
-        hand = new ArrayList<>();
-        this.tilePile = Game.getGame().getTilePile();
-
-        for(int i = 0; i < MAX_TILES_IN_BANK; i++){
-            drawFromPile();
-        }
+        hand = new PlayerHand();
     }
 
     public APlayer(APlayer other){
@@ -46,8 +41,7 @@ public abstract class APlayer {
         otherPlayers = new ArrayList<>(other.otherPlayers);
         curState = other.curState;
         token = other.token;
-        this.hand = new ArrayList<>(other.hand);
-        tilePile = other.tilePile;
+        hand = new PlayerHand();
     }
 
     //================================================================================
@@ -65,16 +59,8 @@ public abstract class APlayer {
         return token;
     }
 
-    public Tile getTile(int i){
-        if (0 <= i && i < 3) {
-            if (i > hand.size() - 1)
-                return null;
+    public PlayerHand getHand(){return hand;}
 
-            return hand.get(i);
-        }
-        else
-            throw new IndexOutOfBoundsException("Illegal Hand Access");
-    }
 
     //================================================================================
     // Public methods
@@ -97,8 +83,7 @@ public abstract class APlayer {
         curState = State.TURNPLAYABLE;
     }
 
-
-    public void initialize(List<Token> otherPlayers){
+    public void initialize(List<Color> otherPlayers){
         if (curState != State.UNINITIALIZED)
             throw new ContractException();
 
@@ -114,48 +99,21 @@ public abstract class APlayer {
         curState = State.GAMEENDED;
     }
 
+    // Enforces Sequential contract but delegates picking the tile to chooseTileHelper
     public Tile chooseTile(){
-        if (curState != State.TURNPLAYABLE || !isValidHand())
+        if (curState != State.TURNPLAYABLE || !hand.isValid())
             throw new ContractException();
 
         return chooseTileHelper();
     }
 
-    public boolean holdsTile(Tile tile){
-        return hand.contains(tile);
-    }
 
-    public void drawFromPile() {
+    public void drawFromDeck() {
+        hand.drawFromDeck();
 
-        if (!hasFullHand() && !tilePile.isEmpty()) {
-            Tile drawnTile = tilePile.drawFromDeck();
-
-            // TODO: This check exists only for the benefit of our tests. Refactor tests to render it unneccesary
-            if (drawnTile != null)
-                hand.add(drawnTile);
-        }
-        else
+        // Indicates an unsuccessful draw
+        if (!hand.isFull())
             requestDragonTile();
-    }
-
-    public boolean hasFullHand() {
-        return hand.size() == MAX_TILES_IN_BANK;
-    }
-
-    public boolean hasEmptyHand() {
-        return hand.isEmpty();
-    }
-
-    public void removeTileFromHand(Tile tile){
-        hand.remove(tile);
-    }
-
-    public void returnTilesToPile(){
-        for (Tile tile: hand) {
-            tilePile.returnToDeck(tile);
-        }
-
-        hand = new ArrayList<>();
     }
 
     public boolean isSafeMove(Tile tile){
@@ -190,24 +148,6 @@ public abstract class APlayer {
         return legalMoves;
     }
 
-    public boolean isValidHand(){
-        if (hand.size() > 3)
-            return false;
-
-        for (Tile tile: hand){
-            if (Game.getGame().getBoard().findLocationOfTile(tile) != null)
-                return false;
-        }
-
-        for (int i = 0; i < hand.size(); i++){
-            for (int j = i + 1; j < hand.size(); j++ ){
-                if (hand.get(i).equals(hand.get(j)))
-                    return false;
-            }
-        }
-
-        return true;
-    }
 
     //================================================================================
     // Private methods

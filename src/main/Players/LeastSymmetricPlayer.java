@@ -9,10 +9,11 @@ import java.util.Random;
 /**
  * Created by vyasalwar on 4/30/18.
  */
-public class LeastSymmetricPlayer extends ScorePlayer {
+public class LeastSymmetricPlayer extends TileHeuristicPlayer {
 
     public LeastSymmetricPlayer(String name, Color color) {
         super(name, color);
+        playerType = PlayerType.LEASTSYMMETRIC;
     }
 
     @Override

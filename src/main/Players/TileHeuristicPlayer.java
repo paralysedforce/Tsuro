@@ -8,9 +8,9 @@ import java.util.Set;
 /**
  * Created by vyasalwar on 5/3/18.
  */
-public abstract class ScorePlayer extends APlayer {
+public abstract class TileHeuristicPlayer extends APlayer {
 
-    public ScorePlayer(String name, Color color){
+    public TileHeuristicPlayer(String name, Color color){
         super(name, color);
     }
 

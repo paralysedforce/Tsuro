@@ -1,4 +1,4 @@
-package main;
+package main.Players;
 
 /**
  * Created by vyasalwar on 4/16/18.

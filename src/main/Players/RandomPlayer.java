@@ -23,6 +23,7 @@ public class RandomPlayer extends APlayer {
     public RandomPlayer(String name, Color color){
         super(name, color);
         random = new Random();
+        playerType = PlayerType.RANDOM;
     }
 
     public RandomPlayer(APlayer other){

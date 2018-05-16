@@ -8,9 +8,10 @@ import java.util.Random;
 /**
  * Created by vyasalwar on 4/30/18.
  */
-public class MostSymmetricPlayer extends ScorePlayer {
+public class MostSymmetricPlayer extends TileHeuristicPlayer {
     public MostSymmetricPlayer(String name, Color color) {
         super(name, color);
+        playerType = PlayerType.MOSTSYMMETRIC;
     }
 
     // Get random starting location
