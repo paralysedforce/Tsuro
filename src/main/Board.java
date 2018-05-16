@@ -2,6 +2,8 @@ package main;
 
 import javafx.util.Pair;
 import main.Players.APlayer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.*;
 
@@ -11,7 +13,7 @@ import java.util.*;
  *
  * Created by vyasalwar on 4/16/18.
  */
-public class Board {
+public class Board implements Parsable{
 
     //================================================================================
     // Constructor
@@ -196,5 +198,28 @@ public class Board {
         int col = token.getBoardSpace().getCol();
         int tokenSpace = token.getTokenSpace();
         return isOnEdge(row, col, tokenSpace);
+    }
+
+    @Override
+    public Element toXML(Document document) {
+        Element boardElement = document.createElement("board");
+        Element mapElement = document.createElement("map");
+
+        /* List of tiles */
+        for (int i = 0; i < BOARD_LENGTH; i++){
+            for (int j = 0; j < BOARD_LENGTH; j++){
+                if (isOccupied(i, j)){
+                    mapElement.appendChild(getBoardSpace(i, j).toXML(document));
+                }
+            }
+        }
+
+        boardElement.appendChild(mapElement);
+        return boardElement;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) {
+
     }
 }

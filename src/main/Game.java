@@ -1,10 +1,6 @@
 package main;
 
-import javafx.util.Pair;
-import main.Players.APlayer;
-import main.Players.LeastSymmetricPlayer;
-import main.Players.MostSymmetricPlayer;
-import main.Players.RandomPlayer;
+import main.Players.*;
 
 import java.util.*;
 
@@ -93,7 +89,7 @@ public class Game {
 
     // Determine whether a player has the ability to play the move.
     public boolean isLegalMove(Tile tile, APlayer player){
-        if(!player.holdsTile(tile))
+        if(!player.getHand().holdsTile(tile))
             return false;
 
         if(player.hasSafeMove() && board.willKillPlayer(tile, player))
@@ -125,12 +121,12 @@ public class Game {
             if (failedPlayers.containsAll(remainingPlayers))
                 return failedPlayers;
 
-            player.removeTileFromHand(tile);
-            player.drawFromPile();
+            player.getHand().removeTile(tile);
+            player.getHand().drawFromDeck();
 
             if (!failedPlayers.isEmpty()) {
                 for (APlayer failedPlayer : failedPlayers)
-                    failedPlayer.returnTilesToPile();
+                    failedPlayer.getHand().returnTilesToDeck();
 
                 APlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
 
@@ -145,9 +141,9 @@ public class Game {
     }
 
     public void initializePlayers(){
-        List<Token> startingTokenList = new ArrayList<>();
+        List<Color> startingTokenList = new ArrayList<>();
         for(APlayer player : remainingPlayers){
-            startingTokenList.add(player.getToken());
+            startingTokenList.add(player.getColor());
         }
         for(APlayer player : remainingPlayers){
             player.initialize(startingTokenList);
@@ -221,7 +217,7 @@ public class Game {
     // Checks to see if all players still in the game have full hands
     private boolean areAllRemainingHandsFull() {
        for(APlayer player : remainingPlayers){
-           if (!player.hasFullHand())
+           if (!player.getHand().isFull())
                return false;
        }
        return true;
@@ -229,7 +225,7 @@ public class Game {
 
     private boolean areAllRemainingHandsEmpty() {
         for(APlayer player : remainingPlayers){
-            if (!player.hasEmptyHand())
+            if (!player.getHand().isEmpty())
                 return false;
         }
         return true;
@@ -240,7 +236,7 @@ public class Game {
     private void drawAfterElimination(APlayer playerToDrawFirst){
         int playerToDrawIndex = remainingPlayers.indexOf(playerToDrawFirst);
         while(!tilePile.isEmpty() && !areAllRemainingHandsFull()){
-            remainingPlayers.get(playerToDrawIndex).drawFromPile();
+            remainingPlayers.get(playerToDrawIndex).getHand().drawFromDeck();
             playerToDrawIndex = (playerToDrawIndex + 1) % remainingPlayers.size();
             resetDragonTile();
         }
@@ -265,7 +261,7 @@ public class Game {
         if (dragonTileOwner == eliminatedPlayer){
             resetDragonTile();
         }
-        eliminatedPlayer.returnTilesToPile();
+        eliminatedPlayer.getHand().returnTilesToDeck();
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
     }

@@ -1,7 +1,9 @@
 package main;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Set;
  * Created by vyasalwar on 4/15/18.
  *
  */
-public class Tile {
+public class Tile implements Parsable {
 
     //================================================================================
     // Instance Variables
@@ -159,11 +161,29 @@ public class Tile {
         }
     }
 
+    //================================================================================
+    // XML Conversion methods
+    //================================================================================
+
+    @Override
+    public Element toXML(Document document) {
+        Element tileElement = document.createElement("tile");
+        for (TileConnection tileConnection: connections){
+            tileElement.appendChild(tileConnection.toXML(document));
+        }
+        return tileElement;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) {
+
+    }
+
 
     //================================================================================
     // Private helper class
     //================================================================================
-    private class TileConnection {
+    private class TileConnection implements Parsable {
 
         private int endpointA;
         private int endpointB;
@@ -222,6 +242,25 @@ public class Tile {
         }
 
 
+        @Override
+        public Element toXML(Document document) {
+            Element connectionElement = document.createElement("connect");
+            Element endpointAElement = document.createElement("n");
+            endpointAElement.appendChild(document.createTextNode(Integer.toString(endpointA)));
+
+            Element endpointBElement = document.createElement("n");
+            endpointAElement.appendChild(document.createTextNode(Integer.toString(endpointB)));
+
+            connectionElement.appendChild(endpointAElement);
+            connectionElement.appendChild(endpointBElement);
+
+            return connectionElement;
+        }
+
+        @Override
+        public void fromXML(Element xmlElement) {
+
+        }
     }
 
 }

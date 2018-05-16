@@ -2,13 +2,16 @@ package main;
 
 //import org.omg.PortableServer.THREAD_POLICY_ID;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.util.*;
 
 /**
  *
  * Created by vyasalwar on 4/16/18.
  */
-public class BoardSpace {
+public class BoardSpace implements Parsable{
 
     private final int NUM_SPACES = 8;
 
@@ -109,4 +112,33 @@ public class BoardSpace {
     }
 
 
+    @Override
+    public Element toXML(Document document) {
+        if (!hasTile())
+            throw new ContractException("toXML called on a Boardspace without a tile");
+
+        Element entryElement = document.createElement("ent");
+
+
+        Element xyElement = document.createElement("xy");
+        Element xElement = document.createElement("x");
+        Element yElement = document.createElement("y");
+
+        xElement.appendChild(document.createTextNode(Integer.toString(row)));
+        yElement.appendChild(document.createTextNode(Integer.toString(col)));
+        xyElement.appendChild(xElement);
+        xyElement.appendChild(yElement);
+
+        Element tileElement = tile.toXML(document);
+
+        entryElement.appendChild(xyElement);
+        entryElement.appendChild(tileElement);
+
+        return entryElement;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) {
+
+    }
 }
