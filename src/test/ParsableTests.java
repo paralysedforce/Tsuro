@@ -204,8 +204,7 @@ public class ParsableTests {
     public void testTileFromXml() {
         try {
             Node node = nodeFromString(testTileXml);
-            Tile actual = new Tile();
-            actual.fromXML((Element) node);
+            Tile actual = new Tile((Element) node);
             assertEquals(testTile, actual);
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();

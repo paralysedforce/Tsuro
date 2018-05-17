@@ -33,6 +33,15 @@ public class Tile implements Parsable {
     }
 
     /**
+     * Constructs the tile to the specs listed in xmlElement
+     * @param xmlElement Element with specs for this Tile.
+     */
+    public Tile(Element xmlElement) {
+        this.connections = new HashSet<>();
+        this.fromXML(xmlElement);
+    }
+
+    /**
      * Constructs an instance of Tile from explicit path endpoints
      *
      * @param startA    endpoint for pathA
@@ -196,22 +205,17 @@ public class Tile implements Parsable {
 
     @Override
     public void fromXML(Element xmlElement) {
-        // TODO: contract saying that connections is empty since fromXML overwrites the object.
         if (!xmlElement.getTagName().equals("tile"))
-            // TODO: throw an error blaming passer
-            return;
+            throw new IllegalArgumentException("Tag for Tile construction not <tile>: " + xmlElement.getTagName());
 
         Node child = xmlElement.getFirstChild();
         for (int i=0; i<4; i++) {
-            TileConnection c = new TileConnection();
-            c.fromXML((Element) child);
-            this.connections.add(c);
+            this.connections.add(new TileConnection((Element) child));
             child = child.getNextSibling();
         }
 
         if (child != null)
-            // TODO: throw error blaming passer
-            return;
+            throw new IllegalArgumentException("More than four xml children in <tile> tag");
     }
 
 
@@ -225,8 +229,11 @@ public class Tile implements Parsable {
 
         /**
          * Default constructor for constructing from XML.
+         *
+         * @param xmlElement Element containing the data for this TileConnection.
          */
-        public TileConnection() {
+        public TileConnection(Element xmlElement) {
+            this.fromXML(xmlElement);
         }
 
         // Explicit constructor
@@ -303,25 +310,25 @@ public class Tile implements Parsable {
         @Override
         public void fromXML(Element xmlElement) {
             if (!xmlElement.getTagName().equals("connect"))
-                // TODO: throw an error blaming passer
-                return;
+                throw new IllegalArgumentException("Tag of element passed to TileConnection.from" +
+                        "XML was not <connect>: " + xmlElement.getTagName());
 
             Node child = xmlElement.getFirstChild();
             if (!child.getNodeName().equals("n"))
-                // TODO: throw an error blaming passer
-                return;
+                throw new IllegalArgumentException("Child of <connect> is not <n>: " +
+                        child.getNodeName());
 
             this.endpointA = Integer.valueOf(child.getTextContent());
 
             child = child.getNextSibling();
             if (!child.getNodeName().equals("n"))
-                // TODO: throw an error blaming passer
-                return;
+                throw new IllegalArgumentException("Child of <connect> is not <n>: " +
+                        child.getNodeName());
+
             this.endpointB = Integer.valueOf(child.getTextContent());
 
             if (!(child.getNextSibling() == null))
-                // TODO: throw an error blaming passer
-                return;
+                throw new IllegalArgumentException("extra children of <connect> found.");
         }
     }
 
