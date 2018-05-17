@@ -2,6 +2,7 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +27,23 @@ public class Tile implements Parsable {
     // Constructors
     //================================================================================
 
-    // Constructor from explicit values
+    public Tile() {
+        // Default constructor. Should only be used prior to building from an XML object.
+        this.connections = new HashSet<>();
+    }
+
+    /**
+     * Constructs an instance of Tile from explicit path endpoints
+     *
+     * @param startA    endpoint for pathA
+     * @param endA      endpoint for pathA
+     * @param startB    endpoint for pathB
+     * @param endB      endpoint for pathB
+     * @param startC    endpoint for pathC
+     * @param endC      endpoint for pathC
+     * @param startD    endpoint for pathD
+     * @param endD      endpoint for pathD
+     */
     public Tile(int startA, int endA,
                 int startB, int endB,
                 int startC, int endC,
@@ -59,7 +76,10 @@ public class Tile implements Parsable {
             throw new InstantiationError("Tile created with invalid arguments");
     }
 
-    // Constructor from other object. Clones other tile into this one
+    /** Constructor from other object. Clones other tile into this one
+     *
+     * @param other Tile to clone.
+     */
     public Tile(Tile other){
         connections = new HashSet<>();
         for (TileConnection tileConnection : other.connections){
@@ -176,7 +196,22 @@ public class Tile implements Parsable {
 
     @Override
     public void fromXML(Element xmlElement) {
+        // TODO: contract saying that connections is empty since fromXML overwrites the object.
+        if (!xmlElement.getTagName().equals("tile"))
+            // TODO: throw an error blaming passer
+            return;
 
+        Node child = xmlElement.getFirstChild();
+        for (int i=0; i<4; i++) {
+            TileConnection c = new TileConnection();
+            c.fromXML((Element) child);
+            this.connections.add(c);
+            child = child.getNextSibling();
+        }
+
+        if (child != null)
+            // TODO: throw error blaming passer
+            return;
     }
 
 
@@ -187,6 +222,12 @@ public class Tile implements Parsable {
 
         private int endpointA;
         private int endpointB;
+
+        /**
+         * Default constructor for constructing from XML.
+         */
+        public TileConnection() {
+        }
 
         // Explicit constructor
         public TileConnection (int endpointA, int endpointB) {
@@ -244,12 +285,14 @@ public class Tile implements Parsable {
 
         @Override
         public Element toXML(Document document) {
+            // Connection ontains two number elements
             Element connectionElement = document.createElement("connect");
+
             Element endpointAElement = document.createElement("n");
             endpointAElement.appendChild(document.createTextNode(Integer.toString(endpointA)));
 
             Element endpointBElement = document.createElement("n");
-            endpointAElement.appendChild(document.createTextNode(Integer.toString(endpointB)));
+            endpointBElement.appendChild(document.createTextNode(Integer.toString(endpointB)));
 
             connectionElement.appendChild(endpointAElement);
             connectionElement.appendChild(endpointBElement);
@@ -259,7 +302,26 @@ public class Tile implements Parsable {
 
         @Override
         public void fromXML(Element xmlElement) {
+            if (!xmlElement.getTagName().equals("connect"))
+                // TODO: throw an error blaming passer
+                return;
 
+            Node child = xmlElement.getFirstChild();
+            if (!child.getNodeName().equals("n"))
+                // TODO: throw an error blaming passer
+                return;
+
+            this.endpointA = Integer.valueOf(child.getTextContent());
+
+            child = child.getNextSibling();
+            if (!child.getNodeName().equals("n"))
+                // TODO: throw an error blaming passer
+                return;
+            this.endpointB = Integer.valueOf(child.getTextContent());
+
+            if (!(child.getNextSibling() == null))
+                // TODO: throw an error blaming passer
+                return;
         }
     }
 
