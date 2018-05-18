@@ -1,4 +1,6 @@
 *.class
 *.log
 *.iml
+**/workspace.xml
+**/tasks.xml
 /out/*
