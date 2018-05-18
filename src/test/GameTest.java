@@ -66,6 +66,7 @@ public class GameTest {
         player.placeToken(space, 0);
         game.registerPlayer(player);
 
+        Assert.assertNotNull(player.getHand());
         Assert.assertTrue(game.isLegalMove(testTile, player));
     }
 
@@ -135,9 +136,9 @@ public class GameTest {
         game.registerPlayer(keith);
         game.playTurn(testTile, vyas);
 
-        Assert.assertNull(vyas.getTile(0));
-        Assert.assertNull(vyas.getTile(1));
-        Assert.assertNull(vyas.getTile(2));
+        Assert.assertNull(vyas.getHand().getTile(0));
+        Assert.assertNull(vyas.getHand().getTile(1));
+        Assert.assertNull(vyas.getHand().getTile(2));
         Assert.assertEquals(spaceOne.findToken(vyas.getToken()), -1);
         Assert.assertNull(vyas.getToken().getBoardSpace());
     }
@@ -184,8 +185,8 @@ public class GameTest {
         game.registerPlayer(christos);
 
         Assert.assertEquals(game.playTurn(testTile, vyas).size(), 2);
-        Assert.assertTrue(robby.hasFullHand());
-        Assert.assertTrue(christos.hasFullHand());
+        Assert.assertTrue(robby.getHand().isFull());
+        Assert.assertTrue(christos.getHand().isFull());
 
         verify(tilePileMock, times(14)).drawFromDeck();
     }

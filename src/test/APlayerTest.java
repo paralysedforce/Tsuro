@@ -41,7 +41,7 @@ public class APlayerTest {
                 .thenReturn(tileOne, tileTwo, tileThree);
 
         APlayer player = new RandomPlayer("Keith", Color.BLACK);
-        player.drawFromPile();
+        player.drawFromDeck();
 
         verify(tilePileMock, times(3)).drawFromDeck();
     }
@@ -56,7 +56,7 @@ public class APlayerTest {
                 .thenReturn(tileOne);
 
         APlayer player = new RandomPlayer("Keith", Color.BLACK);
-        player.drawFromPile();
+        player.drawFromDeck();
 
         verify(tilePileMock, times(4)).drawFromDeck();
     }
@@ -71,9 +71,9 @@ public class APlayerTest {
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
         APlayer player = new RandomPlayer("Keith", Color.BLACK);
 
-        Assert.assertTrue(player.holdsTile(testTile));
+        Assert.assertTrue(player.getHand().holdsTile(testTile));
         testTile.rotateClockwise();
-        Assert.assertTrue(player.holdsTile(testTile));
+        Assert.assertTrue(player.getHand().holdsTile(testTile));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class APlayerTest {
         Tile testTile = new Tile(0, 4, 1, 5, 2, 6, 3, 7);
         APlayer player = new RandomPlayer("Keith", Color.BLACK);
 
-        Assert.assertFalse(player.holdsTile(testTile));
+        Assert.assertFalse(player.getHand().holdsTile(testTile));
     }
 
     @Test

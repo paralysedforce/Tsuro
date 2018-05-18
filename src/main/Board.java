@@ -60,9 +60,6 @@ public class Board implements Parsable{
         BoardSpace curSpace = token.getBoardSpace();
         int curTokenSpace = token.getTokenSpace();
 
-       /* int nextTokenSpace = token.findNextTokenSpace();
-        BoardSpace nextSpace = getNextSpace(token);*/
-
         try {
             // Move to the space across the tile
             curTokenSpace = tile.findMatch(curTokenSpace);
