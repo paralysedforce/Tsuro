@@ -1,12 +1,15 @@
 package main;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javafx.util.Pair;
 import main.Players.APlayer;
 
 /**
  * Created by vyasalwar on 4/16/18.
  */
-public class Token {
+public class Token implements Parsable {
 
     //================================================================================
     // Instance Variables
@@ -80,4 +83,14 @@ public class Token {
     }
 
 
+    @Override
+    public Element toXML(Document document) {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) {
+        // TODO
+    }
 }
