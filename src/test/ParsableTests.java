@@ -65,6 +65,7 @@ public class ParsableTests {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "html"); // This prevents collapsing empty tags
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
@@ -309,10 +310,10 @@ public class ParsableTests {
     }
 
     /* ****************************** TESTING PAWNS **************************************** */
-    private final String pawnLocTop = "<pawn-loc><h></h><n>2</n><n>4</n></pawn-loc>"; // Corresponds to (2,2,0)
-    private final String pawnLocRight = "<pawn-loc><v></v><n>3</n><n>5</n></pawn-loc>"; // Corresponds to (2,2,2)
+    private final String pawnLocTop = "<pawn-loc><h></h><n>2</n><n>4</n></pawn-loc>";   // Corresponds to (2,2,0)
+    private final String pawnLocRight = "<pawn-loc><v></v><n>3</n><n>4</n></pawn-loc>"; // Corresponds to (2,2,2)
     private final String pawnLocBottom = "<pawn-loc><h></h><n>3</n><n>4</n></pawn-loc>";// Corresponds to (2,2,5)
-    private final String pawnLocLeft = "<pawn-loc><v></v><n>4</n><n>5</n></pawn-loc>"; // Corresponds to (2,2,6)
+    private final String pawnLocLeft = "<pawn-loc><v></v><n>2</n><n>5</n></pawn-loc>";  // Corresponds to (2,2,6)
     private final String testPawnStart =
             "<ent>" +
                     "<color>blue</color>";
@@ -323,33 +324,34 @@ public class ParsableTests {
         Document doc = setUpDocument();
         RandomPlayer bluePlayer = new RandomPlayer("", Color.BLUE);
         BoardSpace space = new BoardSpace(2,2);
+        boolean debug = false;
         // Top
         Token topToken = new Token(space, 0, bluePlayer);
         assertElementIsExpected(
                 topToken.toXML(doc),
                 testPawnStart + pawnLocTop + testPawnEnd,
-                true
+                debug
         );
         // Right
         Token rightToken = new Token(space, 2, bluePlayer);
         assertElementIsExpected(
                 rightToken.toXML(doc),
                 testPawnStart + pawnLocRight + testPawnEnd,
-                true
+                debug
         );
         // Bottom
         Token bottomToken = new Token(space, 5, bluePlayer);
         assertElementIsExpected(
                 bottomToken.toXML(doc),
                 testPawnStart + pawnLocBottom + testPawnEnd,
-                true
+                debug
         );
-        // Top
+        // Left
         Token leftToken = new Token(space, 6, bluePlayer);
         assertElementIsExpected(
                 leftToken.toXML(doc),
                 testPawnStart + pawnLocLeft + testPawnEnd,
-                true
+                debug
         );
     }
 
