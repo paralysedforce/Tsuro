@@ -21,7 +21,7 @@ public class IntegrationTest {
     @Test
     public void playGameTest(){
         APlayer vyas = new RandomPlayer("Vyas", Color.BLUE, 0);
-        APlayer keith = new RandomPlayer("Keith", Color.BLACK, 0);
+        APlayer keith = new RandomPlayer("Keith", Color.SIENNA, 0);
 
         game.registerPlayer(vyas);
         game.registerPlayer(keith);
@@ -38,8 +38,8 @@ public class IntegrationTest {
                 game.getTilePile().shuffleDeck(seed);
 
                 APlayer vyas = new RandomPlayer("Vyas", Color.BLUE, seed);
-                APlayer keith = new RandomPlayer("Keith", Color.BLACK, seed);
-                APlayer robby = new RandomPlayer("Robby", Color.GREY, seed);
+                APlayer keith = new RandomPlayer("Keith", Color.SIENNA, seed);
+                APlayer robby = new RandomPlayer("Robby", Color.HOTPINK, seed);
 
                 game.registerPlayer(vyas);
                 game.registerPlayer(keith);

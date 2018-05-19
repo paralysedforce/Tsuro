@@ -43,7 +43,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.placeToken(space, 0);
         game.registerPlayer(player);
@@ -61,7 +61,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.placeToken(space, 0);
         game.registerPlayer(player);
@@ -83,7 +83,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.placeToken(space, 0);
         game.registerPlayer(player);
@@ -104,7 +104,7 @@ public class GameTest {
                 .thenReturn(null);
 
         BoardSpace space = board.getBoardSpace(0, 0);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.placeToken(space, 0);
         game.registerPlayer(player);
@@ -128,7 +128,7 @@ public class GameTest {
         APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
         vyas.initialize(new ArrayList<>());
         vyas.placeToken(spaceOne, 0);
-        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        APlayer keith = new RandomPlayer("Keith", Color.SIENNA);
         keith.initialize(new ArrayList<>());
         keith.placeToken(spaceTwo, 2);
 
@@ -169,10 +169,10 @@ public class GameTest {
         APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
         vyas.initialize(new ArrayList<>());
         vyas.placeToken(spaceOne, 7);
-        APlayer keith =  new RandomPlayer("Keith", Color.BLACK);
+        APlayer keith =  new RandomPlayer("Keith", Color.SIENNA);
         keith.initialize(new ArrayList<>());
         keith.placeToken(spaceOne, 6);
-        APlayer robby =  new RandomPlayer("Robby", Color.GREY);
+        APlayer robby =  new RandomPlayer("Robby", Color.HOTPINK);
         robby.initialize(new ArrayList<>());
         robby.placeToken(spaceTwo, 2);
         APlayer christos =  new RandomPlayer("Christos", Color.GREEN);

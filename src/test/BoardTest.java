@@ -44,7 +44,7 @@ public class BoardTest {
 
 
         BoardSpace lowerSpace = board.getBoardSpace(1, 0);
-        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        APlayer keith = new RandomPlayer("Keith", Color.SIENNA);
         keith.initialize(new ArrayList<>());
         keith.placeToken(lowerSpace, 7);
         Tile keithTile = new Tile(7, 0, 1, 2, 3, 4, 5, 6);
@@ -112,7 +112,7 @@ public class BoardTest {
         /* Setup */
         Board board = new Board();
         BoardSpace start = board.getBoardSpace(0, 0);
-        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        APlayer keith = new RandomPlayer("Keith", Color.SIENNA);
         keith.initialize(new ArrayList<>());
         keith.placeToken(start, 0);
         Tile tile = new Tile(0, 7, 2, 6, 1, 3, 4, 5);
@@ -156,10 +156,10 @@ public class BoardTest {
         APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
         vyas.initialize(new ArrayList<>());
         vyas.placeToken(start, 0);
-        APlayer keith = new RandomPlayer("Keith", Color.BLACK);
+        APlayer keith = new RandomPlayer("Keith", Color.SIENNA);
         keith.initialize(new ArrayList<>());
         keith.placeToken(start, 1);
-        APlayer robby = new RandomPlayer("Robby", Color.GREY);
+        APlayer robby = new RandomPlayer("Robby", Color.HOTPINK);
         robby.initialize(new ArrayList<>());
         robby.placeToken(start, 6);
         APlayer christos = new RandomPlayer("Christos", Color.GREEN);

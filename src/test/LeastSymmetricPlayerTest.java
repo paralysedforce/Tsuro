@@ -29,7 +29,7 @@ public class LeastSymmetricPlayerTest {
 
     @Test
     public void LeastSymmetricPlayerCanBeInstantiatedTest() {
-        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.BLACK);
+        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class LeastSymmetricPlayerTest {
 
          */
 
-        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.BLACK);
+        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
         Tile tile = leastSymmetricPlayer.chooseTile();
@@ -83,7 +83,7 @@ public class LeastSymmetricPlayerTest {
 
          */
 
-        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.BLACK);
+        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
         Tile tile = leastSymmetricPlayer.chooseTile();
@@ -119,7 +119,7 @@ public class LeastSymmetricPlayerTest {
 
          */
 
-        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.BLACK);
+        APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
         Tile tile = leastSymmetricPlayer.chooseTile();

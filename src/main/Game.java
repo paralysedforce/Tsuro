@@ -285,7 +285,7 @@ public class Game {
         System.out.println("Welcome to Tsuro!");
 
         for (String player: args) {
-            game.registerPlayer(player, Color.BLACK, PlayerType.RANDOM);
+            game.registerPlayer(player, Color.SIENNA, PlayerType.RANDOM);
         }
         game.playGame();
     }

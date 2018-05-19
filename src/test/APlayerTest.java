@@ -40,7 +40,7 @@ public class APlayerTest {
         when(tilePileMock.drawFromDeck())
                 .thenReturn(tileOne, tileTwo, tileThree);
 
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.drawFromDeck();
 
         verify(tilePileMock, times(3)).drawFromDeck();
@@ -55,7 +55,7 @@ public class APlayerTest {
                 .thenReturn(null, null, null)
                 .thenReturn(tileOne);
 
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.drawFromDeck();
 
         verify(tilePileMock, times(4)).drawFromDeck();
@@ -69,7 +69,7 @@ public class APlayerTest {
                 .thenReturn(tileOne, tileTwo, tileThree);
 
         Tile testTile = new Tile(0, 1, 2, 3, 4, 5, 6, 7);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
 
         Assert.assertTrue(player.getHand().holdsTile(testTile));
         testTile.rotateClockwise();
@@ -84,7 +84,7 @@ public class APlayerTest {
                 .thenReturn(tileOne, tileTwo, tileThree);
 
         Tile testTile = new Tile(0, 4, 1, 5, 2, 6, 3, 7);
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
 
         Assert.assertFalse(player.getHand().holdsTile(testTile));
     }
@@ -92,7 +92,7 @@ public class APlayerTest {
     @Test
     public void initFirstSucceeds() {
         try {
-            APlayer player = new RandomPlayer("Keith", Color.BLACK);
+            APlayer player = new RandomPlayer("Keith", Color.SIENNA);
             player.initialize(new ArrayList<>());
         }
         catch (ContractException e) {
@@ -102,40 +102,40 @@ public class APlayerTest {
 
     @Test(expected = ContractException.class)
     public void placeTokenBeforeInitFails() {
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.placeToken();
     }
 
     @Test(expected = ContractException.class)
     public void chooseTileBeforeInitFails() {
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.chooseTile();
     }
 
     @Test(expected = ContractException.class)
     public void chooseTileBeforePlaceTokenFails() {
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.chooseTile();
     }
 
     @Test (expected = ContractException.class)
     public void endGameBeforePlaceTokenFails() {
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
         player.endGame();
     }
 
     @Test (expected = ContractException.class)
     public void endGameBeforeInitFails() {
-        APlayer player = new RandomPlayer("Keith", Color.BLACK);
+        APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.endGame();
     }
 
     @Test
     public void correctSequentialContractSucceeds() {
         try {
-            APlayer player = new RandomPlayer("Keith", Color.BLACK);
+            APlayer player = new RandomPlayer("Keith", Color.SIENNA);
             player.initialize(new ArrayList<>());
             player.placeToken();
             player.chooseTile();
