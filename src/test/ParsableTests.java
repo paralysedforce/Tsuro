@@ -1,5 +1,10 @@
 package test;
 
+import junit.framework.TestCase;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,6 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import main.BoardSpace;
 import main.Tile;
 
 import static org.junit.Assert.assertEquals;
@@ -33,6 +39,12 @@ import static org.junit.Assert.assertTrue;
  */
 
 public class ParsableTests {
+
+    @Before
+    public void setUp() throws Exception {
+
+        this.setupTestSpace();
+    }
 
     /**
      * Transforms a dom element to string for printing, comparison, or sending over the wire.\
@@ -76,7 +88,7 @@ public class ParsableTests {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-            assertTrue(false); // When in doubt, fail the enclosing test.
+            Assert.assertTrue(false); // When in doubt, fail the enclosing test.
             return null; // To make compiler happy.
         }
     }
@@ -93,8 +105,9 @@ public class ParsableTests {
     private boolean nodesAreEquivalent(Node node1, Node node2, boolean debug) {
         // Tag equivalence
         if (!Objects.equals(node1.getNodeName(), node2.getNodeName())) {
-            System.err.println("Node names are not equivalent: " +
-                    node1.getNodeName() + " differs from " + node2.getNodeName());
+            if (debug)
+                System.err.println("\nNode names are not equivalent: " +
+                        node1.getNodeName() + " differs from " + node2.getNodeName());
             return false;
         }
 
@@ -113,14 +126,19 @@ public class ParsableTests {
         // Internal node, compare children
         // Create arraylists out of the nodelists
         NodeList children1 = node1.getChildNodes();
-        NodeList children2 = node1.getChildNodes();
-        if (children1.getLength() != children2.getLength()) return false;
+        NodeList children2 = node2.getChildNodes();
+        if (children1.getLength() != children2.getLength()) {
+            if (debug)
+                System.err.println("Children lengths are not equivalent for " + node1.getNodeName() +
+                        ": " + Integer.toString(children1.getLength()) + " vs " + Integer.toString(children2.getLength()));
+            return false;
+        }
         for (int i = 0; i < children1.getLength(); i++) {
             Node child = children1.item(i);
             boolean childWasFound = false;
             for (int j = 0; j < children2.getLength(); j++) {
                 // Look for child in children2
-                if (nodesAreEquivalent(child, children2.item(j), debug)) {
+                if (nodesAreEquivalent(child, children2.item(j), false)) {
                     // Found child in children2
                     childWasFound = true;
                     break;
@@ -134,7 +152,6 @@ public class ParsableTests {
         }
         // Length the same and all children in list 1 found in list 2
         return true;
-
     }
 
     private Node nodeFromString(String xml) throws ParserConfigurationException, IOException, SAXException {
@@ -142,6 +159,50 @@ public class ParsableTests {
                 new ByteArrayInputStream(xml.getBytes("UTF-8"))
         );
         return doc.getFirstChild();
+    }
+
+    // A couple of quick tests to show that the above testing code works
+    @Test
+    public void compareXmlSame() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                true
+        ));
+    }
+    @Test
+    public void compareXmlChildrenDifferentOrder() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span2></span2><span1></span1></div>").getParentNode(),
+                true
+        ));
+    }
+    @Test
+    public void compareXmlChildMissing() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1></div>").getParentNode(),
+                false
+        ));
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                false
+        ));
+    }
+    @Test
+    public void compareXmlChildText() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                false
+        ));
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                true
+        ));
     }
 
     /**
@@ -160,12 +221,12 @@ public class ParsableTests {
                 System.out.println(xmlElementToString(element));
                 System.out.println(xmlElementToString((Element) expectedNode));
             }
-            assertTrue(nodesAreEquivalent(element, expectedNode, debug)); // Provides useful debugging info.
+            Assert.assertTrue(nodesAreEquivalent(expectedNode, element, debug)); // Provides useful debugging info.
             //Note: The line below was commented out because it takes order of children into account.
 //            assertTrue(element.isEqualNode(expectedNode)); // Should also be true, but doesn't rely on untested code.
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            assertTrue(false); // When in doubt, fail the enclosing test.
+            Assert.assertTrue(false); // When in doubt, fail the enclosing test.
         }
     }
 
@@ -197,7 +258,7 @@ public class ParsableTests {
     public void testTileToXml() {
         Document doc = setUpDocument();
         Element element = testTile.toXML(doc);
-        assertElementIsExpected(element, testTileXml, true);
+        assertElementIsExpected(element, testTileXml, false);
     }
 
     @Test
@@ -206,12 +267,49 @@ public class ParsableTests {
             Node node = nodeFromString(testTileXml);
             Tile actual = new Tile();
             actual.fromXML((Element) node);
-            assertEquals(testTile, actual);
+            Assert.assertEquals(testTile, actual);
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
             //noinspection ConstantConditions
-            assertTrue(false);
+            Assert.assertTrue(false);
         }
     }
+
+    /* ****************************** TESTING TILES ON BOARD ********************************** */
+    private BoardSpace testSpace = new BoardSpace(1, 3);
+    private final String testSpaceXml =
+            "<ent>" +
+                    "<xy>" +
+                    "<x>" +
+                    "<n>1</n>" +
+                    "</x>" +
+                    "<y>" +
+                    "<n>3</n>" +
+                    "</y>" +
+                    "</xy>" +
+                    testTileXml +
+                    "</ent>";
+
+    public void setupTestSpace() {
+        testSpace.setTile(testTile);
+    }
+
+    @Test
+    public void testBoardSpaceToXml() {
+        Document doc = setUpDocument();
+        Element element = testSpace.toXML(doc);
+        assertElementIsExpected(element, testSpaceXml, false);
+    }
+
+
+
+
+
+    /* ****************************** TESTING PAWNS **************************************** */
+
+
+    /* ****************************** TESTING BOARD **************************************** */
+
+
 
 }
