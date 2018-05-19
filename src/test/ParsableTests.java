@@ -266,17 +266,11 @@ public class ParsableTests {
     }
 
     @Test
-    public void testTileFromXml() {
-        try {
-            Node node = nodeFromString(testTileXml);
-            Tile actual = new Tile();
-            actual.fromXML((Element) node);
-            Assert.assertEquals(testTile, actual);
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-            //noinspection ConstantConditions
-            Assert.assertTrue(false);
-        }
+    public void testTileFromXml() throws IOException, SAXException, ParserConfigurationException {
+        Node node = nodeFromString(testTileXml);
+        Tile actual = new Tile();
+        actual.fromXML((Element) node);
+        Assert.assertEquals(testTile, actual);
     }
 
     /* ****************************** TESTING TILES ON BOARD ********************************** */
@@ -303,6 +297,15 @@ public class ParsableTests {
         Document doc = setUpDocument();
         Element element = testSpace.toXML(doc);
         assertElementIsExpected(element, testSpaceXml, false);
+    }
+
+    @Test
+    public void testSpaceFromXml() throws IOException, SAXException, ParserConfigurationException {
+        BoardSpace actual = new BoardSpace(1, 3);
+        actual.setTile(testTile);
+        Node node = nodeFromString(testSpaceXml);
+        actual.fromXML((Element) node);
+        assertTrue(actual.equals(testSpace));
     }
 
     /* ****************************** TESTING PAWNS **************************************** */
