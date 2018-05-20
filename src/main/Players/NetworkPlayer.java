@@ -1,6 +1,9 @@
 package main.Players;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,16 +73,37 @@ public class NetworkPlayer extends APlayer {
                             NetworkMessage.GET_NAME.getMessageRootElement(d)
                     ));
 
+            String response = fromClient.readLine();
 
-        } catch (ParserConfigurationException e) {
+            Node responseNode = NetworkMessage.nodeFromString(response);
+            return responseNode.getTextContent();
+
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
+            return ""; // TODO: something smarter on failure.
         }
-        return ""; // TODO: something smarter on failure.
     }
 
     @Override
     void initialize(Color color, List<Color> colors) {
-        throw new NotImplementedException();
+        try {
+            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element initializeElement = NetworkMessage.INITIALIZE.getMessageRootElement(d);
+            initializeElement.appendChild(this.getColor().toXml(d));
+
+            Element colorListElement = d.createElement("list");
+            for (Color aColor : colors) {
+                colorListElement.appendChild(aColor.toXml(d));
+            }
+
+            initializeElement.appendChild(colorListElement);
+
+            toClient.println(NetworkMessage.xmlElementToString(initializeElement));
+
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

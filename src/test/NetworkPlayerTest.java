@@ -21,10 +21,11 @@ public class NetworkPlayerTest {
 
     @Test
     public void testGetName() {
-        Reader r = new StringReader("");
+        Reader r = new StringReader("<player-name>name!</player-name>\n");
         Writer w = new StringWriter();
         APlayer player = new NetworkPlayer("Name", Color.BLUE, r, w);
-        player.getName();
+
+        Assert.assertEquals(player.getName(), "name!");
 
         Assert.assertEquals(
                 w.toString(),
