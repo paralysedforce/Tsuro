@@ -1,11 +1,12 @@
 package main;
 
-import javafx.util.Pair;
-import main.Players.APlayer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import main.Players.APlayer;
 
 /**
  *
@@ -48,8 +49,10 @@ public class Board implements Parsable{
     // Public methods
     //================================================================================
 
-    // Returns true if there is a tile on the row and col
-    public boolean isOccupied(int row, int col) {
+    /**
+     * Returns true if there is a tile on the row and col
+     */
+    public boolean hasTile(int row, int col) {
         return getBoardSpace(row, col).hasTile();
     }
 
@@ -200,18 +203,23 @@ public class Board implements Parsable{
     @Override
     public Element toXML(Document document) {
         Element boardElement = document.createElement("board");
-        Element mapElement = document.createElement("map");
+        Element tileMap = document.createElement("map");
+        Element pawnMap = document.createElement("map");
 
         /* List of tiles */
         for (int i = 0; i < BOARD_LENGTH; i++){
             for (int j = 0; j < BOARD_LENGTH; j++){
-                if (isOccupied(i, j)){
-                    mapElement.appendChild(getBoardSpace(i, j).toXML(document));
+                if (hasTile(i, j)){
+                    tileMap.appendChild(getBoardSpace(i, j).toXML(document));
+                }
+
+                for (Token token : getBoardSpace(i,j).getTokensOnSpace()) {
+                    pawnMap.appendChild(token.toXML(document));
                 }
             }
         }
 
-        boardElement.appendChild(mapElement);
+        boardElement.appendChild(tileMap);
         return boardElement;
     }
 

@@ -26,7 +26,7 @@ public class BoardTest {
         player.placeToken(space, 0);
 
         board.placeTile(tile, player);
-        Assert.assertTrue(board.isOccupied(0, 0));
+        Assert.assertTrue(board.hasTile(0, 0));
         Assert.assertFalse(player.getToken().getBoardSpace().hasTile());
         Assert.assertEquals(player.getToken().getTokenSpace(), 7);
     }
@@ -76,8 +76,8 @@ public class BoardTest {
 
          */
 
-        Assert.assertFalse(board.isOccupied(0, 0));
-        Assert.assertFalse(board.isOccupied(1, 0));
+        Assert.assertFalse(board.hasTile(0, 0));
+        Assert.assertFalse(board.hasTile(1, 0));
         Assert.assertFalse(upperSpace.hasTile());
         Assert.assertFalse(lowerSpace.hasTile());
 
@@ -132,7 +132,7 @@ public class BoardTest {
          */
 
         Assert.assertFalse(start.hasTile());
-        Assert.assertFalse(board.isOccupied(0, 0));
+        Assert.assertFalse(board.hasTile(0, 0));
         Assert.assertEquals(tile.findMatch(0), 7);
         Assert.assertTrue(board.willKillPlayer(tile, keith));
 
