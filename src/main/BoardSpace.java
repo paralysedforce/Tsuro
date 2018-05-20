@@ -137,10 +137,12 @@ public class BoardSpace implements Parsable {
 
         Element nRowElement = document.createElement("n");
         nRowElement.appendChild(document.createTextNode(Integer.toString(row)));
-        xElement.appendChild(nRowElement);
         Element nColElement = document.createElement("n");
         nColElement.appendChild(document.createTextNode(Integer.toString(col)));
-        yElement.appendChild(nColElement);
+
+        xElement.appendChild(nColElement);
+        yElement.appendChild(nRowElement);
+
         xyElement.appendChild(xElement);
         xyElement.appendChild(yElement);
 
