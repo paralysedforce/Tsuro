@@ -1,10 +1,7 @@
 package test;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,8 +12,8 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,13 +24,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import javafx.util.Pair;
+import main.Board;
 import main.BoardSpace;
 import main.Color;
+import main.Players.APlayer;
 import main.Players.RandomPlayer;
 import main.Tile;
 import main.Token;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -48,6 +47,8 @@ public class ParsableTests {
     public void setUp() throws Exception {
 
         this.setupTestSpace();
+
+        this.setUpTestBoard();
     }
 
     /**
@@ -275,15 +276,15 @@ public class ParsableTests {
     }
 
     /* ****************************** TESTING TILES ON BOARD ********************************** */
-    private BoardSpace testSpace = new BoardSpace(1, 3);
+    private BoardSpace testSpace = new BoardSpace(1, 2);
     private final String testSpaceXml =
             "<ent>" +
                     "<xy>" +
                     "<x>" +
-                    "<n>1</n>" +
+                    "<n>2</n>" +
                     "</x>" +
                     "<y>" +
-                    "<n>3</n>" +
+                    "<n>1</n>" +
                     "</y>" +
                     "</xy>" +
                     testTileXml +
@@ -302,7 +303,7 @@ public class ParsableTests {
 
     @Test
     public void testSpaceFromXml() throws IOException, SAXException, ParserConfigurationException {
-        BoardSpace actual = new BoardSpace(1, 3);
+        BoardSpace actual = new BoardSpace(1, 2);
         actual.setTile(testTile);
         Node node = nodeFromString(testSpaceXml);
         actual.fromXML((Element) node);
@@ -356,6 +357,60 @@ public class ParsableTests {
     }
 
     /* ****************************** TESTING BOARD **************************************** */
+    private final String testBoardXml =
+            "<board>" +
+                    "<map>" +
+                    testSpaceXml +
+                    "</map>" +
+                    "<map>" +
+                    testPawnStart +
+                    pawnLocTop +
+                    testPawnEnd +
+                    testPawnStart +
+                    pawnLocLeft +
+                    testPawnEnd +
+                    "</map>" +
+                    "</board>";
+    private Board testBoard;
+    private void setUpTestBoard() {
+        testBoard = new Board();
+        APlayer playerTop = new APlayer("", Color.BLUE) {
+            @Override
+            public Pair<BoardSpace, Integer> getStartingLocation() {
+                return new Pair<>(testBoard.getBoardSpace(1,2), 4);
+            }
+            @Override
+            protected Tile chooseTileHelper() {
+                return null;
+            }
+        };
+        playerTop.initialize(new ArrayList<>());
+        playerTop.placeToken();
+        testBoard.placeTile(testTile, playerTop); // Moves playerTop to (2,2,0)
+
+        APlayer playerLeft = new APlayer("", Color.BLUE) {
+            @Override
+            public Pair<BoardSpace, Integer> getStartingLocation() {
+                return new Pair<>(testBoard.getBoardSpace(2,2), 6);
+            }
+            @Override
+            protected Tile chooseTileHelper() {
+                return null;
+            }
+        };
+        playerLeft.initialize(new ArrayList<>());
+        playerLeft.placeToken();
+    }
+
+    @Test
+    public void testBoardToXml() {
+        Document doc = setUpDocument();
+        assertElementIsExpected(
+                testBoard.toXML(doc),
+                testBoardXml,
+                true
+        );
+    }
 
 
 

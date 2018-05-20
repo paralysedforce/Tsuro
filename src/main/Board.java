@@ -220,6 +220,7 @@ public class Board implements Parsable{
         }
 
         boardElement.appendChild(tileMap);
+        boardElement.appendChild(pawnMap);
         return boardElement;
     }
 
