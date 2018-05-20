@@ -1,8 +1,5 @@
 package test;
 
-import main.*;
-import main.Players.APlayer;
-import main.Players.RandomPlayer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +9,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 
-import static org.mockito.Mockito.*;
+import main.Color;
+import main.ContractException;
+import main.Game;
+import main.Players.APlayer;
+import main.Players.RandomPlayer;
+import main.Tile;
+import main.TilePile;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APlayerTest {

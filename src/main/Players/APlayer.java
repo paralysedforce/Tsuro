@@ -1,12 +1,17 @@
 package main.Players;
 
-import javafx.util.Pair;
-import main.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javafx.util.Pair;
+import main.BoardSpace;
+import main.Color;
+import main.ContractException;
+import main.Game;
+import main.Tile;
+import main.Token;
 
 public abstract class APlayer {
 
