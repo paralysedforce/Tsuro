@@ -29,6 +29,7 @@ import main.Board;
 import main.BoardSpace;
 import main.Color;
 import main.Players.APlayer;
+import main.Players.MockPlayer;
 import main.Players.RandomPlayer;
 import main.Tile;
 import main.Token;
@@ -374,13 +375,14 @@ public class ParsableTests {
     private Board testBoard;
     private void setUpTestBoard() {
         testBoard = new Board();
-        APlayer playerTop = new APlayer("", Color.BLUE) {
+        APlayer playerTop = new MockPlayer("", Color.BLUE) {
             @Override
-            public Pair<BoardSpace, Integer> getStartingLocation() {
+            public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
                 return new Pair<>(testBoard.getBoardSpace(1,2), 4);
             }
+
             @Override
-            protected Tile chooseTileHelper() {
+            public Tile mockChooseTile(Board board, int remainingTiles) {
                 return null;
             }
         };
@@ -388,13 +390,14 @@ public class ParsableTests {
         playerTop.placeToken();
         testBoard.placeTile(testTile, playerTop); // Moves playerTop to (2,2,0)
 
-        APlayer playerLeft = new APlayer("", Color.BLUE) {
+        APlayer playerLeft = new MockPlayer("", Color.BLUE) {
             @Override
-            public Pair<BoardSpace, Integer> getStartingLocation() {
+            public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
                 return new Pair<>(testBoard.getBoardSpace(2,2), 6);
             }
+
             @Override
-            protected Tile chooseTileHelper() {
+            public Tile mockChooseTile(Board board, int remainingTiles) {
                 return null;
             }
         };
@@ -408,7 +411,7 @@ public class ParsableTests {
         assertElementIsExpected(
                 testBoard.toXML(doc),
                 testBoardXml,
-                true
+                false
         );
     }
 

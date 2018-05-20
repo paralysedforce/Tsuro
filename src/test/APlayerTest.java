@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import main.Color;
 import main.ContractException;
@@ -130,13 +131,13 @@ public class APlayerTest {
     public void endGameBeforePlaceTokenFails() {
         APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
-        player.endGame();
+        player.endGame(new HashSet<>());
     }
 
     @Test (expected = ContractException.class)
     public void endGameBeforeInitFails() {
         APlayer player = new RandomPlayer("Keith", Color.SIENNA);
-        player.endGame();
+        player.endGame(new HashSet<>());
     }
 
     @Test
@@ -147,7 +148,7 @@ public class APlayerTest {
             player.placeToken();
             player.chooseTile();
             player.chooseTile();
-            player.endGame();
+            player.endGame(new HashSet<>());
         }
         catch (ContractException e) {
             throw new AssertionError();

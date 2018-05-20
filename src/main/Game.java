@@ -1,8 +1,16 @@
 package main;
 
-import main.Players.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 
-import java.util.*;
+import main.Players.APlayer;
+import main.Players.LeastSymmetricPlayer;
+import main.Players.MostSymmetricPlayer;
+import main.Players.PlayerType;
+import main.Players.RandomPlayer;
 
 public class Game {
 
@@ -192,11 +200,16 @@ public class Game {
 //                i = (i + 1) % remainingPlayers.size();
         }
 
+        Set<Color> winningPlayers = new HashSet<>();
+        for (APlayer player : remainingPlayers) {
+            winningPlayers.add(player.getColor());
+        }
+
         for (APlayer player : remainingPlayers){
-            player.endGame();
+            player.endGame(winningPlayers);
         }
         for (APlayer player : eliminatedPlayers){
-            player.endGame();
+            player.endGame(winningPlayers);
         }
 
         return new HashSet<>(remainingPlayers);

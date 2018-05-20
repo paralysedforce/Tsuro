@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.util.Pair;
+import main.Board;
 import main.BoardSpace;
 import main.Color;
 import main.ContractException;
@@ -13,7 +14,7 @@ import main.Game;
 import main.Tile;
 import main.Token;
 
-public abstract class APlayer {
+public abstract class APlayer extends IPlayer {
 
     //================================================================================
     // Instance Variables
@@ -56,10 +57,6 @@ public abstract class APlayer {
         return color;
     }
 
-    public String getName(){
-        return name;
-    }
-
     public Token getToken(){
         return token;
     }
@@ -74,7 +71,7 @@ public abstract class APlayer {
         if (curState != State.INITIALIZED)
             throw new ContractException();
 
-        Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation();
+        Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation(Game.getGame().getBoard());
         token = new Token(startingTokenLocation.getKey(), startingTokenLocation.getValue(), this);
         curState = State.TURNPLAYABLE;
     }
@@ -88,18 +85,23 @@ public abstract class APlayer {
         curState = State.TURNPLAYABLE;
     }
 
-    public void initialize(List<Color> otherPlayers){
+    public final void initialize(List<Color> otherPlayers){
         if (curState != State.UNINITIALIZED)
             throw new ContractException();
+
+        // Allow subclasses to further implement this method
+        this.initialize(this.color, otherPlayers);
 
         this.otherPlayers = new ArrayList<>(otherPlayers);
         this.curState = State.INITIALIZED;
     }
 
-    public void endGame(){
+    public void endGame(Set<Color> colors){
         if (curState != State.TURNPLAYABLE)
             throw new ContractException();
-        // Do something?
+
+        // Do something if subclass deems appropriate
+        this.endGame(Game.getGame().getBoard(), colors);
 
         curState = State.GAMEENDED;
     }
@@ -109,7 +111,7 @@ public abstract class APlayer {
         if (curState != State.TURNPLAYABLE || !hand.isValid())
             throw new ContractException();
 
-        return chooseTileHelper();
+        return this.chooseTile(Game.getGame().getBoard(), Game.getGame().getTilePile().getCount());
     }
 
 
@@ -163,12 +165,15 @@ public abstract class APlayer {
     }
 
     //================================================================================
-    // Abstract methods
+    // IPlayer methods that can be overwritten by subclasses
     //================================================================================
-    abstract public Pair<BoardSpace, Integer> getStartingLocation();
+    public String getName(){
+        return name;
+    }
 
-    // TODO: Think of a better name for this method
-    abstract protected Tile chooseTileHelper();
+    void initialize(Color color, List<Color> colors) { }
+
+    void endGame(Board board, Set<Color> colors) { }
 
 
     //================================================================================

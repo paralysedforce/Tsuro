@@ -1,13 +1,13 @@
 package main.Players;
 
+import java.util.Scanner;
+
 import javafx.util.Pair;
+import main.Board;
 import main.BoardSpace;
 import main.Color;
 import main.Game;
 import main.Tile;
-
-import java.lang.reflect.Array;
-import java.util.Scanner;
 
 /**
  * Created by vyasalwar on 5/3/18.
@@ -19,8 +19,7 @@ public class UserPlayer extends APlayer{
         playerType = PlayerType.HUMAN;
     }
 
-    @Override
-    public Pair<BoardSpace, Integer> getStartingLocation() {
+    public Pair<BoardSpace, Integer> getStartingLocation(Board board) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("It is " + getName() + "'s turn.");
@@ -45,7 +44,7 @@ public class UserPlayer extends APlayer{
         }
     }
 
-    protected Tile chooseTileHelper(){
+    protected Tile chooseTile(Board board, int remainingTiles){
         System.out.println("It is " + getName() + "'s turn.");
         System.out.println("Type help to see commands");
         /* For input */

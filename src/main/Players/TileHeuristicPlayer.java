@@ -1,9 +1,10 @@
 package main.Players;
 
+import java.util.Set;
+
+import main.Board;
 import main.Color;
 import main.Tile;
-
-import java.util.Set;
 
 /**
  * Created by vyasalwar on 5/3/18.
@@ -14,8 +15,7 @@ public abstract class TileHeuristicPlayer extends APlayer {
         super(name, color);
     }
 
-    @Override
-    protected Tile chooseTileHelper(){
+    protected Tile chooseTile(Board board, int remainingTiles){
         Set<Tile> legalMoves = getLegalMoves();
         Tile bestTile = null;
         int bestScore = Integer.MIN_VALUE;
