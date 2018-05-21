@@ -2,6 +2,7 @@ package test;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -10,7 +11,11 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import main.Color;
+import main.Game;
 import main.NetworkMessage;
 import main.Players.APlayer;
 import main.Players.NetworkPlayer;
@@ -31,31 +36,81 @@ public class NetworkPlayerTest {
 
         Assert.assertEquals(
                 w.toString(),
-                "<" +NetworkMessage.GET_NAME.getTag() + ">" +
+                "<" + NetworkMessage.GET_NAME.getTag() + ">" +
                         "</" + NetworkMessage.GET_NAME.getTag() + ">\r\n"
         );
     }
 
     @Test
     public void testInitialize() {
-        List<Color> colors = Arrays.asList(Color.BLUE, Color.DARKGREEN);
-        String xmlResponse = "<void></void>\n";
+        String xmlResponse = getInitializationResponse();
 
         Reader r = new StringReader(xmlResponse);
         Writer w = new StringWriter();
-        APlayer player = new NetworkPlayer("Name", Color.BLUE, r, w);
+        APlayer player = initiizeNetworkPlayer(r, w);
 
-        player.initialize(colors);
-
+        Assert.assertEquals(player.getColor(), Color.BLUE);
         Assert.assertEquals(
                 w.toString(),
-                "<" + NetworkMessage.INITIALIZE.getTag() + ">" +
-                        "<color>" + Color.BLUE.str() + "</color>" +
-                        "<list>" +
-                        "<color>" + Color.BLUE.str() + "</color>" +
-                        "<color>" + Color.DARKGREEN.str() + "</color>" +
-                        "</list>" +
-                        "</" + NetworkMessage.INITIALIZE.getTag() + ">\r\n"
-                );
+                getInitializationRequest());
+    }
+
+    private List<Color> getInitializationColors() {
+        return Arrays.asList(Color.BLUE, Color.SIENNA);
+    }
+
+    private String getInitializationRequest() {
+        return "<" + NetworkMessage.INITIALIZE.getTag() + ">" +
+                "<color>" + Color.BLUE.str() + "</color>" +
+                "<list>" +
+                "<color>" + Color.BLUE.str() + "</color>" +
+                "<color>" + Color.SIENNA.str() + "</color>" +
+                "</list>" +
+                "</" + NetworkMessage.INITIALIZE.getTag() + ">\r\n";
+    }
+
+    private String getInitializationResponse() {
+        return "<void></void>\n";
+    }
+
+    private APlayer initiizeNetworkPlayer(Reader r, Writer w) {
+        APlayer player = new NetworkPlayer("Testname", Color.BLUE, r, w);
+        player.initialize(getInitializationColors());
+        return player;
+    }
+
+    @Test
+    public void testPlacePawn() throws ParserConfigurationException {
+        Reader r = new StringReader(
+                getInitializationResponse() +
+                        "<pawn-loc>" +
+                        "<h></h>" +
+                        "<n>0</n>" +
+                        "<n>2</n>" +
+                        "</pawn-loc>\r\n"
+        );
+        Writer w = new StringWriter();
+        APlayer player = initiizeNetworkPlayer(r, w);
+
+        Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        String expectedPlacementRequestBoard =
+                NetworkMessage.xmlElementToString(Game.getGame().getBoard().toXML(d));
+
+        player.placeToken();
+
+        // The token should now be at (0,1,0)
+        Assert.assertEquals(player.getToken().getBoardSpace().getCol(), 1);
+        Assert.assertEquals(player.getToken().getBoardSpace().getRow(), 0);
+        Assert.assertEquals(player.getToken().getTokenSpace(), 0);
+
+        // The request should be formed as expected.
+        Assert.assertEquals(
+                w.toString(),
+                getInitializationRequest() +
+                        "<" + NetworkMessage.PLACE_PAWN.getTag() + ">" +
+                        expectedPlacementRequestBoard +
+                        "</" + NetworkMessage.PLACE_PAWN.getTag() + ">\r\n"
+
+        );
     }
 }

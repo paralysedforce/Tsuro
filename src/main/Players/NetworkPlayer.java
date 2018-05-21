@@ -14,6 +14,7 @@ import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +26,7 @@ import main.BoardSpace;
 import main.Color;
 import main.NetworkMessage;
 import main.Tile;
+import main.Token;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -111,7 +113,48 @@ public class NetworkPlayer extends APlayer {
 
     @Override
     Pair<BoardSpace, Integer> getStartingLocation(Board board) {
-        throw new NotImplementedException();
+        try {
+            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+            toClient.println(
+                    "<" + NetworkMessage.PLACE_PAWN.getTag() + ">" +
+                            NetworkMessage.xmlElementToString(board.toXML(d)) +
+                            "</" + NetworkMessage.PLACE_PAWN.getTag() + ">"
+            );
+            String response = fromClient.readLine();
+
+            Node e = NetworkMessage.nodeFromString(response);
+            boolean isHorizontal;
+            int coord1, coord2;
+
+            if (e.getNodeName().equals(NetworkMessage.PAWN_LOC.getTag())) {
+                Node orientationNode = e.getFirstChild();
+                if (orientationNode.getNodeName().equals("h") ||
+                        orientationNode.getNodeName().equals("v")) {
+                    isHorizontal = orientationNode.getNodeName().equals("h");
+
+                    Node coord1Node = orientationNode.getNextSibling();
+                    if (coord1Node.getNodeName().equals("n")) {
+                        coord1 = Integer.valueOf(coord1Node.getTextContent());
+
+                        Node coord2Node = coord1Node.getNextSibling();
+                        if (coord2Node.getNodeName().equals("n")) {
+                            coord2 = Integer.valueOf(coord2Node.getTextContent());
+
+                            return Token.locationFromPawnLoc(board, isHorizontal, coord1, coord2);
+                        }
+                    }
+                }
+            }
+
+            // Default to returning a random location
+            System.err.println("Couldn't parse location: " + response);
+            return RandomPlayer.getRandomStartingLocation(new Random());
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+            // Randomly choose a starting location
+            return RandomPlayer.getRandomStartingLocation(new Random());
+        }
     }
 
     @Override
