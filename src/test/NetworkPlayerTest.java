@@ -2,6 +2,7 @@ package test;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 import org.w3c.dom.Document;
 
 import java.io.Reader;
@@ -15,10 +16,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import main.Color;
+import main.ContractException;
 import main.Game;
 import main.NetworkMessage;
 import main.Players.APlayer;
 import main.Players.NetworkPlayer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by William on 5/20/2018.
@@ -112,5 +115,40 @@ public class NetworkPlayerTest {
                         "</" + NetworkMessage.PLACE_PAWN.getTag() + ">\r\n"
 
         );
+    }
+
+    @Test
+    public void testPlayTurn() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void testEndGame() {
+        try {
+            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Reader r = new StringReader("<void></void>");
+            Writer w = new StringWriter();
+            APlayer player = initiizeNetworkPlayer(r, w);
+            String expectedRequestBoard =
+                    NetworkMessage.xmlElementToString(Game.getGame().getBoard().toXML(d));
+            String expectedColors =
+                    "<set>" +
+                            NetworkMessage.xmlElementToString(Color.BLUE.toXml(d)) +
+                            "</set>";
+
+            player.endGame(Sets.newSet(Color.BLUE));
+
+            Assert.assertEquals(
+                    w.toString(),
+                    "<" + NetworkMessage.END_GAME.getTag() + ">" +
+                            expectedRequestBoard + expectedColors +
+                            "</" + NetworkMessage.END_GAME.getTag() + ">\r\n"
+            );
+
+        } catch (ContractException e) {
+            // We know that calling endGame will break the contract, so catch in anticipation.
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
     }
 }
