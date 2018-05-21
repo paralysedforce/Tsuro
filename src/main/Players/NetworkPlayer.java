@@ -100,7 +100,10 @@ public class NetworkPlayer extends APlayer {
 
             toClient.println(NetworkMessage.xmlElementToString(initializeElement));
 
-        } catch (ParserConfigurationException e) {
+            String response = fromClient.readLine();
+            // TODO: Maybe add a check to make sure the response is void?
+
+        } catch (ParserConfigurationException | IOException e) {
             e.printStackTrace();
         }
 

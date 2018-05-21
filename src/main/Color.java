@@ -16,6 +16,10 @@ public enum Color {
         str = s;
     }
 
+    public String str() {
+        return str;
+    }
+
     public Element toXml(Document document) {
         Element tag = document.createElement("color");
         tag.appendChild(document.createTextNode(str));
