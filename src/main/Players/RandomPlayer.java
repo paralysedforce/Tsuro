@@ -46,7 +46,7 @@ public class RandomPlayer extends APlayer {
         return getRandomStartingLocation(random);
     }
 
-    protected Tile chooseTile(Board board, int remainingTiles) {
+    protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
         Set<Tile> legalMoves =  getLegalMoves();
         Tile[] legalMovesArr = legalMoves.toArray(new Tile[legalMoves.size()]);
         int randomIndex = random.nextInt(legalMovesArr.length);

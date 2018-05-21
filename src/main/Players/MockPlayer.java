@@ -1,5 +1,7 @@
 package main.Players;
 
+import java.util.Set;
+
 import javafx.util.Pair;
 import main.Board;
 import main.BoardSpace;
@@ -24,7 +26,7 @@ public abstract class MockPlayer extends APlayer {
     public abstract Pair<BoardSpace, Integer> mockStartingLocation(Board board);
 
     @Override
-    Tile chooseTile(Board board, int remainingTiles) {
+    Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
         return null;
     }
 

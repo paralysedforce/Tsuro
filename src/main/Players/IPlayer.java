@@ -42,7 +42,7 @@ abstract class IPlayer {
 //    ;; count of tiles that are not yet handed out to players.
 //    ;; The result is the tile the player should place,
 //    ;; suitably rotated.
-    abstract Tile chooseTile(Board board, int remainingTiles);
+abstract Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles);
 
 //    end-game       ;; board? (set/c color?) -> void?
 //    ;; Called to inform the player of the final board

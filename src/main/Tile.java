@@ -196,7 +196,6 @@ public class Tile implements Parsable {
 
     @Override
     public void fromXML(Element xmlElement) {
-        // TODO: contract saying that connections is empty since fromXML overwrites the object.
         if (!xmlElement.getTagName().equals("tile"))
             // TODO: throw an error blaming passer
             return;

@@ -111,7 +111,11 @@ public abstract class APlayer extends IPlayer {
         if (curState != State.TURNPLAYABLE || !hand.isValid())
             throw new ContractException();
 
-        return this.chooseTile(Game.getGame().getBoard(), Game.getGame().getTilePile().getCount());
+        Set<Tile> hand = new HashSet<>();
+        for (Tile aTile : this.hand) {
+            hand.add(aTile);
+        }
+        return this.chooseTile(Game.getGame().getBoard(), hand, Game.getGame().getTilePile().getCount());
     }
 
 

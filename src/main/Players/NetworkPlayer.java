@@ -158,8 +158,40 @@ public class NetworkPlayer extends APlayer {
     }
 
     @Override
-    Tile chooseTile(Board board, int remainingTiles) {
-        throw new NotImplementedException();
+    Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
+        // Make play-turn network call
+        try {
+            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element boardElement = board.toXML(d);
+            Element handElement = d.createElement("set");
+            Element remainingTilesElement = d.createElement("n");
+
+            for (Tile tile : hand) handElement.appendChild(tile.toXML(d));
+            remainingTilesElement.appendChild(d.createTextNode(Integer.toString(remainingTiles)));
+
+            Element playTurnElement = d.createElement(NetworkMessage.PLAY_TURN.getTag());
+
+            playTurnElement.appendChild(boardElement);
+            playTurnElement.appendChild(handElement);
+            playTurnElement.appendChild(remainingTilesElement);
+
+            toClient.println(NetworkMessage.xmlElementToString(playTurnElement));
+
+            String response = fromClient.readLine();
+
+            Node responseNode = NetworkMessage.nodeFromString(response);
+
+            if (responseNode.getNodeName().equals(NetworkMessage.TILE.getTag())) {
+                Tile tile = new Tile();
+                tile.fromXML((Element) responseNode);
+                return tile;
+            }
+
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+        }
+        // TODO: make a random move or have null interpreted as illegal move and replaced with random.
+        return null;
     }
 
     @Override

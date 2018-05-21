@@ -15,7 +15,7 @@ public abstract class TileHeuristicPlayer extends APlayer {
         super(name, color);
     }
 
-    protected Tile chooseTile(Board board, int remainingTiles){
+    protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
         Set<Tile> legalMoves = getLegalMoves();
         Tile bestTile = null;
         int bestScore = Integer.MIN_VALUE;
