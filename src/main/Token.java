@@ -2,6 +2,7 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javafx.util.Pair;
 import main.Players.APlayer;
@@ -133,5 +134,46 @@ public class Token implements Parsable {
     @Override
     public void fromXML(Element xmlElement) {
         // TODO
+    }
+
+    /**
+     * Builds a location from the network definition of location
+     * @param board that the location will be on
+     * @param isHorizontal true if the token is on a horizontal space, false otherwise.
+     * @param coord1 row number if isHorizontal, col number otherwise
+     * @param coord2 col number if isHorizontal, row number otherwise
+     * @return the internal representation of the location on board.
+     */
+    public static Pair<BoardSpace, Integer> locationFromPawnLoc(Board board, boolean isHorizontal, int coord1, int coord2) {
+        int possibleRow1, possibleRow2, possibleCol1, possibleCol2, row, col, tick;
+
+        if (isHorizontal) {
+            possibleRow1 = coord1-1;
+            possibleRow2 = coord1;
+            col = coord2/2;
+            if (possibleRow1 < 0 || board.hasTile(possibleRow1, col)) {
+                row = possibleRow2; // Token is on the top of the square
+                tick = coord2 % 2;
+            } else {
+                row = possibleRow1; // Token is on the bottom of the square
+                tick = (coord2%2 == 1 ? 4 : 5);
+            }
+        } else {
+            possibleCol1 = coord1-1;
+            possibleCol2 = coord1;
+            row = coord2/2;
+            if (possibleCol1 < 0 || board.hasTile(row, possibleCol1)) {
+                col = possibleCol2; // Token is on the left of the square
+                tick = (coord2%2 == 1 ? 6 : 7);
+            }
+            else {
+                col = possibleCol1; // Token is on the right of the square
+                tick = (coord2%2 == 1 ? 3 : 2);
+            }
+        }
+        return new Pair<> (
+                board.getBoardSpace(row, col),
+                tick
+        );
     }
 }

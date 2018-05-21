@@ -34,6 +34,7 @@ import main.Players.RandomPlayer;
 import main.Tile;
 import main.Token;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -177,6 +178,7 @@ public class ParsableTests {
                 true
         ));
     }
+
     @Test
     public void compareXmlChildrenDifferentOrder() throws IOException, SAXException, ParserConfigurationException {
         Assert.assertTrue(nodesAreEquivalent(
@@ -185,6 +187,7 @@ public class ParsableTests {
                 true
         ));
     }
+
     @Test
     public void compareXmlChildMissing() throws IOException, SAXException, ParserConfigurationException {
         Assert.assertFalse(nodesAreEquivalent(
@@ -198,6 +201,7 @@ public class ParsableTests {
                 false
         ));
     }
+
     @Test
     public void compareXmlChildText() throws IOException, SAXException, ParserConfigurationException {
         Assert.assertFalse(nodesAreEquivalent(
@@ -325,7 +329,7 @@ public class ParsableTests {
     public void testPawnLocations() {
         Document doc = setUpDocument();
         RandomPlayer bluePlayer = new RandomPlayer("", Color.BLUE);
-        BoardSpace space = new BoardSpace(2,2);
+        BoardSpace space = new BoardSpace(2, 2);
         boolean debug = false;
         // Top
         Token topToken = new Token(space, 0, bluePlayer);
@@ -357,6 +361,49 @@ public class ParsableTests {
         );
     }
 
+    private static void assertLocationSame(Pair<BoardSpace, Integer> location, int row, int col, int tick) {
+        assertEquals(location.getKey().getRow(), row);
+        assertEquals(location.getKey().getCol(), col);
+        assertEquals(location.getValue().intValue(), tick);
+    }
+
+    @Test
+    public void testLocationToInternalRepresentation() {
+        Board board = new Board();
+        Pair<BoardSpace, Integer> result;
+
+        // Top edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 0, 0),
+                0, 0, 0
+        );
+
+        // Right edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 6, 0),
+                0, 5, 2
+        );
+
+        // Bottom edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 6, 0),
+                5,0,5
+        );
+
+        // Left edge,
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 0, 0),
+                0,0,7
+        );
+
+        // TODO: internal tests
+        // Internal with tile above
+        // Internal with tile to the right
+        // Internal with tile below
+        // Internal with tile to the left
+
+    }
+
     /* ****************************** TESTING BOARD **************************************** */
     private final String testBoardXml =
             "<board>" +
@@ -373,12 +420,13 @@ public class ParsableTests {
                     "</map>" +
                     "</board>";
     private Board testBoard;
+
     private void setUpTestBoard() {
         testBoard = new Board();
         APlayer playerTop = new MockPlayer("", Color.BLUE) {
             @Override
             public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
-                return new Pair<>(testBoard.getBoardSpace(1,2), 4);
+                return new Pair<>(testBoard.getBoardSpace(1, 2), 4);
             }
 
             @Override
@@ -393,7 +441,7 @@ public class ParsableTests {
         APlayer playerLeft = new MockPlayer("", Color.BLUE) {
             @Override
             public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
-                return new Pair<>(testBoard.getBoardSpace(2,2), 6);
+                return new Pair<>(testBoard.getBoardSpace(2, 2), 6);
             }
 
             @Override
@@ -414,7 +462,6 @@ public class ParsableTests {
                 false
         );
     }
-
 
 
 }
