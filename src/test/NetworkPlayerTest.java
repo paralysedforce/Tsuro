@@ -55,7 +55,7 @@ public class NetworkPlayerTest {
                         "<color>" + Color.BLUE.str() + "</color>" +
                         "<color>" + Color.DARKGREEN.str() + "</color>" +
                         "</list>" +
-                        "</" + NetworkMessage.INITIALIZE.getTag() + ">"
+                        "</" + NetworkMessage.INITIALIZE.getTag() + ">\r\n"
                 );
     }
 }
