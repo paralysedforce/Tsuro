@@ -27,7 +27,6 @@ import main.Color;
 import main.NetworkMessage;
 import main.Tile;
 import main.Token;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by William on 5/20/2018.
@@ -196,6 +195,27 @@ public class NetworkPlayer extends APlayer {
 
     @Override
     void endGame(Board board, Set<Color> winners) {
-        throw new NotImplementedException();
+        try {
+            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element boardElement = board.toXML(d);
+            Element winnersSet = d.createElement("set");
+
+            for (Color color : winners) {
+                winnersSet.appendChild(color.toXml(d));
+            }
+
+            Element endGameElement = d.createElement(NetworkMessage.END_GAME.getTag());
+            endGameElement.appendChild(boardElement);
+            endGameElement.appendChild(winnersSet);
+
+            toClient.println(NetworkMessage.xmlElementToString(endGameElement));
+
+            String response = fromClient.readLine();
+            // TODO: Maybe do something if the response is not <void></void>
+
+        } catch (ParserConfigurationException | IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
