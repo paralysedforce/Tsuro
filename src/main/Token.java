@@ -2,11 +2,9 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javafx.util.Pair;
 import main.Players.APlayer;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -22,7 +20,7 @@ public class Token implements Parsable {
     //================================================================================
     // Constructor
     //================================================================================
-    public Token(BoardSpace startingLocation, int startingTokenSpace, APlayer player){
+    public Token(BoardSpace startingLocation, int startingTokenSpace, APlayer player) {
         space = startingLocation;
         this.player = player;
         space.addToken(this, startingTokenSpace);
@@ -32,18 +30,17 @@ public class Token implements Parsable {
     // Getters
     //================================================================================
 
-    public BoardSpace getBoardSpace(){
+    public BoardSpace getBoardSpace() {
         return space;
     }
 
-    public int getTokenSpace(){
+    public int getTokenSpace() {
         return space.findToken(this);
     }
 
-    public APlayer getPlayer(){
+    public APlayer getPlayer() {
         return player;
     }
-
 
 
     //================================================================================
@@ -52,34 +49,42 @@ public class Token implements Parsable {
 
     // Removes the token from the board altogether
     //   Should only be called when a player loses
-    public void removeFromBoard(){
+    public void removeFromBoard() {
         space.removeToken(this);
         space = null;
     }
 
     // Places the token at the given location
-    public void moveToken(BoardSpace boardSpace, int tokenSpace){
+    public void moveToken(BoardSpace boardSpace, int tokenSpace) {
         space.removeToken(this);
         boardSpace.addToken(this, tokenSpace);
         space = boardSpace;
     }
 
     // Gets the tokenSpace on the adjacent tile bordering
-    public int findNextTokenSpace(){
+    public int findNextTokenSpace() {
         int tokenSpace = getTokenSpace();
         return getMirroredTokenSpace(tokenSpace);
     }
 
-    public static int getMirroredTokenSpace(int tokenSpace){
-        switch (tokenSpace){
-            case 0: return 5;
-            case 1: return 4;
-            case 2: return 7;
-            case 3: return 6;
-            case 4: return 1;
-            case 5: return 0;
-            case 6: return 3;
-            case 7: return 2;
+    public static int getMirroredTokenSpace(int tokenSpace) {
+        switch (tokenSpace) {
+            case 0:
+                return 5;
+            case 1:
+                return 4;
+            case 2:
+                return 7;
+            case 3:
+                return 6;
+            case 4:
+                return 1;
+            case 5:
+                return 0;
+            case 6:
+                return 3;
+            case 7:
+                return 2;
         }
         throw new IllegalArgumentException("Invalid tokenSpace");
     }
@@ -101,7 +106,7 @@ public class Token implements Parsable {
             boolean isLeft = tick > 5;
             if (!isLeft) coord1 += 1;
 
-            coord2 = 2*row;
+            coord2 = 2 * row;
             if (tick == 3 || tick == 6) coord2 += 1;
         } else {
             hvElement = document.createElement("h");
@@ -110,7 +115,7 @@ public class Token implements Parsable {
             boolean isTop = tick < 2;
             if (!isTop) coord1 += 1;
 
-            coord2 = 2*col;
+            coord2 = 2 * col;
             if (tick == 1 || tick == 4) coord2 += 1;
         }
 
@@ -139,46 +144,77 @@ public class Token implements Parsable {
 
     /**
      * Builds a location from the network definition of location
-     * @param board that the location will be on
+     *
+     * @param board        that the location will be on
      * @param isHorizontal true if the token is on a horizontal space, false otherwise.
-     * @param coord1 row number if isHorizontal, col number otherwise
-     * @param coord2 col number if isHorizontal, row number otherwise
+     * @param coord1       row number if isHorizontal, col number otherwise
+     * @param coord2       col number if isHorizontal, row number otherwise
      * @return the internal representation of the location on board.
      */
     public static Pair<BoardSpace, Integer> locationFromPawnLoc(Board board, boolean isHorizontal, int coord1, int coord2) {
         int possibleRow1, possibleRow2, possibleCol1, possibleCol2, row, col, tick;
 
         if (isHorizontal) {
-            possibleRow1 = coord1-1;
+            possibleRow1 = coord1 - 1;
             possibleRow2 = coord1;
-            col = coord2/2;
+            col = coord2 / 2;
             if (possibleRow1 < 0 || board.hasTile(possibleRow1, col)) {
                 row = possibleRow2; // Token is on the top of the square
                 tick = coord2 % 2;
             } else {
                 row = possibleRow1; // Token is on the bottom of the square
-                tick = (coord2%2 == 1 ? 4 : 5);
+                tick = (coord2 % 2 == 1 ? 4 : 5);
             }
         } else {
-            possibleCol1 = coord1-1;
+            possibleCol1 = coord1 - 1;
             possibleCol2 = coord1;
-            row = coord2/2;
+            row = coord2 / 2;
             if (possibleCol1 < 0 || board.hasTile(row, possibleCol1)) {
                 col = possibleCol2; // Token is on the left of the square
-                tick = (coord2%2 == 1 ? 6 : 7);
-            }
-            else {
+                tick = (coord2 % 2 == 1 ? 6 : 7);
+            } else {
                 col = possibleCol1; // Token is on the right of the square
-                tick = (coord2%2 == 1 ? 3 : 2);
+                tick = (coord2 % 2 == 1 ? 3 : 2);
             }
         }
-        return new Pair<> (
+        return new Pair<>(
                 board.getBoardSpace(row, col),
                 tick
         );
     }
 
     public static String pawnLocFromLocation(Pair<BoardSpace, Integer> playerLocation) {
-        throw new NotImplementedException();
+        int row = playerLocation.getKey().getRow();
+        int col = playerLocation.getKey().getCol();
+        int tick = playerLocation.getValue();
+
+        int direction = tick / 2;
+        boolean isHorizontal = direction % 2 == 0;
+
+        int coord1, coord2;
+        if (isHorizontal) {
+            coord1 = row;
+            if (direction == 2) coord1 += 1;
+
+            coord2 = col * 2;
+            if (tick == 1 || tick == 4) coord2 += 1;
+
+        } else {
+            coord1 = col;
+            if (direction == 1) coord1 += 1;
+
+            coord2 = row * 2;
+            if (tick == 3 || tick == 6) coord2 += 1;
+        }
+
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("<pawn-loc>")
+                .append(isHorizontal ? "<h></h>" : "<v></v>")
+                .append("<n>")
+                .append(coord1)
+                .append("</n><n>")
+                .append(coord2)
+                .append("</n></pawn-loc>");
+        return resultBuilder.toString();
     }
 }
