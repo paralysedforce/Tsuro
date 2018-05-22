@@ -1,5 +1,7 @@
 package test;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,6 +12,7 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +24,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import javafx.util.Pair;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Players.APlayer;
+import main.Players.MockPlayer;
+import main.Players.RandomPlayer;
 import main.Tile;
+import main.Token;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +44,14 @@ import static org.junit.Assert.assertTrue;
  */
 
 public class ParsableTests {
+
+    @Before
+    public void setUp() throws Exception {
+
+        this.setupTestSpace();
+
+        this.setUpTestBoard();
+    }
 
     /**
      * Transforms a dom element to string for printing, comparison, or sending over the wire.\
@@ -49,6 +68,7 @@ public class ParsableTests {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "html"); // This prevents collapsing empty tags
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
@@ -76,7 +96,7 @@ public class ParsableTests {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-            assertTrue(false); // When in doubt, fail the enclosing test.
+            Assert.assertTrue(false); // When in doubt, fail the enclosing test.
             return null; // To make compiler happy.
         }
     }
@@ -93,8 +113,9 @@ public class ParsableTests {
     private boolean nodesAreEquivalent(Node node1, Node node2, boolean debug) {
         // Tag equivalence
         if (!Objects.equals(node1.getNodeName(), node2.getNodeName())) {
-            System.err.println("Node names are not equivalent: " +
-                    node1.getNodeName() + " differs from " + node2.getNodeName());
+            if (debug)
+                System.err.println("\nNode names are not equivalent: " +
+                        node1.getNodeName() + " differs from " + node2.getNodeName());
             return false;
         }
 
@@ -113,14 +134,19 @@ public class ParsableTests {
         // Internal node, compare children
         // Create arraylists out of the nodelists
         NodeList children1 = node1.getChildNodes();
-        NodeList children2 = node1.getChildNodes();
-        if (children1.getLength() != children2.getLength()) return false;
+        NodeList children2 = node2.getChildNodes();
+        if (children1.getLength() != children2.getLength()) {
+            if (debug)
+                System.err.println("Children lengths are not equivalent for " + node1.getNodeName() +
+                        ": " + Integer.toString(children1.getLength()) + " vs " + Integer.toString(children2.getLength()));
+            return false;
+        }
         for (int i = 0; i < children1.getLength(); i++) {
             Node child = children1.item(i);
             boolean childWasFound = false;
             for (int j = 0; j < children2.getLength(); j++) {
                 // Look for child in children2
-                if (nodesAreEquivalent(child, children2.item(j), debug)) {
+                if (nodesAreEquivalent(child, children2.item(j), false)) {
                     // Found child in children2
                     childWasFound = true;
                     break;
@@ -134,7 +160,6 @@ public class ParsableTests {
         }
         // Length the same and all children in list 1 found in list 2
         return true;
-
     }
 
     private Node nodeFromString(String xml) throws ParserConfigurationException, IOException, SAXException {
@@ -142,6 +167,53 @@ public class ParsableTests {
                 new ByteArrayInputStream(xml.getBytes("UTF-8"))
         );
         return doc.getFirstChild();
+    }
+
+    // A couple of quick tests to show that the above testing code works
+    @Test
+    public void compareXmlSame() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                true
+        ));
+    }
+
+    @Test
+    public void compareXmlChildrenDifferentOrder() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span2></span2><span1></span1></div>").getParentNode(),
+                true
+        ));
+    }
+
+    @Test
+    public void compareXmlChildMissing() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1></div>").getParentNode(),
+                false
+        ));
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1></span1></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                false
+        ));
+    }
+
+    @Test
+    public void compareXmlChildText() throws IOException, SAXException, ParserConfigurationException {
+        Assert.assertFalse(nodesAreEquivalent(
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1></span1><span2></span2></div>").getParentNode(),
+                false
+        ));
+        Assert.assertTrue(nodesAreEquivalent(
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                nodeFromString("<div><span1>text</span1><span2></span2></div>").getParentNode(),
+                true
+        ));
     }
 
     /**
@@ -160,12 +232,12 @@ public class ParsableTests {
                 System.out.println(xmlElementToString(element));
                 System.out.println(xmlElementToString((Element) expectedNode));
             }
-            assertTrue(nodesAreEquivalent(element, expectedNode, debug)); // Provides useful debugging info.
+            Assert.assertTrue(nodesAreEquivalent(expectedNode, element, debug)); // Provides useful debugging info.
             //Note: The line below was commented out because it takes order of children into account.
 //            assertTrue(element.isEqualNode(expectedNode)); // Should also be true, but doesn't rely on untested code.
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            assertTrue(false); // When in doubt, fail the enclosing test.
+            Assert.assertTrue(false); // When in doubt, fail the enclosing test.
         }
     }
 
@@ -197,20 +269,199 @@ public class ParsableTests {
     public void testTileToXml() {
         Document doc = setUpDocument();
         Element element = testTile.toXML(doc);
-        assertElementIsExpected(element, testTileXml, true);
+        assertElementIsExpected(element, testTileXml, false);
     }
 
     @Test
-    public void testTileFromXml() {
-        try {
-            Node node = nodeFromString(testTileXml);
-            Tile actual = new Tile((Element) node);
-            assertEquals(testTile, actual);
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-            //noinspection ConstantConditions
-            assertTrue(false);
-        }
+    public void testTileFromXml() throws IOException, SAXException, ParserConfigurationException {
+        Node node = nodeFromString(testTileXml);
+        Tile actual = new Tile();
+        actual.fromXML((Element) node);
+        Assert.assertEquals(testTile, actual);
     }
+
+    /* ****************************** TESTING TILES ON BOARD ********************************** */
+    private BoardSpace testSpace = new BoardSpace(1, 2);
+    private final String testSpaceXml =
+            "<ent>" +
+                    "<xy>" +
+                    "<x>" +
+                    "<n>2</n>" +
+                    "</x>" +
+                    "<y>" +
+                    "<n>1</n>" +
+                    "</y>" +
+                    "</xy>" +
+                    testTileXml +
+                    "</ent>";
+
+    public void setupTestSpace() {
+        testSpace.setTile(testTile);
+    }
+
+    @Test
+    public void testBoardSpaceToXml() {
+        Document doc = setUpDocument();
+        Element element = testSpace.toXML(doc);
+        assertElementIsExpected(element, testSpaceXml, false);
+    }
+
+    @Test
+    public void testSpaceFromXml() throws IOException, SAXException, ParserConfigurationException {
+        BoardSpace actual = new BoardSpace(1, 2);
+        actual.setTile(testTile);
+        Node node = nodeFromString(testSpaceXml);
+        actual.fromXML((Element) node);
+        assertTrue(actual.equals(testSpace));
+    }
+
+    /* ****************************** TESTING PAWNS **************************************** */
+    private final String pawnLocTop = "<pawn-loc><h></h><n>2</n><n>4</n></pawn-loc>";   // Corresponds to (2,2,0)
+    private final String pawnLocRight = "<pawn-loc><v></v><n>3</n><n>4</n></pawn-loc>"; // Corresponds to (2,2,2)
+    private final String pawnLocBottom = "<pawn-loc><h></h><n>3</n><n>4</n></pawn-loc>";// Corresponds to (2,2,5)
+    private final String pawnLocLeft = "<pawn-loc><v></v><n>2</n><n>5</n></pawn-loc>";  // Corresponds to (2,2,6)
+    private final String testPawnStart =
+            "<ent>" +
+                    "<color>blue</color>";
+    private final String testPawnEnd = "</ent>";
+
+    @Test
+    public void testPawnLocations() {
+        Document doc = setUpDocument();
+        RandomPlayer bluePlayer = new RandomPlayer("", Color.BLUE);
+        BoardSpace space = new BoardSpace(2, 2);
+        boolean debug = false;
+        // Top
+        Token topToken = new Token(space, 0, bluePlayer);
+        assertElementIsExpected(
+                topToken.toXML(doc),
+                testPawnStart + pawnLocTop + testPawnEnd,
+                debug
+        );
+        // Right
+        Token rightToken = new Token(space, 2, bluePlayer);
+        assertElementIsExpected(
+                rightToken.toXML(doc),
+                testPawnStart + pawnLocRight + testPawnEnd,
+                debug
+        );
+        // Bottom
+        Token bottomToken = new Token(space, 5, bluePlayer);
+        assertElementIsExpected(
+                bottomToken.toXML(doc),
+                testPawnStart + pawnLocBottom + testPawnEnd,
+                debug
+        );
+        // Left
+        Token leftToken = new Token(space, 6, bluePlayer);
+        assertElementIsExpected(
+                leftToken.toXML(doc),
+                testPawnStart + pawnLocLeft + testPawnEnd,
+                debug
+        );
+    }
+
+    private static void assertLocationSame(Pair<BoardSpace, Integer> location, int row, int col, int tick) {
+        assertEquals(location.getKey().getRow(), row);
+        assertEquals(location.getKey().getCol(), col);
+        assertEquals(location.getValue().intValue(), tick);
+    }
+
+    @Test
+    public void testLocationToInternalRepresentation() {
+        Board board = new Board();
+        Pair<BoardSpace, Integer> result;
+
+        // Top edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 0, 0),
+                0, 0, 0
+        );
+
+        // Right edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 6, 0),
+                0, 5, 2
+        );
+
+        // Bottom edge
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 6, 0),
+                5,0,5
+        );
+
+        // Left edge,
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 0, 0),
+                0,0,7
+        );
+
+        // TODO: internal tests
+        // Internal with tile above
+        // Internal with tile to the right
+        // Internal with tile below
+        // Internal with tile to the left
+
+    }
+
+    /* ****************************** TESTING BOARD **************************************** */
+    private final String testBoardXml =
+            "<board>" +
+                    "<map>" +
+                    testSpaceXml +
+                    "</map>" +
+                    "<map>" +
+                    testPawnStart +
+                    pawnLocTop +
+                    testPawnEnd +
+                    testPawnStart +
+                    pawnLocLeft +
+                    testPawnEnd +
+                    "</map>" +
+                    "</board>";
+    private Board testBoard;
+
+    private void setUpTestBoard() {
+        testBoard = new Board();
+        APlayer playerTop = new MockPlayer("", Color.BLUE) {
+            @Override
+            public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
+                return new Pair<>(testBoard.getBoardSpace(1, 2), 4);
+            }
+
+            @Override
+            public Tile mockChooseTile(Board board, int remainingTiles) {
+                return null;
+            }
+        };
+        playerTop.initialize(new ArrayList<>());
+        playerTop.placeToken();
+        testBoard.placeTile(testTile, playerTop); // Moves playerTop to (2,2,0)
+
+        APlayer playerLeft = new MockPlayer("", Color.BLUE) {
+            @Override
+            public Pair<BoardSpace, Integer> mockStartingLocation(Board board) {
+                return new Pair<>(testBoard.getBoardSpace(2, 2), 6);
+            }
+
+            @Override
+            public Tile mockChooseTile(Board board, int remainingTiles) {
+                return null;
+            }
+        };
+        playerLeft.initialize(new ArrayList<>());
+        playerLeft.placeToken();
+    }
+
+    @Test
+    public void testBoardToXml() {
+        Document doc = setUpDocument();
+        assertElementIsExpected(
+                testBoard.toXML(doc),
+                testBoardXml,
+                false
+        );
+    }
+
 
 }

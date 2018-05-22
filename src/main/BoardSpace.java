@@ -8,10 +8,9 @@ import org.w3c.dom.Element;
 import java.util.*;
 
 /**
- *
  * Created by vyasalwar on 4/16/18.
  */
-public class BoardSpace implements Parsable{
+public class BoardSpace implements Parsable {
 
     private final int NUM_SPACES = 8;
 
@@ -26,13 +25,13 @@ public class BoardSpace implements Parsable{
     //================================================================================
     // Constructors
     //================================================================================
-    public BoardSpace(int row, int col){
+    public BoardSpace(int row, int col) {
         tile = null;
         tokenSpaces = new HashMap<>();
         this.row = row;
         this.col = col;
 
-        if (!Board.isValidCoordinate(row, col)){
+        if (!Board.isValidCoordinate(row, col)) {
             throw new IllegalArgumentException("Invalid Tile Access");
         }
     }
@@ -42,19 +41,19 @@ public class BoardSpace implements Parsable{
     // Getters
     //================================================================================
 
-    public Tile getTile(){
+    public Tile getTile() {
         return tile;
     }
 
-    public int getRow(){
+    public int getRow() {
         return row;
     }
 
-    public int getCol(){
+    public int getCol() {
         return col;
     }
 
-    public Set<Token> getTokensOnSpace(){
+    public Set<Token> getTokensOnSpace() {
         return new HashSet<>(tokenSpaces.keySet());
     }
 
@@ -62,7 +61,7 @@ public class BoardSpace implements Parsable{
     // Setters
     //================================================================================
 
-    public void setTile(Tile tile){
+    public void setTile(Tile tile) {
         if (!hasTile())
             this.tile = tile;
         else
@@ -73,20 +72,20 @@ public class BoardSpace implements Parsable{
     // Public Methods
     //================================================================================
 
-    public boolean hasTile(){
+    public boolean hasTile() {
         return tile != null;
     }
 
     // Move all tokens on the tile to their opposite endpoints
-    public void advanceTokens(){
+    public void advanceTokens() {
         Set<Token> tokensOnSpace = getTokensOnSpace();
-        for (Token token: tokensOnSpace){
+        for (Token token : tokensOnSpace) {
             advanceToken(token);
         }
     }
 
     // Move
-    public void advanceToken(Token token){
+    public void advanceToken(Token token) {
         if (hasTile()) {
             int endpoint = findToken(token);
             tokenSpaces.replace(token, tile.findMatch(endpoint));
@@ -95,20 +94,32 @@ public class BoardSpace implements Parsable{
 
     // Returns the token space the the token is on.
     //   If the token is not on the space, return -1
-    public int findToken(Token token){
+    public int findToken(Token token) {
         return tokenSpaces.getOrDefault(token, -1);
     }
 
-    public int removeToken(Token token){
+    public int removeToken(Token token) {
         return tokenSpaces.remove(token);
     }
 
-    public void addToken(Token token, int tokenSpace){
+    public void addToken(Token token, int tokenSpace) {
         if (0 <= tokenSpace && tokenSpace < 8)
             tokenSpaces.put(token, tokenSpace);
 
         else
             throw new IllegalArgumentException("Invalid token space");
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return
+                object instanceof BoardSpace
+                        && this.row == ((BoardSpace) object).row
+                        && this.col == ((BoardSpace) object).col
+                        && this.tokenSpaces.equals(((BoardSpace) object).tokenSpaces)
+                        && (this.tile == null && ((BoardSpace) object).tile == null
+                            || this.tile.equals(((BoardSpace) object).tile));
+
     }
 
 
@@ -124,8 +135,14 @@ public class BoardSpace implements Parsable{
         Element xElement = document.createElement("x");
         Element yElement = document.createElement("y");
 
-        xElement.appendChild(document.createTextNode(Integer.toString(row)));
-        yElement.appendChild(document.createTextNode(Integer.toString(col)));
+        Element nRowElement = document.createElement("n");
+        nRowElement.appendChild(document.createTextNode(Integer.toString(row)));
+        Element nColElement = document.createElement("n");
+        nColElement.appendChild(document.createTextNode(Integer.toString(col)));
+
+        xElement.appendChild(nColElement);
+        yElement.appendChild(nRowElement);
+
         xyElement.appendChild(xElement);
         xyElement.appendChild(yElement);
 

@@ -1,14 +1,15 @@
 package main.Players;
 
 //import apple.laf.JRSUIConstants;
-import javafx.util.Pair;
-import main.*;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import javafx.util.Pair;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Game;
+import main.Tile;
 
 public class RandomPlayer extends APlayer {
 
@@ -41,11 +42,11 @@ public class RandomPlayer extends APlayer {
     //================================================================================
     // Override methods
     //================================================================================
-    public Pair<BoardSpace, Integer> getStartingLocation(){
+    public Pair<BoardSpace, Integer> getStartingLocation(Board board){
         return getRandomStartingLocation(random);
     }
 
-    protected Tile chooseTileHelper() {
+    protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
         Set<Tile> legalMoves =  getLegalMoves();
         Tile[] legalMovesArr = legalMoves.toArray(new Tile[legalMoves.size()]);
         int randomIndex = random.nextInt(legalMovesArr.length);

@@ -1,13 +1,14 @@
 package main.Players;
 
+import java.util.Scanner;
+import java.util.Set;
+
 import javafx.util.Pair;
+import main.Board;
 import main.BoardSpace;
 import main.Color;
 import main.Game;
 import main.Tile;
-
-import java.lang.reflect.Array;
-import java.util.Scanner;
 
 /**
  * Created by vyasalwar on 5/3/18.
@@ -19,8 +20,7 @@ public class UserPlayer extends APlayer{
         playerType = PlayerType.HUMAN;
     }
 
-    @Override
-    public Pair<BoardSpace, Integer> getStartingLocation() {
+    public Pair<BoardSpace, Integer> getStartingLocation(Board board) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("It is " + getName() + "'s turn.");
@@ -45,7 +45,7 @@ public class UserPlayer extends APlayer{
         }
     }
 
-    protected Tile chooseTileHelper(){
+    protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
         System.out.println("It is " + getName() + "'s turn.");
         System.out.println("Type help to see commands");
         /* For input */
@@ -62,9 +62,9 @@ public class UserPlayer extends APlayer{
 
             else if (command.startsWith("choose")){
                 Tile tile = null;
-                if      (command.endsWith("1")) tile = hand.getTile(0);
-                else if (command.endsWith("2")) tile = hand.getTile(1);
-                else if (command.endsWith("3")) tile = hand.getTile(2);
+                if (command.endsWith("1")) tile = this.hand.getTile(0);
+                else if (command.endsWith("2")) tile = this.hand.getTile(1);
+                else if (command.endsWith("3")) tile = this.hand.getTile(2);
 
                 if (tile == null || !Game.getGame().isLegalMove(tile, this))
                     System.err.println("Error: choose a valid tile");
@@ -75,9 +75,9 @@ public class UserPlayer extends APlayer{
             else if (command.startsWith("rotate")){
                 try {
                     Tile toRotate = null;
-                    if      (command.endsWith("1")) toRotate = hand.getTile(0);
-                    else if (command.endsWith("2")) toRotate = hand.getTile(1);
-                    else if (command.endsWith("3")) toRotate = hand.getTile(2);
+                    if (command.endsWith("1")) toRotate = this.hand.getTile(0);
+                    else if (command.endsWith("2")) toRotate = this.hand.getTile(1);
+                    else if (command.endsWith("3")) toRotate = this.hand.getTile(2);
                     else                         throw new NullPointerException();
 
                     toRotate.rotateClockwise();
@@ -93,8 +93,8 @@ public class UserPlayer extends APlayer{
                 System.out.println("Displaying tiles in hand...");
                 for (int i = 0; i < 3; i++){
                     String line = "\t" + (i+1) + ": ";
-                    if (hand.getTile(i) != null)
-                        line += hand.getTile(i).toString();
+                    if (this.hand.getTile(i) != null)
+                        line += this.hand.getTile(i).toString();
                     else
                         line += "No tile present";
 

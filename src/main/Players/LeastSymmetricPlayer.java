@@ -1,9 +1,12 @@
 package main.Players;
 
-import javafx.util.Pair;
-import main.*;
-
 import java.util.Random;
+
+import javafx.util.Pair;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Tile;
 
 
 /**
@@ -16,8 +19,7 @@ public class LeastSymmetricPlayer extends TileHeuristicPlayer {
         playerType = PlayerType.LEASTSYMMETRIC;
     }
 
-    @Override
-    public Pair<BoardSpace, Integer> getStartingLocation(){
+    public Pair<BoardSpace, Integer> getStartingLocation(Board board){
         return RandomPlayer.getRandomStartingLocation(new Random());
     }
 
