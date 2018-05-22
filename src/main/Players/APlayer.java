@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.util.Pair;
-import main.Board;
-import main.BoardSpace;
-import main.Color;
-import main.ContractException;
-import main.Game;
-import main.Tile;
-import main.Token;
+import main.*;
 
 public abstract class APlayer extends IPlayer {
 
@@ -29,6 +23,7 @@ public abstract class APlayer extends IPlayer {
 
     protected PlayerType playerType;
     protected PlayerHand hand;
+    protected Board board;
 
     //================================================================================
     // Constructor
@@ -39,6 +34,7 @@ public abstract class APlayer extends IPlayer {
         curState = State.UNINITIALIZED;
         token = null;
         hand = new PlayerHand();
+        board = Game.getGame().getBoard();
     }
 
     public APlayer(APlayer other){
@@ -63,26 +59,38 @@ public abstract class APlayer extends IPlayer {
 
     public PlayerHand getHand(){return hand;}
 
+    //================================================================================
+    // Setters
+    //================================================================================
+
+    public void setColor(Color color) {this.color = color;}
+
+    public void setBoard(Board board) {this.board = board; }
+
 
     //================================================================================
     // Public methods
     //================================================================================
-    public void placeToken() {
+    public Pair<BoardSpace, Integer> placeToken() {
         if (curState != State.INITIALIZED)
             throw new ContractException();
 
-        Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation(Game.getGame().getBoard());
+        Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation(board);
         token = new Token(startingTokenLocation.getKey(), startingTokenLocation.getValue(), this);
         curState = State.TURNPLAYABLE;
+
+        return startingTokenLocation;
     }
 
     //Same as placeToken but with a provided location for testing
-    public void placeToken(BoardSpace startingLocation, int startingTokenSpace){
+    public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
         if (curState != State.INITIALIZED)
             throw new ContractException();
 
         token = new Token(startingLocation, startingTokenSpace, this);
         curState = State.TURNPLAYABLE;
+
+        return new Pair<>(startingLocation, startingTokenSpace);
     }
 
     public final void initialize(List<Color> otherPlayers){
@@ -101,13 +109,13 @@ public abstract class APlayer extends IPlayer {
             throw new ContractException();
 
         // Do something if subclass deems appropriate
-        this.endGame(Game.getGame().getBoard(), colors);
+        this.endGame(board, colors);
 
         curState = State.GAMEENDED;
     }
 
     // Enforces Sequential contract but delegates picking the tile to chooseTileHelper
-    public Tile chooseTile(){
+    public Tile chooseTile(int numTilesLeft){
         if (curState != State.TURNPLAYABLE || !hand.isValid())
             throw new ContractException();
 
@@ -115,7 +123,7 @@ public abstract class APlayer extends IPlayer {
         for (Tile aTile : this.hand) {
             hand.add(aTile);
         }
-        return this.chooseTile(Game.getGame().getBoard(), hand, Game.getGame().getTilePile().getCount());
+        return this.chooseTile(board, hand, numTilesLeft);
     }
 
 
@@ -128,7 +136,7 @@ public abstract class APlayer extends IPlayer {
     }
 
     public boolean isSafeMove(Tile tile){
-        return !Game.getGame().getBoard().willKillPlayer(tile, this);
+        return !board.willKillPlayer(tile, this);
     }
 
     public boolean hasSafeMove(){
@@ -178,6 +186,10 @@ public abstract class APlayer extends IPlayer {
     void initialize(Color color, List<Color> colors) { }
 
     void endGame(Board board, Set<Color> colors) { }
+
+    public void setHand(PlayerHand hand) {
+        this.hand = hand;
+    }
 
 
     //================================================================================

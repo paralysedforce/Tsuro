@@ -1,8 +1,11 @@
 package main.Players;
 
 import main.Game;
+import main.Parsable;
 import main.Tile;
 import main.TilePile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +18,7 @@ import java.util.function.Consumer;
  *
  * Created by vyasalwar on 5/15/18.
  */
-public class PlayerHand implements Iterable<Tile>{
+public class PlayerHand implements Iterable<Tile>, Parsable{
 
     private final int MAX_TILES_IN_HAND = 3;
     private TilePile deck;
@@ -102,5 +105,15 @@ public class PlayerHand implements Iterable<Tile>{
     @Override
     public Iterator<Tile> iterator() {
         return hand.iterator();
+    }
+
+    @Override
+    public Element toXML(Document document) {
+        return null;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) throws IllegalArgumentException {
+
     }
 }

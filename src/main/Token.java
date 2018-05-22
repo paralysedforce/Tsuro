@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 
 import javafx.util.Pair;
 import main.Players.APlayer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by vyasalwar on 4/16/18.
@@ -175,5 +176,9 @@ public class Token implements Parsable {
                 board.getBoardSpace(row, col),
                 tick
         );
+    }
+
+    public static String pawnLocFromLocation(Pair<BoardSpace, Integer> playerLocation) {
+        throw new NotImplementedException();
     }
 }

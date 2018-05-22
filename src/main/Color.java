@@ -2,6 +2,7 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by vyasalwar on 4/27/18.
@@ -26,4 +27,8 @@ public enum Color {
         return tag;
     }
 
+
+    public static Color fromXml(Element colorNode) {
+        throw new NotImplementedException();
+    }
 }

@@ -54,7 +54,7 @@ public class LeastSymmetricPlayerTest {
         APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
-        Tile tile = leastSymmetricPlayer.chooseTile();
+        Tile tile = leastSymmetricPlayer.chooseTile(420);
         Assert.assertTrue(Game.getGame().getBoard().willKillPlayer(tile, leastSymmetricPlayer));
     }
 
@@ -86,7 +86,7 @@ public class LeastSymmetricPlayerTest {
         APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
-        Tile tile = leastSymmetricPlayer.chooseTile();
+        Tile tile = leastSymmetricPlayer.chooseTile(420420);
         Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, leastSymmetricPlayer));
         Assert.assertTrue(tile.equals(new Tile(0, 5, 1, 4, 2, 7, 3, 6)));
     }
@@ -122,7 +122,7 @@ public class LeastSymmetricPlayerTest {
         APlayer leastSymmetricPlayer = new LeastSymmetricPlayer("Vyas", Color.SIENNA);
         leastSymmetricPlayer.initialize(new ArrayList<>());
         leastSymmetricPlayer.placeToken();
-        Tile tile = leastSymmetricPlayer.chooseTile();
+        Tile tile = leastSymmetricPlayer.chooseTile(420);
         Assert.assertFalse(Game.getGame().getBoard().willKillPlayer(tile, leastSymmetricPlayer));
         Assert.assertTrue(tile.equals(new Tile(0, 4, 1, 2, 3, 5, 6, 7)));
         Assert.assertEquals(tile.calculateSymmetries(), 1);

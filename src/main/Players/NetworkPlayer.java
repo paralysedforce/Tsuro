@@ -1,5 +1,7 @@
 package main.Players;
 
+import main.Players.APlayer;
+import main.Players.RandomPlayer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -86,7 +88,8 @@ public class NetworkPlayer extends APlayer {
     }
 
     @Override
-    void initialize(Color color, List<Color> colors) {
+    public void initialize(Color color, List<Color> colors) {
+        super.initialize(color, colors);
         try {
             Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element initializeElement = NetworkMessage.INITIALIZE.getMessageRootElement(d);

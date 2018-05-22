@@ -117,14 +117,14 @@ public class APlayerTest {
     @Test(expected = ContractException.class)
     public void chooseTileBeforeInitFails() {
         APlayer player = new RandomPlayer("Keith", Color.SIENNA);
-        player.chooseTile();
+        player.chooseTile(420);
     }
 
     @Test(expected = ContractException.class)
-    public void chooseTileBeforePlaceTokenFails() {
+    public void chooseTileB420eforePlaceTokenFails() {
         APlayer player = new RandomPlayer("Keith", Color.SIENNA);
         player.initialize(new ArrayList<>());
-        player.chooseTile();
+        player.chooseTile(420);
     }
 
     @Test (expected = ContractException.class)
@@ -146,8 +146,8 @@ public class APlayerTest {
             APlayer player = new RandomPlayer("Keith", Color.SIENNA);
             player.initialize(new ArrayList<>());
             player.placeToken();
-            player.chooseTile();
-            player.chooseTile();
+            player.chooseTile(420);
+            player.chooseTile(420);
             player.endGame(new HashSet<>());
         }
         catch (ContractException e) {

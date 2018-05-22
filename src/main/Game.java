@@ -174,7 +174,7 @@ public class Game {
 //        int i = 0;
         while (true) {
             APlayer player = remainingPlayers.get(0);
-            Tile tile = player.chooseTile();
+            Tile tile = player.chooseTile(tilePile.getCount());
             try {
                 Set<APlayer> losingPlayers = playTurn(tile, player);
                 if(losingPlayers.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
