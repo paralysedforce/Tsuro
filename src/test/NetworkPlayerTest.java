@@ -40,7 +40,7 @@ public class NetworkPlayerTest {
         Assert.assertEquals(
                 w.toString(),
                 "<" + NetworkMessage.GET_NAME.getTag() + ">" +
-                        "</" + NetworkMessage.GET_NAME.getTag() + ">\r\n"
+                        "</" + NetworkMessage.GET_NAME.getTag() + ">\n"
         );
     }
 
@@ -69,7 +69,7 @@ public class NetworkPlayerTest {
                 "<color>" + Color.BLUE.str() + "</color>" +
                 "<color>" + Color.SIENNA.str() + "</color>" +
                 "</list>" +
-                "</" + NetworkMessage.INITIALIZE.getTag() + ">\r\n";
+                "</" + NetworkMessage.INITIALIZE.getTag() + ">\n";
     }
 
     private String getInitializationResponse() {
@@ -112,7 +112,7 @@ public class NetworkPlayerTest {
                 getInitializationRequest() +
                         "<" + NetworkMessage.PLACE_PAWN.getTag() + ">" +
                         expectedPlacementRequestBoard +
-                        "</" + NetworkMessage.PLACE_PAWN.getTag() + ">\r\n"
+                        "</" + NetworkMessage.PLACE_PAWN.getTag() + ">\n"
 
         );
     }
@@ -142,7 +142,7 @@ public class NetworkPlayerTest {
                     w.toString(),
                     "<" + NetworkMessage.END_GAME.getTag() + ">" +
                             expectedRequestBoard + expectedColors +
-                            "</" + NetworkMessage.END_GAME.getTag() + ">\r\n"
+                            "</" + NetworkMessage.END_GAME.getTag() + ">\n"
             );
 
         } catch (ContractException e) {
