@@ -1,25 +1,27 @@
 package main;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-import javafx.util.Pair;
-import main.Parser.ParserException;
-import main.Players.APlayer;
-import main.Players.PlayerHand;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import javafx.util.Pair;
+import main.Parser.ParserException;
+import main.Players.APlayer;
+import main.Players.PlayerHand;
 
 /**
  * The Player's representation of the Game Server
@@ -39,7 +41,7 @@ public class NetworkGame {
 
     private Socket socket;
     private BufferedReader reader;
-    private Writer writer;
+    private PrintWriter writer;
 
     //================================================================================
     // Constructors
@@ -92,7 +94,8 @@ public class NetworkGame {
     }
 
     private void sendResponseToServer(String response) throws IOException{
-        writer.write(response);
+        writer.println(response);
+        writer.flush();
     }
 
     private String forwardRequestToAPlayer(String request) throws IOException {
