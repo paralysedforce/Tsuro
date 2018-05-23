@@ -30,9 +30,9 @@ abstract class IPlayer {
 //    ;; colors, in the order that the game will be played.
     abstract void initialize(Color color, List<Color> colors);
 
-//            place-pawn     ;; board? -> pawn-loc?
+//    place-pawn     ;; board? -> pawn-loc?
 //    ;; Called at the first step in a game; indicates where
-//            ;; the player wishes to place their pawn. The pawn must
+//    ;; the player wishes to place their pawn. The pawn must
 //    ;; be placed along the edge in an unoccupied space.
     abstract Pair<BoardSpace, Integer> getStartingLocation(Board board);
 
