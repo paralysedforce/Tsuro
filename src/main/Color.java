@@ -2,7 +2,8 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import main.Parser.ParserException;
 
 /**
  * Created by vyasalwar on 4/27/18.
@@ -29,6 +30,25 @@ public enum Color {
 
 
     public static Color fromXml(Element colorNode) {
-        throw new NotImplementedException();
+        switch (colorNode.getTextContent()) {
+            case "green":
+                return GREEN;
+            case "red":
+                return RED;
+            case "orange":
+                return ORANGE;
+            case "blue":
+                return BLUE;
+            case "sienna":
+                return SIENNA;
+            case "hotpink":
+                return HOTPINK;
+            case "darkgreen":
+                return DARKGREEN;
+            case "purple":
+                return PURPLE;
+            default:
+                throw new ParserException("Unknown color in element: " + colorNode.getTextContent());
+        }
     }
 }
