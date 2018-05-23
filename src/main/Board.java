@@ -2,10 +2,13 @@ package main;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import javafx.util.Pair;
+import main.Parser.ParserException;
 import main.Players.APlayer;
 
 /**
@@ -226,6 +229,56 @@ public class Board implements Parsable{
 
     @Override
     public void fromXML(Element xmlElement) {
+        // Input checking
+        if (!xmlElement.getTagName().equals("board"))
+            throw new ParserException("Board.fromXml() called on non-board element: " + xmlElement.getTagName());
+
+        Node tilesElement = xmlElement.getFirstChild();
+        Node pawnsElement = tilesElement.getNextSibling();
+
+        // Update the tiles
+        for (Node tileEntElement = tilesElement.getFirstChild();
+                tileEntElement != null;
+                tileEntElement = tileEntElement.getNextSibling()) {
+            Node xyNode = tileEntElement.getFirstChild();
+            Node xNode = xyNode.getFirstChild();
+            Node yNode = xNode.getNextSibling();
+            int x = Integer.valueOf(xNode.getTextContent());
+            int y = Integer.valueOf(yNode.getTextContent());
+
+            Tile toPlace = new Tile();
+            toPlace.fromXML((Element) xyNode.getNextSibling());
+
+            this.getBoardSpace(y, x).setTile(toPlace);
+        }
+
+        // Update the pawns
+        for (Node pawnEntNode = pawnsElement.getFirstChild();
+                pawnEntNode != null;
+                pawnEntNode = pawnEntNode.getNextSibling()) {
+            Node colorNode = pawnEntNode.getFirstChild();
+            Node pawnLocNode = colorNode.getNextSibling();
+
+            Color color = Color.fromXml((Element) colorNode);
+
+            Node hvNode = pawnLocNode.getFirstChild();
+            boolean isHorizontal = hvNode.getNodeName().equals("h");
+
+            Node coord1Node = hvNode.getNextSibling();
+            Node coord2Node = coord1Node.getNextSibling();
+            int coord1 = Integer.valueOf(coord1Node.getTextContent());
+            int coord2 = Integer.valueOf(coord2Node.getTextContent());
+
+            Pair<BoardSpace, Integer> location =
+                    Token.locationFromPawnLoc(this, isHorizontal, coord1, coord2);
+
+            // Creates a token that places itself on the board
+            // TODO: When we refactor token and Aplayer, make player not null. (maybe a Color)
+            new Token(location.getKey(), location.getValue(), null);
+
+
+        }
+
 
     }
 }
