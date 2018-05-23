@@ -1,4 +1,4 @@
-package test;
+package test.PlayerTests;
 
 import org.junit.Assert;
 import org.junit.Before;

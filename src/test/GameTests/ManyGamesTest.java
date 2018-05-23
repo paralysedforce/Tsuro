@@ -1,4 +1,4 @@
-package test;
+package test.GameTests;
 
 import main.Color;
 import main.Game;
@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class IntegrationTest {
+public class ManyGamesTest {
 
     Game game;
 
@@ -31,7 +31,7 @@ public class IntegrationTest {
 
     @Test
     public void playManyGamesTest() {
-        for(int seed = 0; seed < 10000; seed++){
+        for(int seed = 0; seed < 50; seed++){
             try {
                 game.resetGame();
                 game = Game.getGame();

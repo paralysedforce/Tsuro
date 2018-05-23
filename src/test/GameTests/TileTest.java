@@ -1,4 +1,4 @@
-package test;
+package test.GameTests;
 
 import main.*;
 import org.junit.After;

@@ -1,4 +1,4 @@
-package test;
+package test.PlayerTests;
 
 import main.*;
 import main.Players.*;
