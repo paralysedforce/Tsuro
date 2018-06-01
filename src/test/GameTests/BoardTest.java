@@ -221,4 +221,21 @@ public class BoardTest {
         Assert.assertEquals(losers.size(), 1);
         Assert.assertTrue(losers.contains(vyas.getToken()));
     }
+
+    @Test
+    public void willKillPlayerReflexiveTest(){
+        Board board = new Board();
+        BoardSpace start = board.getBoardSpace(0, 0);
+        BoardSpace farawayTile = board.getBoardSpace(0, 1);
+        farawayTile.setTile(new Tile(0, 1, 2, 3, 4, 5, 6, 7));
+        APlayer vyas = new RandomPlayer("Vyas", Color.BLUE);
+        vyas.initialize(new ArrayList<>());
+        vyas.placeToken(start, 7);
+
+        Tile suicideTile = new Tile(0, 5, 1, 4, 2, 7, 3, 6);
+        Assert.assertTrue(board.willKillPlayer(suicideTile, vyas));
+
+        Set<Token> tokenSet = board.placeTile(suicideTile, vyas);
+        Assert.assertTrue(tokenSet.contains(vyas.getToken()));
+    }
 }

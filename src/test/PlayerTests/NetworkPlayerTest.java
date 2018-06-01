@@ -1,6 +1,7 @@
 package test.PlayerTests;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.w3c.dom.Document;
@@ -117,6 +118,7 @@ public class NetworkPlayerTest {
         );
     }
 
+    @Ignore
     @Test
     public void testPlayTurn() {
         throw new NotImplementedException();

@@ -43,6 +43,7 @@ public abstract class APlayer extends IPlayer {
         otherPlayers = new ArrayList<>(other.otherPlayers);
         curState = other.curState;
         token = other.token;
+        board = other.board;
         hand = new PlayerHand();
     }
 

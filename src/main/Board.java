@@ -63,23 +63,39 @@ public class Board implements Parsable{
     // Does not actually place the tile
     public boolean willKillPlayer(Tile tile, APlayer player) {
         Token token = player.getToken();
-        BoardSpace curSpace = token.getBoardSpace();
+        BoardSpace originalSpace = token.getBoardSpace();
+
+        BoardSpace curSpace = originalSpace;
         int curTokenSpace = token.getTokenSpace();
 
         try {
-            // Move to the space across the tile
-            curTokenSpace = tile.findMatch(curTokenSpace);
-            curSpace = getNextSpace(curSpace, curTokenSpace);
-            curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
 
-            // Trace out a path by moving across spaces with tiles on them
-            while (curSpace.hasTile()){
-                curTokenSpace = curSpace.getTile().findMatch(curTokenSpace);
-                curSpace = getNextSpace(curSpace, curTokenSpace);
-                curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
+            // Trace out a path on the board
+            while (true){
+
+                // Each time we cross the original space,
+                //  we need to use the information from the input tile
+                if (curSpace == originalSpace) {
+                    // Move to the space across the tile
+                    curTokenSpace = tile.findMatch(curTokenSpace);
+                    curSpace = getNextSpace(curSpace, curTokenSpace);
+                    curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
+                }
+
+                // If we pass a space with a tile on it
+                //   Use the information from that tile
+                else if (curSpace.hasTile()) {
+                    curTokenSpace = curSpace.getTile().findMatch(curTokenSpace);
+                    curSpace = getNextSpace(curSpace, curTokenSpace);
+                    curTokenSpace = Token.getMirroredTokenSpace(curTokenSpace);
+                }
+                else {
+                    // We're on a valid space on the board without a tile
+                    //   that we aren't trying to place a tile onto
+                    return false;
+                }
             }
-            // We've walked to a place on the board without a tile
-            return false;
+
         }
 
         catch (IllegalArgumentException e){

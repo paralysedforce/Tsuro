@@ -1,4 +1,4 @@
-package test;
+package test.ParserTests;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import main.Token;
  * Created by William on 5/22/2018.
  */
 
-public class TokenParsingTest {
+public class TokenNetworkingTest {
 
     @Test
     public void pawnLocFromLocationTest() {

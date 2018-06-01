@@ -1,4 +1,4 @@
-package test;
+package test.ParserTests;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import main.Token;
  * Created by William on 5/22/2018.
  */
 
-public class BoardParsingTest {
+public class BoardNetworkingTest {
 
     @Test
     public void testBoardFromXml() throws IOException, SAXException, ParserConfigurationException {
