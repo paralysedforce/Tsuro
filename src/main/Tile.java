@@ -4,7 +4,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,7 +25,7 @@ public class Tile implements Parsable {
     //================================================================================
 
     private final int ROTATIONS_PER_CYCLE = 4;
-    private Set<TileConnection> connections;
+    private LinkedHashSet<TileConnection> connections;
 
     //================================================================================
     // Constructors
@@ -29,7 +33,7 @@ public class Tile implements Parsable {
 
     public Tile() {
         // Default constructor. Should only be used prior to building from an XML object.
-        this.connections = new HashSet<>();
+        this.connections = new LinkedHashSet<>();
     }
 
     /**
@@ -37,7 +41,7 @@ public class Tile implements Parsable {
      * @param xmlElement Element with specs for this Tile.
      */
     public Tile(Element xmlElement) {
-        this.connections = new HashSet<>();
+        this.connections = new LinkedHashSet<>();
         this.fromXML(xmlElement);
     }
 
@@ -58,7 +62,7 @@ public class Tile implements Parsable {
                 int startC, int endC,
                 int startD, int endD){
 
-        connections = new HashSet<>();
+        connections = new LinkedHashSet<>();
         connections.add(new TileConnection(startA, endA));
         connections.add(new TileConnection(startB, endB));
         connections.add(new TileConnection(startC, endC));
@@ -71,7 +75,7 @@ public class Tile implements Parsable {
     // Constructor that reads from an input file.
     //   See TilePile.fillAllTiles to see usage
     public Tile(String fileLine){
-        connections = new HashSet<>();
+        connections = new LinkedHashSet<>();
 
         // endpoints are separated by single spaces when reading from file
         String[] endpoints = fileLine.split(" ");
@@ -90,7 +94,7 @@ public class Tile implements Parsable {
      * @param other Tile to clone.
      */
     public Tile(Tile other){
-        connections = new HashSet<>();
+        connections = new LinkedHashSet<>();
         for (TileConnection tileConnection : other.connections){
             connections.add(new TileConnection(tileConnection));
         }
@@ -106,7 +110,7 @@ public class Tile implements Parsable {
         /* Important: modifying the state of a Hash Table in a way that changes hashes will
             cause the hash table to be unusable! Reassign connections to a new HashSet instead.
          */
-        Set<TileConnection> newConnections = new HashSet<>();
+        LinkedHashSet<TileConnection> newConnections = new LinkedHashSet<>();
         for (TileConnection connection : connections){
             connection.rotateClockwise();
             newConnections.add(connection);
@@ -197,7 +201,9 @@ public class Tile implements Parsable {
     @Override
     public Element toXML(Document document) {
         Element tileElement = document.createElement("tile");
-        for (TileConnection tileConnection: connections){
+        List<TileConnection> sortedConnections =  new ArrayList<>(connections);
+        sortedConnections.sort(Comparator.comparingInt(o -> Math.min(o.endpointA, o.endpointB)));
+        for (TileConnection tileConnection: sortedConnections){
             tileElement.appendChild(tileConnection.toXML(document));
         }
         return tileElement;
@@ -301,8 +307,13 @@ public class Tile implements Parsable {
             Element endpointBElement = document.createElement("n");
             endpointBElement.appendChild(document.createTextNode(Integer.toString(endpointB)));
 
-            connectionElement.appendChild(endpointAElement);
-            connectionElement.appendChild(endpointBElement);
+            if (endpointA > endpointB) {
+                connectionElement.appendChild(endpointBElement);
+                connectionElement.appendChild(endpointAElement);
+            } else {
+                connectionElement.appendChild(endpointAElement);
+                connectionElement.appendChild(endpointBElement);
+            }
 
             return connectionElement;
         }
