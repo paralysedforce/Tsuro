@@ -1,20 +1,27 @@
 package test.ParserTests;
 
-import javafx.util.Pair;
-import main.Board;
-import main.BoardSpace;
-import main.Color;
-import main.Parser.ParserUtils;
-import main.Players.RandomPlayer;
-import main.Token;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import javafx.util.Pair;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Parser.ParserUtils;
+import main.Players.RandomPlayer;
+import main.Tile;
+import main.Token;
+
 import static org.junit.Assert.assertEquals;
-import static test.ParserTests.ParserTestUtils.*;
+import static test.ParserTests.ParserTestUtils.assertElementIsExpected;
+import static test.ParserTests.ParserTestUtils.pawnLocBottom;
+import static test.ParserTests.ParserTestUtils.pawnLocLeft;
+import static test.ParserTests.ParserTestUtils.pawnLocRight;
+import static test.ParserTests.ParserTestUtils.pawnLocTop;
+import static test.ParserTests.ParserTestUtils.testPawnTemplate;
 
 /**
  * Created by vyasalwar on 5/22/18.
@@ -67,7 +74,6 @@ public class TokenParsingTest {
     @Test
     public void testLocationToInternalRepresentation() {
         Board board = new Board();
-        Pair<BoardSpace, Integer> result;
 
         // Top edge
         assertLocationSame(
@@ -95,5 +101,66 @@ public class TokenParsingTest {
         // Internal with tile below
         // Internal with tile to the left
 
+
+    }
+
+    abstract class MockBoard extends Board {
+        public abstract void setup();
+    }
+
+    @Test
+    public void locationToInternalFromDebug() {
+        MockBoard board = new MockBoard() {
+            public void setup() {
+                this.getBoardSpace(2, 3).setTile(new Tile());
+                this.getBoardSpace(3, 5).setTile(new Tile());
+            }
+        };
+        board.setup();
+
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 3, 6),
+                3, 3, 0
+        );
+
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 5, 7),
+                3, 4, 3
+        );
+    }
+
+
+    @Test
+    public void endGameEdgeTokens() {
+        MockBoard board = new MockBoard() {
+            public void setup() {
+                this.getBoardSpace(2, 5).setTile(new Tile());
+            }
+        };
+        board.setup();
+
+        // Top
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 0, 5),
+                0, 2, 1
+        );
+
+        // Right
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 6, 5),
+                2, 5, 3
+        );
+
+        // Left
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, false, 0, 5),
+                2, 0, 6
+        );
+
+        // Bottom
+        assertLocationSame(
+                Token.locationFromPawnLoc(board, true, 6, 5),
+                5, 2, 4
+        );
     }
 }
