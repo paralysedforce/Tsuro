@@ -183,6 +183,19 @@ public class Board implements Parsable{
         return total;
     }
 
+    public Token findToken(Color color) {
+        for (int i=0; i < 6; i++) {
+            for (int j=0; j<6; j++) {
+                for (Token t : getBoardSpace(i, j).getTokensOnSpace()) {
+                    if (t.getPlayer().getColor() == color) {
+                        return t;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     //================================================================================
     // Private Helpers
     //================================================================================

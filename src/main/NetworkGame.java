@@ -260,6 +260,7 @@ public class NetworkGame {
                 Set<Tile> moves = getLegalMoves();
                 System.out.println("Number of legal moves: " + moves.size());
 
+                System.out.println("Choosing tile at location row: " + token.getBoardSpace().getRow() + " col: " + token.getBoardSpace().getCol());
                 if (moves.size() > 0)
                     return moves.iterator().next();
                 else

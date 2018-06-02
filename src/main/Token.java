@@ -145,6 +145,10 @@ public class Token implements Parsable {
         return entryElement;
     }
 
+    public void setPlayer(APlayer player) {
+        this.player = player;
+    }
+
     @Override
     public void fromXML(Element xmlElement) {
         // TODO

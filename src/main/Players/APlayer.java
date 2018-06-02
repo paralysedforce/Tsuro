@@ -68,9 +68,12 @@ public abstract class APlayer extends IPlayer {
 
     public void setBoard(Board board) {
         this.board = board;
-        // Player should be on board too if it was not already
-        if (token != null)
-            board.updateToken(token);
+        Token boardToken = board.findToken(color);
+        // Update player token if necessary
+        if (token != null && boardToken != null) {
+            this.token = boardToken;
+            boardToken.setPlayer(this);
+        }
     }
 
 
