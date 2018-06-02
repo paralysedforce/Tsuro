@@ -22,6 +22,7 @@ import javafx.util.Pair;
 import main.Parser.ParserException;
 import main.Players.APlayer;
 import main.Players.PlayerHand;
+import main.Players.RandomPlayer;
 
 /**
  * The Player's representation of the Game Server
@@ -71,7 +72,7 @@ public class NetworkGame {
     // Runs a loop to listen on the input stream, parse data,
     // forward requests to appropriate method on APlayer, then send back a response
     public void handleInstructions() {
-        while (!gameEnded) {
+        while (!gameEnded || true) {
             try {
                 String request = getRequestFromInputStream();
                 String response = forwardRequestToAPlayer(request);
@@ -94,13 +95,15 @@ public class NetworkGame {
     }
 
     private void sendResponseToServer(String response) throws IOException{
-        writer.println(response);
+        writer.print(response);
+        writer.print("\n");
         writer.flush();
     }
 
     private String forwardRequestToAPlayer(String request) throws IOException {
         try {
             Node root = NetworkMessage.nodeFromString(request);
+            System.out.println(root.getNodeName());
             switch (root.getNodeName()) {
                 case "get-name":
                     return getNameHandler(root);
@@ -165,26 +168,50 @@ public class NetworkGame {
     }
 
     private String playTurnHandler(Node root) throws IOException{
+        System.out.println("Player's color is: " + this.aplayer.getColor());
         Node boardNode = root.getFirstChild();
+        System.out.println("RECEIVED BOARD: ");
+        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
         Node setOfTilesNode = boardNode.getNextSibling();
         Node tilesLeftNode = setOfTilesNode.getNextSibling();
 
         Board board = new Board();
         board.fromXML((Element) boardNode);
+        System.out.println("Number of tokens on board: " + board.tokenCount());
+
         aplayer.setBoard(board);
+        System.out.println("Number of tokens on board: " + board.tokenCount());
+
 
 
         PlayerHand playerHand = new PlayerHand();
         playerHand.fromXML((Element)setOfTilesNode);
         aplayer.setHand(playerHand);
 
+        System.out.println("NEW PLAYER HAND: ");
+        System.out.println(NetworkMessage.xmlElementToString((Element) setOfTilesNode));
 
         int numTilesLeft = Integer.parseInt(tilesLeftNode.getTextContent());
         Tile tile = aplayer.chooseTile(numTilesLeft);
+        if (!aplayer.getHand().holdsTile(tile)) {
+            System.out.println("ASDFASDFASDF");
+        }
+
+        board.placeTile(tile, aplayer);
+
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            System.out.println("INTERNAL BOARD:");
+            System.out.println(NetworkMessage.xmlElementToString(board.toXML(document)));
+
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
 
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element returnedTileElement = tile.toXML(document);
+            System.out.println(NetworkMessage.xmlElementToString(returnedTileElement));
             return NetworkMessage.xmlElementToString(returnedTileElement);
 
         } catch (ParserConfigurationException e) {
@@ -196,6 +223,9 @@ public class NetworkGame {
     private String endGameHandler(Node root){
 
         Node boardNode = root.getFirstChild();
+
+        System.out.println("END GAME BOARD: ");
+        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
 
         // Parse the board
         Board board = new Board();
@@ -214,6 +244,33 @@ public class NetworkGame {
         aplayer.endGame(winners);
         gameEnded = true;
         return "<void></void>";
+    }
+
+
+    //================================================================================
+    // Entry point for running a network player
+    //================================================================================
+
+    public static void main(String[] args) {
+        String host = args[0];
+        int port = Integer.valueOf(args[1]);
+        APlayer mockPlayer = new RandomPlayer("randy", Color.BLUE) {
+            @Override
+            protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
+                Set<Tile> moves = getLegalMoves();
+                System.out.println("Number of legal moves: " + moves.size());
+
+                if (moves.size() > 0)
+                    return moves.iterator().next();
+                else
+                    return this.hand.getTile(0);
+            }
+        };
+//        APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+
+        System.out.println("connecting to host: " + host + " at port: " + port + " with player " + mockPlayer);
+
+        new NetworkGame(host, port, mockPlayer).handleInstructions();
     }
 
 }

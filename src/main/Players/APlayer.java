@@ -19,7 +19,7 @@ public abstract class APlayer extends IPlayer {
     private Color color;
     private List<Color> otherPlayers;
     private State curState;
-    private Token token;
+    protected Token token;
 
     protected PlayerType playerType;
     protected PlayerHand hand;
@@ -66,7 +66,12 @@ public abstract class APlayer extends IPlayer {
 
     public void setColor(Color color) {this.color = color;}
 
-    public void setBoard(Board board) {this.board = board; }
+    public void setBoard(Board board) {
+        this.board = board;
+        // Player should be on board too if it was not already
+        if (token != null)
+            board.updateToken(token);
+    }
 
 
     //================================================================================
@@ -95,7 +100,7 @@ public abstract class APlayer extends IPlayer {
     }
 
     public final void initialize(List<Color> otherPlayers){
-        if (curState != State.UNINITIALIZED)
+        if (!(curState == State.UNINITIALIZED || curState == State.GAMEENDED))
             throw new ContractException();
 
         // Allow subclasses to further implement this method
@@ -117,8 +122,8 @@ public abstract class APlayer extends IPlayer {
 
     // Enforces Sequential contract but delegates picking the tile to chooseTileHelper
     public Tile chooseTile(int numTilesLeft){
-        if (curState != State.TURNPLAYABLE || !hand.isValid())
-            throw new ContractException();
+        if (curState != State.TURNPLAYABLE)// || !hand.isValid())
+            throw new ContractException("State is " + curState + " and hand is valid=" + hand.isValid());
 
         Set<Tile> hand = new HashSet<>();
         for (Tile aTile : this.hand) {

@@ -131,7 +131,15 @@ public class Token implements Parsable {
 
         Element entryElement = document.createElement("ent");
 
-        entryElement.appendChild(this.player.getColor().toXml(document));
+        if (this.player != null) {
+            entryElement.appendChild(this
+                    .player
+                    .getColor()
+                    .toXml(document));
+        } else {
+            // TODO something else for default
+            entryElement.appendChild(Color.DARKGREEN.toXml(document));
+        }
         entryElement.appendChild(pawnLoc);
 
         return entryElement;
@@ -159,8 +167,14 @@ public class Token implements Parsable {
             possibleRow2 = coord1;
             col = coord2 / 2;
             if (possibleRow1 < 0 || board.hasTile(possibleRow1, col)) {
-                row = possibleRow2; // Token is on the top of the square
+                row = possibleRow2; // Token is on the top of the next square
                 tick = coord2 % 2;
+
+                if (row == 6) {
+                    // Token was eliminated on the bottom
+                    row = 5;
+                    tick = (tick == 0 ? 5 : 4);
+                }
             } else {
                 row = possibleRow1; // Token is on the bottom of the square
                 tick = (coord2 % 2 == 1 ? 4 : 5);
@@ -172,15 +186,27 @@ public class Token implements Parsable {
             if (possibleCol1 < 0 || board.hasTile(row, possibleCol1)) {
                 col = possibleCol2; // Token is on the left of the square
                 tick = (coord2 % 2 == 1 ? 6 : 7);
+
+                if (col == 6) {
+                    // Token eliminated on the right side
+                    col = possibleCol1;
+                    tick = (tick == 6 ? 3 : 2);
+                }
             } else {
                 col = possibleCol1; // Token is on the right of the square
                 tick = (coord2 % 2 == 1 ? 3 : 2);
             }
         }
-        return new Pair<>(
-                board.getBoardSpace(row, col),
-                tick
-        );
+
+        try {
+            return new Pair<>(
+                    board.getBoardSpace(row, col),
+                    tick
+            );
+        } catch (IllegalArgumentException e) {
+            System.err.println("Inputs were " + coord1 + " " + coord2);
+            throw e;
+        }
     }
 
     public static String pawnLocFromLocation(Pair<BoardSpace, Integer> playerLocation) {

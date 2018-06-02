@@ -10,6 +10,7 @@ import java.util.Set;
 import javafx.util.Pair;
 import main.Parser.ParserException;
 import main.Players.APlayer;
+import main.Players.PlaceholderPlayer;
 
 /**
  *
@@ -43,7 +44,7 @@ public class Board implements Parsable{
     //================================================================================
     public BoardSpace getBoardSpace(int row, int col) {
         if (!isValidCoordinate(row, col))
-            throw new IllegalArgumentException("Invalid Tile Access");
+            throw new IllegalArgumentException("Invalid Tile Access row: " + row + " col: " + col);
 
         return spaces[row][col];
     }
@@ -64,6 +65,8 @@ public class Board implements Parsable{
     public boolean willKillPlayer(Tile tile, APlayer player) {
         Token token = player.getToken();
         BoardSpace originalSpace = token.getBoardSpace();
+        int originalRow = originalSpace.getRow();
+        int originalCol = originalSpace.getCol();
 
         BoardSpace curSpace = originalSpace;
         int curTokenSpace = token.getTokenSpace();
@@ -75,7 +78,7 @@ public class Board implements Parsable{
 
                 // Each time we cross the original space,
                 //  we need to use the information from the input tile
-                if (curSpace == originalSpace) {
+                if (curSpace == originalSpace || (originalRow == curSpace.getRow() && originalCol == curSpace.getCol())) {
                     // Move to the space across the tile
                     curTokenSpace = tile.findMatch(curTokenSpace);
                     curSpace = getNextSpace(curSpace, curTokenSpace);
@@ -124,7 +127,7 @@ public class Board implements Parsable{
             // Eliminate the token if necessary
             if (isOnEdge(token)) {
                 eliminatedPlayers.add(token);
-                token.removeFromBoard();
+//                token.removeFromBoard();
             }
         }
 
@@ -141,6 +144,43 @@ public class Board implements Parsable{
         }
 
         return null;
+    }
+
+    /**
+     * Updates the token at t's space to be owned by player
+     * @param t token of player that should replace a current token.
+     *
+     * @return true if successful, false otherwise
+     */
+    public boolean updateToken(Token t) {
+        BoardSpace space = t.getBoardSpace();
+        int row = space.getRow();
+        int col = space.getCol();
+        int tick = t.getTokenSpace();
+
+        Set<Token> onSpace = this.getBoardSpace(row, col).getTokensOnSpace();
+
+        // Look for token to be replaced
+        for (Token token : onSpace) {
+            if (token.getTokenSpace() == tick) {
+                if (token.getPlayer().getColor() == t.getPlayer().getColor()) {
+                    // Found token that needs replacing
+                    space.addToken(t, tick);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public int tokenCount() {
+        int total = 0;
+        for (int i=0; i < 6; i++) {
+            for (int j=0; j<6; j++) {
+                total += getBoardSpace(i, j).getTokensOnSpace().size();
+            }
+        }
+        return total;
     }
 
     //================================================================================
@@ -269,6 +309,7 @@ public class Board implements Parsable{
         }
 
         // Update the pawns
+        int pawn_counter = 0;
         for (Node pawnEntNode = pawnsElement.getFirstChild();
                 pawnEntNode != null;
                 pawnEntNode = pawnEntNode.getNextSibling()) {
@@ -289,11 +330,12 @@ public class Board implements Parsable{
                     Token.locationFromPawnLoc(this, isHorizontal, coord1, coord2);
 
             // Creates a token that places itself on the board
-            // TODO: When we refactor token and Aplayer, make player not null. (maybe a Color)
-            new Token(location.getKey(), location.getValue(), null);
-
-
+            APlayer placeholder = new PlaceholderPlayer("placeholder", color);
+            new Token(location.getKey(), location.getValue(), placeholder);
+            pawn_counter += 1;
         }
+        System.out.println("Number of pawns parsed: " + pawn_counter);
+
 
 
     }

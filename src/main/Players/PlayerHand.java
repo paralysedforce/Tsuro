@@ -1,17 +1,17 @@
 package main.Players;
 
-import main.Game;
-import main.Parsable;
-import main.Tile;
-import main.TilePile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.function.Consumer;
+
+import main.Game;
+import main.Parsable;
+import main.Tile;
+import main.TilePile;
 
 /**
  * Represents the current tiles held by an APlayer at any time
@@ -22,7 +22,7 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
 
     private final int MAX_TILES_IN_HAND = 3;
     private TilePile deck;
-    private List<Tile> hand;
+    protected List<Tile> hand;
 
     public PlayerHand(){
         this.deck = Game.getGame().getTilePile();
@@ -114,6 +114,19 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
 
     @Override
     public void fromXML(Element xmlElement) throws IllegalArgumentException {
+        Node tileXml = xmlElement.getFirstChild();
+        this.hand = new ArrayList<>();
 
+        if (tileXml != null) {
+            Tile t = new Tile();
+            t.fromXML((Element) tileXml);
+            this.hand.add(t);
+        }
+
+        while ((tileXml = tileXml.getNextSibling()) != null) {
+            Tile t = new Tile();
+            t.fromXML((Element) tileXml);
+            this.hand.add(t);
+        }
     }
 }

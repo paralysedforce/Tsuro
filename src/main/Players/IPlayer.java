@@ -34,7 +34,7 @@ abstract class IPlayer {
 //    ;; Called at the first step in a game; indicates where
 //    ;; the player wishes to place their pawn. The pawn must
 //    ;; be placed along the edge in an unoccupied space.
-    abstract Pair<BoardSpace, Integer> getStartingLocation(Board board);
+    protected abstract Pair<BoardSpace, Integer> getStartingLocation(Board board);
 
 //            play-turn      ;; board? (set/c tile?) natural? -> tile?
 //    ;; Called to ask the player to make a move. The tiles

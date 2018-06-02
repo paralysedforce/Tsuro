@@ -1,19 +1,39 @@
 package test.GameTests;
 
-import main.*;
-import main.Players.APlayer;
-import main.Players.RandomPlayer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import javafx.util.Pair;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Game;
+import main.NetworkMessage;
+import main.Players.APlayer;
+import main.Players.PlayerHand;
+import main.Players.RandomPlayer;
+import main.Tile;
+import main.TilePile;
+import main.Token;
+import test.ParserTests.TokenParsingTest;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GameTest {
@@ -190,5 +210,91 @@ public class GameTest {
 
         verify(tilePileMock, times(14)).drawFromDeck();
     }
+
+    @Test
+    public void testLegalFromDebug() {
+
+        APlayer player = new RandomPlayer("p", Color.RED) {
+            @Override
+            public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
+
+                this.token = new Token(startingLocation, startingTokenSpace, this);
+
+                return new Pair<>(startingLocation, startingTokenSpace);
+            }
+        };
+
+        TokenParsingTest.MockBoard board = new TokenParsingTest.MockBoard() {
+            @Override
+            public void setup() {
+                Tile t = new Tile(0,1, 2, 7, 3, 4, 5, 6);
+                this.getBoardSpace(2, 5).setTile(t);
+            }
+        };
+        board.setup();
+        player.placeToken(board.getBoardSpace(3, 5), 0);
+
+        PlayerHand hand = new PlayerHand() {
+            boolean alreadyDrew = false;
+            @Override
+            public void drawFromDeck() {
+                if (!alreadyDrew) {
+                    Tile t = new Tile(0,1,2,7,3,6,4,5);
+                    this.hand.add(t);
+                    alreadyDrew = true;
+                }
+            }
+        };
+
+        player.setHand(hand);
+        player.setBoard(board);
+
+        Set<Tile> legalMoves = player.getLegalMoves();
+        for (Tile t : legalMoves) {
+            System.out.println(t);
+            try {
+                Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                System.out.println(NetworkMessage.xmlElementToString(t.toXML(doc)));
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        Assert.assertEquals(2, legalMoves.size());
+    }
+
+    @Test
+    public void testLegalFromDebug2() throws IOException, SAXException, ParserConfigurationException {
+        Board b = new Board();
+
+        b.fromXML(
+                (Element) NetworkMessage.nodeFromString("<board><map><ent><xy><x>3</x><y>3</y></xy><tile><connect><n>0</n><n>3</n></connect><connect><n>1</n><n>4</n></connect><connect><n>2</n><n>7</n></connect><connect><n>5</n><n>6</n></connect></tile></ent><ent><xy><x>1</x><y>2</y></xy><tile><connect><n>0</n><n>1</n></connect><connect><n>2</n><n>4</n></connect><connect><n>3</n><n>5</n></connect><connect><n>6</n><n>7</n></connect></tile></ent><ent><xy><x>2</x><y>1</y></xy><tile><connect><n>0</n><n>7</n></connect><connect><n>1</n><n>2</n></connect><connect><n>3</n><n>4</n></connect><connect><n>5</n><n>6</n></connect></tile></ent><ent><xy><x>4</x><y>4</y></xy><tile><connect><n>0</n><n>1</n></connect><connect><n>2</n><n>5</n></connect><connect><n>3</n><n>6</n></connect><connect><n>4</n><n>7</n></connect></tile></ent><ent><xy><x>5</x><y>5</y></xy><tile><connect><n>0</n><n>5</n></connect><connect><n>1</n><n>7</n></connect><connect><n>2</n><n>6</n></connect><connect><n>3</n><n>4</n></connect></tile></ent><ent><xy><x>3</x><y>1</y></xy><tile><connect><n>0</n><n>2</n></connect><connect><n>1</n><n>3</n></connect><connect><n>4</n><n>6</n></connect><connect><n>5</n><n>7</n></connect></tile></ent><ent><xy><x>3</x><y>5</y></xy><tile><connect><n>0</n><n>4</n></connect><connect><n>1</n><n>5</n></connect><connect><n>2</n><n>3</n></connect><connect><n>6</n><n>7</n></connect></tile></ent><ent><xy><x>1</x><y>4</y></xy><tile><connect><n>0</n><n>6</n></connect><connect><n>1</n><n>5</n></connect><connect><n>2</n><n>4</n></connect><connect><n>3</n><n>7</n></connect></tile></ent><ent><xy><x>5</x><y>3</y></xy><tile><connect><n>0</n><n>7</n></connect><connect><n>1</n><n>4</n></connect><connect><n>2</n><n>3</n></connect><connect><n>5</n><n>6</n></connect></tile></ent><ent><xy><x>1</x><y>5</y></xy><tile><connect><n>0</n><n>1</n></connect><connect><n>2</n><n>7</n></connect><connect><n>3</n><n>5</n></connect><connect><n>4</n><n>6</n></connect></tile></ent><ent><xy><x>2</x><y>4</y></xy><tile><connect><n>0</n><n>1</n></connect><connect><n>2</n><n>7</n></connect><connect><n>3</n><n>6</n></connect><connect><n>4</n><n>5</n></connect></tile></ent><ent><xy><x>4</x><y>3</y></xy><tile><connect><n>0</n><n>4</n></connect><connect><n>1</n><n>5</n></connect><connect><n>2</n><n>6</n></connect><connect><n>3</n><n>7</n></connect></tile></ent><ent><xy><x>5</x><y>4</y></xy><tile><connect><n>0</n><n>2</n></connect><connect><n>1</n><n>7</n></connect><connect><n>3</n><n>4</n></connect><connect><n>5</n><n>6</n></connect></tile></ent><ent><xy><x>3</x><y>4</y></xy><tile><connect><n>0</n><n>2</n></connect><connect><n>1</n><n>4</n></connect><connect><n>3</n><n>6</n></connect><connect><n>5</n><n>7</n></connect></tile></ent><ent><xy><x>1</x><y>3</y></xy><tile><connect><n>0</n><n>5</n></connect><connect><n>1</n><n>4</n></connect><connect><n>2</n><n>7</n></connect><connect><n>3</n><n>6</n></connect></tile></ent><ent><xy><x>2</x><y>2</y></xy><tile><connect><n>0</n><n>4</n></connect><connect><n>1</n><n>7</n></connect><connect><n>2</n><n>3</n></connect><connect><n>5</n><n>6</n></connect></tile></ent><ent><xy><x>4</x><y>5</y></xy><tile><connect><n>0</n><n>2</n></connect><connect><n>1</n><n>6</n></connect><connect><n>3</n><n>5</n></connect><connect><n>4</n><n>7</n></connect></tile></ent><ent><xy><x>5</x><y>2</y></xy><tile><connect><n>0</n><n>3</n></connect><connect><n>1</n><n>7</n></connect><connect><n>2</n><n>6</n></connect><connect><n>4</n><n>5</n></connect></tile></ent><ent><xy><x>3</x><y>2</y></xy><tile><connect><n>0</n><n>1</n></connect><connect><n>2</n><n>5</n></connect><connect><n>3</n><n>4</n></connect><connect><n>6</n><n>7</n></connect></tile></ent></map><map><ent><color>red</color><pawn-loc><v></v><n>4</n><n>4</n></pawn-loc></ent><ent><color>blue</color><pawn-loc><h></h><n>1</n><n>5</n></pawn-loc></ent></map></board>\n")
+        );
+        PlayerHand hand = new PlayerHand();
+        hand.fromXML(
+                (Element) NetworkMessage.nodeFromString("<set><tile><connect><n>0</n><n>3</n></connect><connect><n>1</n><n>2</n></connect><connect><n>4</n><n>6</n></connect><connect><n>5</n><n>7</n></connect></tile><tile><connect><n>0</n><n>4</n></connect><connect><n>1</n><n>5</n></connect><connect><n>2</n><n>7</n></connect><connect><n>3</n><n>6</n></connect></tile><tile><connect><n>0</n><n>7</n></connect><connect><n>1</n><n>5</n></connect><connect><n>2</n><n>6</n></connect><connect><n>3</n><n>4</n></connect></tile></set>\n")
+        );
+
+        APlayer player = new RandomPlayer("randy", Color.RED) {
+            @Override
+            public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
+                token = new Token(startingLocation, startingTokenSpace, this);
+
+                return new Pair<>(startingLocation, startingTokenSpace);
+            }
+        };
+        player.setBoard(b);
+        player.setHand(hand);
+        player.placeToken(board.getBoardSpace(2, 4), 7);
+        System.out.println(player.getHand().toXML(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()));
+        System.out.println(NetworkMessage.xmlElementToString(b.toXML(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument())));
+
+//        Assert.assertEquals(3, player.getLegalMoves().size());
+        Tile badTile = new Tile(0, 3, 1, 2, 4, 6, 5, 7);
+//        Assert.assertFalse(player.getLegalMoves().contains(badTile));
+        Assert.assertFalse(player.isSafeMove(badTile));
+    }
+
 
 }

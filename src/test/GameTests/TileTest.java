@@ -1,11 +1,12 @@
 package test.GameTests;
 
-import main.*;
-import org.junit.After;
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import main.Tile;
 
 /**
  * Created by vyasalwar on 4/19/18.
@@ -66,6 +67,16 @@ public class TileTest {
         Assert.assertEquals(tile1.calculateSymmetries(), 4);
         Assert.assertEquals(tile2.calculateSymmetries(), 2);
         Assert.assertEquals(tile3.calculateSymmetries(), 1);
+    }
+
+    @Test
+    public void setOfTilesNotContainRotate() {
+        Set<Tile> tiles = new HashSet<>();
+        Tile original = new Tile(0,3,1,2,4,6,5,7);
+
+        tiles.add(original);
+        original.rotateClockwise();
+        Assert.assertFalse(tiles.contains(original));
     }
 
 }

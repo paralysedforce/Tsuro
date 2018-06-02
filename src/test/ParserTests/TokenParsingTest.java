@@ -104,7 +104,7 @@ public class TokenParsingTest {
 
     }
 
-    abstract class MockBoard extends Board {
+    public abstract static class MockBoard extends Board {
         public abstract void setup();
     }
 
