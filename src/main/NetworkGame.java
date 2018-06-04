@@ -103,7 +103,6 @@ public class NetworkGame {
     private String forwardRequestToAPlayer(String request) throws IOException {
         try {
             Node root = NetworkMessage.nodeFromString(request);
-            System.out.println(root.getNodeName());
             switch (root.getNodeName()) {
                 case "get-name":
                     return getNameHandler(root);
@@ -161,65 +160,40 @@ public class NetworkGame {
 
     private String placePawnHandler(Node root){
         Node boardNode = root.getFirstChild();
-        System.out.println("RECEIVED BOARD: ");
-        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
 
         Board board = new Board();
         board.fromXML((Element) boardNode);
         aplayer.setBoard(board);
         Pair<BoardSpace, Integer> playerLocation = aplayer.placeToken();
 
-        System.out.println("PLACE PAWN RESPONSE: ");
-        System.out.println(Token.pawnLocFromLocation(playerLocation));
-
         return Token.pawnLocFromLocation(playerLocation);
     }
 
     private String playTurnHandler(Node root) throws IOException{
-        System.out.println("Player's color is: " + this.aplayer.getColor());
         Node boardNode = root.getFirstChild();
-        System.out.println("RECEIVED BOARD: ");
-        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
+
         Node setOfTilesNode = boardNode.getNextSibling();
         Node tilesLeftNode = setOfTilesNode.getNextSibling();
 
         Board board = new Board();
         board.fromXML((Element) boardNode);
-        System.out.println("Number of tokens on board: " + board.tokenCount());
 
         aplayer.setBoard(board);
-        System.out.println("Number of tokens on board: " + board.tokenCount());
-
 
 
         PlayerHand playerHand = new PlayerHand();
         playerHand.fromXML((Element)setOfTilesNode);
         aplayer.setHand(playerHand);
 
-        System.out.println("NEW PLAYER HAND: ");
-        System.out.println(NetworkMessage.xmlElementToString((Element) setOfTilesNode));
-
         int numTilesLeft = Integer.parseInt(tilesLeftNode.getTextContent());
         Tile tile = aplayer.chooseTile(numTilesLeft);
-        if (!aplayer.getHand().holdsTile(tile)) {
-            System.out.println("ASDFASDFASDF");
-        }
 
         board.placeTile(tile, aplayer);
 
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            System.out.println("INTERNAL BOARD:");
-            System.out.println(NetworkMessage.xmlElementToString(board.toXML(document)));
-
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element returnedTileElement = tile.toXML(document);
-            System.out.println(NetworkMessage.xmlElementToString(returnedTileElement));
+
             return NetworkMessage.xmlElementToString(returnedTileElement);
 
         } catch (ParserConfigurationException e) {
@@ -231,9 +205,6 @@ public class NetworkGame {
     private String endGameHandler(Node root){
 
         Node boardNode = root.getFirstChild();
-
-        System.out.println("END GAME BOARD: ");
-        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
 
         // Parse the board
         Board board = new Board();
@@ -276,8 +247,6 @@ public class NetworkGame {
 //            }
 //        };
         APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
-
-        System.out.println("connecting to host: " + host + " at port: " + port + " with player " + player);
 
         new NetworkGame(host, port, player).handleInstructions();
     }
