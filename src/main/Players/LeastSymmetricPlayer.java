@@ -20,7 +20,7 @@ public class LeastSymmetricPlayer extends TileHeuristicPlayer {
     }
 
     public Pair<BoardSpace, Integer> getStartingLocation(Board board){
-        return RandomPlayer.getRandomStartingLocation(new Random());
+        return RandomPlayer.getRandomStartingLocation(new Random(), board);
     }
 
     // Order tiles from least to most symmetric, and choose the first legal rotation among them

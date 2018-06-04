@@ -8,7 +8,6 @@ import javafx.util.Pair;
 import main.Board;
 import main.BoardSpace;
 import main.Color;
-import main.Game;
 import main.Tile;
 
 public class RandomPlayer extends APlayer {
@@ -43,7 +42,7 @@ public class RandomPlayer extends APlayer {
     // Override methods
     //================================================================================
     public Pair<BoardSpace, Integer> getStartingLocation(Board board){
-        return getRandomStartingLocation(random);
+        return getRandomStartingLocation(random, board);
     }
 
     protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
@@ -58,26 +57,32 @@ public class RandomPlayer extends APlayer {
     // Public Static Methods
     //================================================================================
 
-    public static Pair<BoardSpace, Integer> getRandomStartingLocation(Random random){
-        Board board = Game.getGame().getBoard();
+    public static Pair<BoardSpace, Integer> getRandomStartingLocation(Random random, Board board){
+//        Board board = this.board;//Game.getGame().getBoard();
 
-        int edgeNumber = random.nextInt(4);
-        int indexOfEdge = random.nextInt(6);
-        int leftOrRightTokenSpace = random.nextInt(2);
+        while (true) {
+            int edgeNumber = random.nextInt(4);
+            int indexOfEdge = random.nextInt(6);
+            int leftOrRightTokenSpace = random.nextInt(2);
+            int row, col;
 
-        int tokenSpace = edgeNumber * 2 + leftOrRightTokenSpace;
-
-        if(edgeNumber == 0){
-            return new Pair<>(board.getBoardSpace(0, indexOfEdge), tokenSpace);
-        }
-        else if (edgeNumber == 1){
-            return new Pair<>(board.getBoardSpace(indexOfEdge, 5), tokenSpace);
-        }
-        else if (edgeNumber == 2){
-            return new Pair<>(board.getBoardSpace(5, indexOfEdge), tokenSpace);
-        }
-        else{
-            return new Pair<>(board.getBoardSpace(indexOfEdge, 0), tokenSpace);
+            int tokenSpace = edgeNumber * 2 + leftOrRightTokenSpace;
+            if (edgeNumber == 0) {
+                row = 0;
+                col = indexOfEdge;
+            } else if (edgeNumber == 1) {
+                row = indexOfEdge;
+                col = 5;
+            } else if (edgeNumber == 2) {
+                row = 5;
+                col = indexOfEdge;
+            } else {
+                row = indexOfEdge;
+                col = 0;
+            }
+            boolean isOccupied = board.getBoardSpace(row, col).getOccupiedSpaces().contains(tokenSpace);
+            if (!isOccupied)
+                return new Pair<>(board.getBoardSpace(row, col), tokenSpace);
         }
 
 

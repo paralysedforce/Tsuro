@@ -1,7 +1,5 @@
 package main.Players;
 
-import main.Players.APlayer;
-import main.Players.RandomPlayer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -114,7 +112,7 @@ public class NetworkPlayer extends APlayer {
     }
 
     @Override
-    Pair<BoardSpace, Integer> getStartingLocation(Board board) {
+    protected Pair<BoardSpace, Integer> getStartingLocation(Board board) {
         try {
             Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -151,11 +149,11 @@ public class NetworkPlayer extends APlayer {
 
             // Default to returning a random location
             System.err.println("Couldn't parse location: " + response);
-            return RandomPlayer.getRandomStartingLocation(new Random());
+            return RandomPlayer.getRandomStartingLocation(new Random(), board);
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
             // Randomly choose a starting location
-            return RandomPlayer.getRandomStartingLocation(new Random());
+            return RandomPlayer.getRandomStartingLocation(new Random(), board);
         }
     }
 

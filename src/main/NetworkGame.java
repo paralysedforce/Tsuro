@@ -21,8 +21,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javafx.util.Pair;
 import main.Parser.ParserException;
 import main.Players.APlayer;
+import main.Players.MostSymmetricPlayer;
 import main.Players.PlayerHand;
-import main.Players.RandomPlayer;
 
 /**
  * The Player's representation of the Game Server
@@ -160,10 +160,18 @@ public class NetworkGame {
     }
 
     private String placePawnHandler(Node root){
+        Node boardNode = root.getFirstChild();
+        System.out.println("RECEIVED BOARD: ");
+        System.out.println(NetworkMessage.xmlElementToString((Element) boardNode));
+
         Board board = new Board();
-        board.fromXML((Element) root.getFirstChild());
+        board.fromXML((Element) boardNode);
         aplayer.setBoard(board);
         Pair<BoardSpace, Integer> playerLocation = aplayer.placeToken();
+
+        System.out.println("PLACE PAWN RESPONSE: ");
+        System.out.println(Token.pawnLocFromLocation(playerLocation));
+
         return Token.pawnLocFromLocation(playerLocation);
     }
 
@@ -254,24 +262,24 @@ public class NetworkGame {
     public static void main(String[] args) {
         String host = args[0];
         int port = Integer.valueOf(args[1]);
-        APlayer mockPlayer = new RandomPlayer("randy", Color.BLUE) {
-            @Override
-            protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
-                Set<Tile> moves = getLegalMoves();
-                System.out.println("Number of legal moves: " + moves.size());
+//        APlayer mockPlayer = new RandomPlayer("randy", Color.BLUE) {
+//            @Override
+//            protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
+//                Set<Tile> moves = getLegalMoves();
+//                System.out.println("Number of legal moves: " + moves.size());
+//
+//                System.out.println("Choosing tile at location row: " + token.getBoardSpace().getRow() + " col: " + token.getBoardSpace().getCol());
+//                if (moves.size() > 0)
+//                    return moves.iterator().next();
+//                else
+//                    return this.hand.getTile(0);
+//            }
+//        };
+        APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
 
-                System.out.println("Choosing tile at location row: " + token.getBoardSpace().getRow() + " col: " + token.getBoardSpace().getCol());
-                if (moves.size() > 0)
-                    return moves.iterator().next();
-                else
-                    return this.hand.getTile(0);
-            }
-        };
-//        APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+        System.out.println("connecting to host: " + host + " at port: " + port + " with player " + player);
 
-        System.out.println("connecting to host: " + host + " at port: " + port + " with player " + mockPlayer);
-
-        new NetworkGame(host, port, mockPlayer).handleInstructions();
+        new NetworkGame(host, port, player).handleInstructions();
     }
 
 }

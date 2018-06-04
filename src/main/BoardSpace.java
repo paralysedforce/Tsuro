@@ -57,6 +57,10 @@ public class BoardSpace implements Parsable {
         return new HashSet<>(tokenSpaces.keySet());
     }
 
+    public Set<Integer> getOccupiedSpaces() {
+        return new HashSet<>(this.tokenSpaces.values());
+    }
+
     //================================================================================
     // Setters
     //================================================================================
