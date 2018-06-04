@@ -1,16 +1,26 @@
 package main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import main.Parser.ParserUtils;
 import main.Players.APlayer;
 import main.Players.LeastSymmetricPlayer;
 import main.Players.MostSymmetricPlayer;
 import main.Players.PlayerType;
 import main.Players.RandomPlayer;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class Game {
 
@@ -289,17 +299,62 @@ public class Game {
     // Main
     //================================================================================
 
-    /* Runs a simple command line UI to play a game
-        EXPERIMENTAL
-     */
+    /* Runs a simple command line UI to play a game */
     public static void main(String[] args){
         Game game = getGame();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to Tsuro!");
+        System.err.println("Welcome to Tsuro!");
 
-        for (String player: args) {
-            game.registerPlayer(player, Color.SIENNA, PlayerType.RANDOM);
+        /* One move */
+        try {
+            /* Get input from stdin */
+            Element tilePileListElement      = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+            Element remainingPlayersElement  = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+            Element eliminatedPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+            Element boardElement             = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+            Element tileToBePlacedElement    = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+
+
+            /* Convert input into Game representations */
+            TilePile tilePile = new TilePile();
+            tilePile.fromXML(tilePileListElement);
+
+            Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayer(remainingPlayersElement).getColor();
+            List<SPlayer> remainingPlayers = ParserUtils.SPlayerListFromNode(remainingPlayersElement);
+            List<SPlayer> eliminatedPlayers = ParserUtils.SPlayerListFromNode(eliminatedPlayersElement);
+
+
+            Board board = new Board();
+            board.fromXML(boardElement);
+
+            Tile tileToBePlaced = new Tile();
+            tileToBePlaced.fromXML(tileToBePlacedElement);
+
+            /* Update Game fields */
+            game.board = board;
+            game.tilePile = tilePile;
+            game.remainingPlayers = remainingPlayers;
+            game.eliminatedPlayers = eliminatedPlayers;
+            game.dragonTileOwner = board.findToken(dragonTileOwnerColor).getPlayer();
+
+            /* Make a move */
+            game.playTurn(tileToBePlaced, remainingPlayers.get(0));
+
+            /* Send output to stdout */
+            Document document = ParserUtils.newDocument();
+            System.out.println(ParserUtils.xmlElementToString(tilePile.toXML(document)));
+            System.out.println(ParserUtils.SPlayerListToString(remainingPlayers));
+            System.out.println(ParserUtils.SPlayerListToString(eliminatedPlayers));
+            System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
+            System.out.println(game.isOver ? ParserUtils.SPlayerListToString(remainingPlayers) : "<false></false>");
+
+        } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
+            e.printStackTrace();
+            return;
         }
-        game.playGame();
+
+
+
+
     }
 }

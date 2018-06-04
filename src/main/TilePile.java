@@ -1,5 +1,9 @@
 package main;
 
+import main.Parser.ParserUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,7 +15,7 @@ import java.util.*;
  *
  * Created by vyasalwar on 4/16/18.
  */
-public class TilePile {
+public class TilePile implements Parsable {
 
     //================================================================================
     // Singleton Design Pattern
@@ -93,5 +97,17 @@ public class TilePile {
         }
     }
 
+    //================================================================================
+    // XML Parsing
+    //================================================================================
+    @Override
+    public Element toXML(Document document) {
+        return ParserUtils.convertTileListToElement(document, (List<Tile>)tiles);
+    }
 
+    @Override
+    public void fromXML(Element xmlElement) throws IllegalArgumentException {
+        List<Tile> tilesInDeck = ParserUtils.tileListFromNode(xmlElement);
+        tiles = new LinkedList<>(tilesInDeck);
+    }
 }

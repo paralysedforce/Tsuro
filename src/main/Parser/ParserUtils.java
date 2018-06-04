@@ -1,5 +1,7 @@
 package main.Parser;
 
+import main.*;
+import main.Players.APlayer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,9 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by vyasalwar on 5/22/18.
@@ -117,6 +117,56 @@ public class ParserUtils {
         );
         return doc.getFirstChild();
     }
+
+    public static List<Tile> tileListFromNode(Node node){
+
+        if (!node.getTextContent().equals("list")){
+            throw new IllegalArgumentException();
+        }
+
+        List<Tile> parsedTileList = new ArrayList<Tile>();
+        for (Node child = node.getFirstChild();
+             child != null;
+             child = child.getNextSibling()){
+
+            // Parse the child
+            Tile parsedChild = new Tile();
+            parsedChild.fromXML((Element) child);
+            parsedTileList.add(parsedChild);
+        }
+
+        return parsedTileList;
+    }
+
+    public static Element convertTileListToElement(Document document, List<Tile> tiles){
+        Element parent = document.createElement("list");
+
+        for (Tile tile: tiles){
+            parent.appendChild(tile.toXML(document));
+        }
+
+        return parent;
+    }
+
+    /*public static List<APlayer> playerListFromNode(Node node){
+
+        if (!node.getTextContent().equals("list")){
+            throw new IllegalArgumentException();
+        }
+
+        List<APlayer> parsedPlayerList = new ArrayList<APlayer>();
+        for (Node child = node.getFirstChild();
+             child != null;
+             child = child.getNextSibling()){
+
+            // Parse the child
+            APlayer parsedChild = new APlayer();
+            parsedChild.fromXML((Element) child);
+            parsedTileList.add(parsedChild);
+        }
+
+        return parsedTileList;
+    }*/
 
 
     //================================================================================

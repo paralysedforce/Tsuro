@@ -1,5 +1,6 @@
 package main;
 
+import main.Parser.ParserUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import javafx.util.Pair;
 import main.Parser.ParserException;
@@ -194,9 +196,9 @@ public class NetworkGame {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element returnedTileElement = tile.toXML(document);
 
-            return NetworkMessage.xmlElementToString(returnedTileElement);
+            return ParserUtils.xmlElementToString(returnedTileElement);
 
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
             throw new IOException();
         }
