@@ -347,9 +347,5 @@ public class Board implements Parsable{
             new Token(location.getKey(), location.getValue(), placeholder);
             pawn_counter += 1;
         }
-        System.out.println("Number of pawns parsed: " + pawn_counter);
-
-
-
     }
 }
