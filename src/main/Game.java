@@ -1,26 +1,15 @@
 package main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
-import main.Parser.ParserUtils;
 import main.Players.APlayer;
 import main.Players.LeastSymmetricPlayer;
 import main.Players.MostSymmetricPlayer;
 import main.Players.PlayerType;
 import main.Players.RandomPlayer;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 public class Game {
 
@@ -131,6 +120,7 @@ public class Game {
                 throw new ContractException("Player made an illegal move");
             }
 
+            // Place tile and move players
             Set<Token> failedTokens = board.placeTile(tile, player);
             Set<APlayer> failedPlayers = new HashSet<>();
             for (Token failedToken : failedTokens)
@@ -139,9 +129,11 @@ public class Game {
             if (failedPlayers.containsAll(remainingPlayers))
                 return failedPlayers;
 
+            // Update hands
             player.getHand().removeTile(tile);
             player.getHand().drawFromDeck();
 
+            // Update deck with eliminated players
             if (!failedPlayers.isEmpty()) {
                 for (APlayer failedPlayer : failedPlayers)
                     failedPlayer.getHand().returnTilesToDeck();
@@ -151,11 +143,39 @@ public class Game {
                 for (APlayer failedPlayer : failedPlayers)
                     eliminatePlayer(failedPlayer);
 
-
                 drawAfterElimination(playerToDrawFirst);
             }
 
             return failedPlayers;
+    }
+
+    /**
+     * Matches the return specs of the assignment, calls playTurn as appropriate
+     * @return null if the game is not over, list of winning players if the game is over.
+     */
+    public HashSet<APlayer> playATurn(Tile tile, APlayer player) throws ContractException {
+
+        // Cheating occurs here and throws ContractException
+        Set<APlayer> playersEliminatedThisTurn = playTurn(tile, player);
+
+        // Check for end game conditions that don't result in one winner in addition to one winner.
+        if(playersEliminatedThisTurn.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
+            return new HashSet<APlayer>(remainingPlayers);
+        }
+        if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
+            return new HashSet<APlayer>(remainingPlayers);
+        }
+
+
+        // Game not ended. Update player lists.
+        if(!eliminatedPlayers.contains(player)){
+            remainingPlayers.remove(player);
+            remainingPlayers.add(player);
+        }
+        this.eliminatedPlayers.addAll(playersEliminatedThisTurn);
+        this.remainingPlayers.removeAll(playersEliminatedThisTurn);
+
+        return null;
     }
 
     public void initializePlayers(){
@@ -177,52 +197,38 @@ public class Game {
             player.placeToken();
         }
 
-        /*
-        for (int i = 0; remainingPlayers.size() <= 1; i = (i + 1) % remainingPlayers.size())
-         */
-
-//        int i = 0;
         while (true) {
-            APlayer player = remainingPlayers.get(0);
-            Tile tile = player.chooseTile(tilePile.getCount());
+            // Get the chosen move
+            APlayer playingPlayer = remainingPlayers.get(0);
+            Tile tile = playingPlayer.chooseTile(tilePile.getCount());
+
+            Set<APlayer> winningPlayers;
             try {
-                Set<APlayer> losingPlayers = playTurn(tile, player);
-                if(losingPlayers.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
-                    break;
-                }
-                if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
-                    break;
-                }
+                // Update winning players
+                winningPlayers = playATurn(tile, playingPlayer);
             }
             catch (ContractException e) {
-                remainingPlayers.remove(player);
-                player = blamePlayer(player);
-                remainingPlayers.add(0, player);
+                // Detect cheating
+                remainingPlayers.remove(playingPlayer);
+                playingPlayer = blamePlayer(playingPlayer);
+                remainingPlayers.add(0, playingPlayer);
                 continue;
             }
 
-            if(!eliminatedPlayers.contains(player)){
-                remainingPlayers.remove(player);
-                remainingPlayers.add(player);
+            if (winningPlayers != null) {
+                Set<Color> winningPlayerColors = new HashSet<>();
+                for (APlayer player : remainingPlayers) {
+                    winningPlayerColors.add(player.getColor());
+                }
+
+                for (APlayer player : remainingPlayers){
+                    player.endGame(winningPlayerColors);
+                }
+
+                return winningPlayers;
+
             }
-
-//            if (remainingPlayers.get(i).equals(player))
-//                i = (i + 1) % remainingPlayers.size();
         }
-
-        Set<Color> winningPlayers = new HashSet<>();
-        for (APlayer player : remainingPlayers) {
-            winningPlayers.add(player.getColor());
-        }
-
-        for (APlayer player : remainingPlayers){
-            player.endGame(winningPlayers);
-        }
-        for (APlayer player : eliminatedPlayers){
-            player.endGame(winningPlayers);
-        }
-
-        return new HashSet<>(remainingPlayers);
     }
 
 
