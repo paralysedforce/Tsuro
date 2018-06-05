@@ -159,8 +159,10 @@ public class GameTest {
         Assert.assertNull(vyas.getHand().getTile(0));
         Assert.assertNull(vyas.getHand().getTile(1));
         Assert.assertNull(vyas.getHand().getTile(2));
-        Assert.assertEquals(spaceOne.findToken(vyas.getToken()), -1);
-        Assert.assertNull(vyas.getToken().getBoardSpace());
+        // Removed because tournament expects to still know eliminated player positions
+//        Assert.assertEquals(spaceOne.findToken(vyas.getToken()), -1);
+//        Assert.assertNull(vyas.getToken().getBoardSpace());
+        Assert.assertEquals(spaceOne.findToken(vyas.getToken()), 1);
     }
 
     @Test
@@ -261,7 +263,7 @@ public class GameTest {
 
         }
 
-        Assert.assertEquals(2, legalMoves.size());
+        Assert.assertEquals(1, legalMoves.size());
     }
 
     @Test

@@ -1,13 +1,18 @@
 package test.GameTests;
 
-import main.*;
-import main.Players.APlayer;
-import main.Players.RandomPlayer;
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Set;
+
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.Players.APlayer;
+import main.Players.RandomPlayer;
+import main.Tile;
+import main.Token;
 
 /**
  * Created by vyasalwar on 4/23/18.
@@ -99,7 +104,7 @@ public class BoardTest {
         Assert.assertTrue(lowerSpace.hasTile());
         Assert.assertTrue(upperSpace.hasTile());
         Assert.assertEquals(lowerSpace.getTokensOnSpace().size(), 0);
-        Assert.assertEquals(upperSpace.getTokensOnSpace().size(), 0);
+        Assert.assertEquals(upperSpace.getTokensOnSpace().size(), 1);
         Assert.assertEquals(vyas.getToken().getBoardSpace().getRow(), 1);
         Assert.assertEquals(vyas.getToken().getBoardSpace().getCol(), 1);
         Assert.assertEquals(vyas.getToken().getTokenSpace(), 7);
