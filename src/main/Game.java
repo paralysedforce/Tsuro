@@ -36,6 +36,7 @@ public class Game {
        this.eliminatedPlayers = new ArrayList<>();
        this.tilePile = new TilePile();
        dragonTileOwner = null;
+       this.isOver = false;
    }
 
     public static Game getGame(){
@@ -55,6 +56,7 @@ public class Game {
     private List<APlayer> eliminatedPlayers;
     private TilePile tilePile;
     private APlayer dragonTileOwner;
+    private boolean isOver;
 
     //================================================================================
     // Getters
@@ -177,11 +179,6 @@ public class Game {
             player.placeToken();
         }
 
-        /*
-        for (int i = 0; remainingPlayers.size() <= 1; i = (i + 1) % remainingPlayers.size())
-         */
-
-//        int i = 0;
         while (true) {
             APlayer player = remainingPlayers.get(0);
             Tile tile = player.chooseTile(tilePile.getCount());
@@ -205,9 +202,6 @@ public class Game {
                 remainingPlayers.remove(player);
                 remainingPlayers.add(player);
             }
-
-//            if (remainingPlayers.get(i).equals(player))
-//                i = (i + 1) % remainingPlayers.size();
         }
 
         Set<Color> winningPlayers = new HashSet<>();
@@ -320,8 +314,8 @@ public class Game {
             tilePile.fromXML(tilePileListElement);
 
             Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayer(remainingPlayersElement).getColor();
-            List<SPlayer> remainingPlayers = ParserUtils.SPlayerListFromNode(remainingPlayersElement);
-            List<SPlayer> eliminatedPlayers = ParserUtils.SPlayerListFromNode(eliminatedPlayersElement);
+            List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
+            List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
 
 
             Board board = new Board();
@@ -343,10 +337,13 @@ public class Game {
             /* Send output to stdout */
             Document document = ParserUtils.newDocument();
             System.out.println(ParserUtils.xmlElementToString(tilePile.toXML(document)));
-            System.out.println(ParserUtils.SPlayerListToString(remainingPlayers));
-            System.out.println(ParserUtils.SPlayerListToString(eliminatedPlayers));
+            System.out.println(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
+            System.out.println(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
             System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
-            System.out.println(game.isOver ? ParserUtils.SPlayerListToString(remainingPlayers) : "<false></false>");
+            System.out.println(game.isOver ?
+                    ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
+                    "<false></false>");
+
 
         } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
             e.printStackTrace();

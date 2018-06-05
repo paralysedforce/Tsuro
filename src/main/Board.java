@@ -127,7 +127,7 @@ public class Board implements Parsable{
             // Eliminate the token if necessary
             if (isOnEdge(token)) {
                 eliminatedPlayers.add(token);
-//                token.removeFromBoard();
+                token.removeFromBoard();
             }
         }
 
@@ -329,7 +329,7 @@ public class Board implements Parsable{
             Node colorNode = pawnEntNode.getFirstChild();
             Node pawnLocNode = colorNode.getNextSibling();
 
-            Color color = Color.fromXml((Element) colorNode);
+            Color color = Color.fromXML((Element) colorNode);
 
             Node hvNode = pawnLocNode.getFirstChild();
             boolean isHorizontal = hvNode.getNodeName().equals("h");

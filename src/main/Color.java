@@ -22,14 +22,14 @@ public enum Color {
         return str;
     }
 
-    public Element toXml(Document document) {
+    public Element toXML(Document document) {
         Element tag = document.createElement("color");
         tag.appendChild(document.createTextNode(str));
         return tag;
     }
 
 
-    public static Color fromXml(Element colorNode) {
+    public static Color fromXML(Element colorNode) {
         switch (colorNode.getTextContent()) {
             case "green":
                 return GREEN;

@@ -135,7 +135,7 @@ public class NetworkPlayerTest {
                     NetworkMessage.xmlElementToString(Game.getGame().getBoard().toXML(d));
             String expectedColors =
                     "<set>" +
-                            NetworkMessage.xmlElementToString(Color.BLUE.toXml(d)) +
+                            NetworkMessage.xmlElementToString(Color.BLUE.toXML(d)) +
                             "</set>";
 
             player.endGame(Sets.newSet(Color.BLUE));

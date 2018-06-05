@@ -260,8 +260,7 @@ public class GameTest {
             }
 
         }
-
-        Assert.assertEquals(2, legalMoves.size());
+        Assert.assertEquals(1, legalMoves.size());
     }
 
     @Test

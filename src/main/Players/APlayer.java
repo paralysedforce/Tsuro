@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javafx.util.Pair;
 import main.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class APlayer extends IPlayer {
 
@@ -205,4 +207,39 @@ public abstract class APlayer extends IPlayer {
     // Sequential Contract
     //================================================================================
     private enum State {UNINITIALIZED, INITIALIZED, TURNPLAYABLE, GAMEENDED};
+
+    //================================================================================
+    // Static SPlayer Parsing Methods
+    //================================================================================
+
+    /* This doesn't actually implement Parsable, but the usage is similar */
+    public static Element toXML(Document document, APlayer player, boolean hasDragonTile) {
+        Element splayerElement = document.createElement(hasDragonTile ? "splayer-dragon": "splayer-nodragon");
+
+        splayerElement.appendChild(player.color.toXML(document));
+        splayerElement.appendChild(player.hand.toXML(document));
+
+        return splayerElement;
+    }
+
+
+    public static APlayer fromXML(Element aplayerElement) {
+        if (!aplayerElement.getTextContent().equals("splayer-dragon") ||
+            !aplayerElement.getTextContent().equals("splayer-nodragon"))
+            throw new IllegalArgumentException();
+
+
+        Element colorElement = (Element) aplayerElement.getFirstChild();
+        Element handElement = (Element) colorElement.getNextSibling();
+
+        Color color = Color.fromXML(colorElement);
+        PlayerHand hand = new PlayerHand();
+        hand.fromXML(handElement);
+
+        APlayer randomPlayer = new RandomPlayer("parsed_player", color);
+        randomPlayer.setHand(hand);
+
+        return randomPlayer;
+    }
+
 }

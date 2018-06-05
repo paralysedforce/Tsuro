@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.print.Doc;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
@@ -212,4 +213,50 @@ public class ParserUtils {
     }
 
 
+    public static APlayer findDragonTilePlayer(Element remainingPlayersElement) {
+        for (Node child = remainingPlayersElement.getFirstChild();
+                child != null;
+                child = child.getNextSibling()){
+            if (child.getTextContent().equals("splayer-dragon")){
+                return APlayer.fromXML((Element) child);
+            }
+        }
+
+        return null;
+    }
+
+    public static String APlayerListToString(List<APlayer> aPlayerList, APlayer dragonTileOwner) {
+        try {
+
+            Document document = newDocument();
+            Element listElement = document.createElement("list");
+            for (APlayer player: aPlayerList){
+
+                Element childElement;
+                childElement = APlayer.toXML(document, player, player == dragonTileOwner);
+                listElement.appendChild(childElement);
+            }
+
+            return xmlElementToString(listElement);
+
+        } catch (ParserConfigurationException | TransformerException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static List<APlayer> APlayerListFromNode(Element aplayerListElement) {
+        if (aplayerListElement.getTextContent().equals("list"))
+            throw new IllegalArgumentException();
+
+        List<APlayer> players = new ArrayList<>();
+        for (Node child = aplayerListElement.getFirstChild();
+             child != null;
+             child = child.getNextSibling()){
+
+            players.add(APlayer.fromXML((Element) child));
+        }
+
+        return players;
+    }
 }
