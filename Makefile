@@ -20,6 +20,7 @@ all:
 
 clean:
 	rm -r out/*
+	rm run.sh
 
 run: all
 	@cd out; \
