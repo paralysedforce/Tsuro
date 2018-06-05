@@ -25,6 +25,7 @@ public class Game {
        this.eliminatedPlayers = new ArrayList<>();
        this.tilePile = new TilePile();
        dragonTileOwner = null;
+       this.isOver = false;
    }
 
     public static Game getGame(){
@@ -44,6 +45,7 @@ public class Game {
     private List<APlayer> eliminatedPlayers;
     private TilePile tilePile;
     private APlayer dragonTileOwner;
+    private boolean isOver;
 
     //================================================================================
     // Getters
@@ -326,8 +328,8 @@ public class Game {
             tilePile.fromXML(tilePileListElement);
 
             Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayer(remainingPlayersElement).getColor();
-            List<SPlayer> remainingPlayers = ParserUtils.SPlayerListFromNode(remainingPlayersElement);
-            List<SPlayer> eliminatedPlayers = ParserUtils.SPlayerListFromNode(eliminatedPlayersElement);
+            List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
+            List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
 
 
             Board board = new Board();
@@ -349,10 +351,13 @@ public class Game {
             /* Send output to stdout */
             Document document = ParserUtils.newDocument();
             System.out.println(ParserUtils.xmlElementToString(tilePile.toXML(document)));
-            System.out.println(ParserUtils.SPlayerListToString(remainingPlayers));
-            System.out.println(ParserUtils.SPlayerListToString(eliminatedPlayers));
+            System.out.println(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
+            System.out.println(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
             System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
-            System.out.println(game.isOver ? ParserUtils.SPlayerListToString(remainingPlayers) : "<false></false>");
+            System.out.println(game.isOver ?
+                    ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
+                    "<false></false>");
+
 
         } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
             e.printStackTrace();

@@ -142,7 +142,7 @@ public class NetworkGame {
         if (!myColorNode.getNodeName().equals("color") || !colorListNode.getNodeName().equals("list"))
             throw new ParserException();
 
-        Color myColor = Color.fromXml((Element) root.getFirstChild());
+        Color myColor = Color.fromXML((Element) root.getFirstChild());
         List<Color> otherColors = new LinkedList<>();
         for (Node colorNode = colorListNode.getFirstChild();
              colorNode != null;
@@ -152,7 +152,7 @@ public class NetworkGame {
                 throw new ParserException();
             }
 
-            otherColors.add(Color.fromXml((Element)colorNode));
+            otherColors.add(Color.fromXML((Element)colorNode));
         }
 
         aplayer.setColor(myColor);
@@ -219,7 +219,7 @@ public class NetworkGame {
              colorNode != null;
              colorNode = colorNode.getNextSibling()
         ){
-            winners.add(Color.fromXml((Element) colorNode));
+            winners.add(Color.fromXML((Element) colorNode));
         }
 
         aplayer.endGame(winners);

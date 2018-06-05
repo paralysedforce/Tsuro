@@ -135,10 +135,10 @@ public class Token implements Parsable {
             entryElement.appendChild(this
                     .player
                     .getColor()
-                    .toXml(document));
+                    .toXML(document));
         } else {
             // TODO something else for default
-            entryElement.appendChild(Color.DARKGREEN.toXml(document));
+            entryElement.appendChild(Color.DARKGREEN.toXML(document));
         }
         entryElement.appendChild(pawnLoc);
 

@@ -91,11 +91,11 @@ public class NetworkPlayer extends APlayer {
         try {
             Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element initializeElement = NetworkMessage.INITIALIZE.getMessageRootElement(d);
-            initializeElement.appendChild(this.getColor().toXml(d));
+            initializeElement.appendChild(this.getColor().toXML(d));
 
             Element colorListElement = d.createElement("list");
             for (Color aColor : colors) {
-                colorListElement.appendChild(aColor.toXml(d));
+                colorListElement.appendChild(aColor.toXML(d));
             }
 
             initializeElement.appendChild(colorListElement);
@@ -202,7 +202,7 @@ public class NetworkPlayer extends APlayer {
             Element winnersSet = d.createElement("set");
 
             for (Color color : winners) {
-                winnersSet.appendChild(color.toXml(d));
+                winnersSet.appendChild(color.toXML(d));
             }
 
             Element endGameElement = d.createElement(NetworkMessage.END_GAME.getTag());
