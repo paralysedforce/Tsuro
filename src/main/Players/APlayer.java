@@ -44,7 +44,7 @@ public abstract class APlayer extends IPlayer {
         curState = other.curState;
         token = other.token;
         board = other.board;
-        hand = new PlayerHand();
+        hand = other.hand;
     }
 
     //================================================================================
