@@ -1,18 +1,18 @@
 package test.ParserTests;
 
-import main.BoardSpace;
-import main.Parser.ParserUtils;
-import main.Tile;
 import org.junit.Assert;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import main.BoardSpace;
+import main.Parser.ParserUtils;
+import main.Tile;
 
 /**
  * Created by vyasalwar on 5/22/18.
@@ -74,10 +74,10 @@ class ParserTestUtils {
             "<ent>" +
                 "<xy>" +
                     "<x>" +
-                        "<n>2</n>" +
+                        "2" +
                     "</x>" +
                     "<y>" +
-                        "<n>1</n>" +
+                        "1" +
                     "</y>" +
                 "</xy>" +
                 testTileXml +

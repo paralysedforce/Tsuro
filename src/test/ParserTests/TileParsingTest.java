@@ -1,8 +1,5 @@
 package test.ParserTests;
 
-import main.BoardSpace;
-import main.Parser.ParserUtils;
-import main.Tile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -10,12 +7,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import main.BoardSpace;
+import main.Parser.ParserUtils;
+import main.Tile;
+
 import static org.junit.Assert.assertTrue;
-import static test.ParserTests.ParserTestUtils.*;
+import static test.ParserTests.ParserTestUtils.assertElementIsExpected;
+import static test.ParserTests.ParserTestUtils.testBoardSpace;
+import static test.ParserTests.ParserTestUtils.testSpaceXml;
+import static test.ParserTests.ParserTestUtils.testTile;
+import static test.ParserTests.ParserTestUtils.testTileXml;
 
 /**
  * Created by vyasalwar on 5/22/18.
