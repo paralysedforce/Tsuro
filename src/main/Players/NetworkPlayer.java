@@ -108,8 +108,10 @@ public class NetworkPlayer extends APlayer {
             // Check to make sure that the response is void
 
 
-        } catch (IOException | TransformerException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+            // Do something maybe?
+            System.exit(-1);
         }
 
     }
@@ -121,7 +123,7 @@ public class NetworkPlayer extends APlayer {
 
             // Construct the request
             String openingTag = String.format("<%s>", NetworkMessage.PLACE_PAWN.getTag());
-            String content = NetworkMessage.xmlElementToString(board.toXML(d));
+            String content = ParserUtils.xmlElementToString(board.toXML(d));
             String closingTag = String.format("</%s>", NetworkMessage.PLACE_PAWN.getTag());
             String request = openingTag + content + closingTag;
 
@@ -159,11 +161,11 @@ public class NetworkPlayer extends APlayer {
             playTurnElement.appendChild(handElement);
             playTurnElement.appendChild(remainingTilesElement);
 
-            toClient.println(NetworkMessage.xmlElementToString(playTurnElement));
+            toClient.println(ParserUtils.xmlElementToString(playTurnElement));
 
             String response = fromClient.readLine();
 
-            Node responseNode = NetworkMessage.nodeFromString(response);
+            Node responseNode = ParserUtils.nodeFromString(response);
 
             if (responseNode.getNodeName().equals(NetworkMessage.TILE.getTag())) {
                 Tile tile = new Tile();
@@ -193,7 +195,7 @@ public class NetworkPlayer extends APlayer {
             endGameElement.appendChild(boardElement);
             endGameElement.appendChild(winnersSet);
 
-            toClient.println(NetworkMessage.xmlElementToString(endGameElement));
+            toClient.println(ParserUtils.xmlElementToString(endGameElement));
 
             String response = fromClient.readLine();
             // TODO: Maybe do something if the response is not <void></void>

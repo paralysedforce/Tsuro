@@ -50,17 +50,25 @@ public class ParserUtils {
      * @param element org.w3c.dom.Element to be transformed into a string.
      * @return String representation of element.
      */
-    public static String xmlElementToString(Element element) throws TransformerException {
+    public static String xmlElementToString(Element element) {
 
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.METHOD, "html"); // This prevents collapsing empty tags
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "html"); // This prevents collapsing empty tags
 
-        //initialize StreamResult with File object to save to file
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(element);
-        transformer.transform(source, result);
-        return result.getWriter().toString();
+            //initialize StreamResult with File object to save to file
+            StreamResult result = new StreamResult(new StringWriter());
+            DOMSource source = new DOMSource(element);
+            transformer.transform(source, result);
+            return result.getWriter().toString();
+        }
+        catch (TransformerException e){
+            // For testing purposes, we just return an empty string. This should be updated if this
+            // code is moved to functional sections.
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private static final String[] UnorderedTags = {"set", "tile"};
@@ -207,24 +215,17 @@ public class ParserUtils {
         return null;
     }
 
-    public static String APlayerListToString(List<APlayer> aPlayerList, APlayer dragonTileOwner) {
-        try {
+public static String APlayerListToString(List<APlayer> aPlayerList, APlayer dragonTileOwner) {
+        Document document = newDocument();
+        Element listElement = document.createElement("list");
+        for (APlayer player: aPlayerList){
 
-            Document document = newDocument();
-            Element listElement = document.createElement("list");
-            for (APlayer player: aPlayerList){
-
-                Element childElement;
-                childElement = APlayer.toXML(document, player, player == dragonTileOwner);
-                listElement.appendChild(childElement);
-            }
-
-            return xmlElementToString(listElement);
-
-        } catch (TransformerException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException();
+            Element childElement;
+            childElement = APlayer.toXML(document, player, player == dragonTileOwner);
+            listElement.appendChild(childElement);
         }
+
+        return xmlElementToString(listElement);
     }
 
     public static List<APlayer> APlayerListFromNode(Element aPlayerListElement) {

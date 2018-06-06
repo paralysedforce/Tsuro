@@ -374,7 +374,7 @@ public class Game {
                     "<false></false>");
 
 
-        } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
             return;
         }

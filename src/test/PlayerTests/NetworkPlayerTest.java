@@ -1,5 +1,6 @@
 package test.PlayerTests;
 
+import main.Parser.ParserUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -98,7 +99,7 @@ public class NetworkPlayerTest {
 
         Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         String expectedPlacementRequestBoard =
-                NetworkMessage.xmlElementToString(Game.getGame().getBoard().toXML(d));
+                ParserUtils.xmlElementToString(Game.getGame().getBoard().toXML(d));
 
         player.placeToken();
 
@@ -132,10 +133,10 @@ public class NetworkPlayerTest {
             Writer w = new StringWriter();
             APlayer player = initiizeNetworkPlayer(r, w);
             String expectedRequestBoard =
-                    NetworkMessage.xmlElementToString(Game.getGame().getBoard().toXML(d));
+                    ParserUtils.xmlElementToString(Game.getGame().getBoard().toXML(d));
             String expectedColors =
                     "<set>" +
-                            NetworkMessage.xmlElementToString(Color.BLUE.toXML(d)) +
+                            ParserUtils.xmlElementToString(Color.BLUE.toXML(d)) +
                             "</set>";
 
             player.endGame(Sets.newSet(Color.BLUE));

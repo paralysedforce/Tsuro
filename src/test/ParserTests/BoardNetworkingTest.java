@@ -1,5 +1,6 @@
 package test.ParserTests;
 
+import main.Parser.ParserUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
@@ -92,7 +93,7 @@ public class BoardNetworkingTest {
 
                         "</board>";
 
-        Element inputXmlElement = (Element) NetworkMessage.nodeFromString(boardXmlInputStr);
+        Element inputXmlElement = (Element) ParserUtils.nodeFromString(boardXmlInputStr);
 
         Board board = new Board();
         board.fromXML(inputXmlElement);

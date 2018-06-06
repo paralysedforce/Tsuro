@@ -104,7 +104,7 @@ public class NetworkGame {
 
     private String forwardRequestToAPlayer(String request) throws IOException {
         try {
-            Node root = NetworkMessage.nodeFromString(request);
+            Node root = ParserUtils.nodeFromString(request);
             switch (root.getNodeName()) {
                 case "get-name":
                     return getNameHandler(root);
@@ -198,7 +198,7 @@ public class NetworkGame {
 
             return ParserUtils.xmlElementToString(returnedTileElement);
 
-        } catch (ParserConfigurationException | TransformerException e) {
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
             throw new IOException();
         }

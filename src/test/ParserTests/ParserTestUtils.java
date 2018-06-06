@@ -37,7 +37,7 @@ class ParserTestUtils {
             boolean eq = ParserUtils.nodesAreEquivalent(expectedNode, element);
             Assert.assertTrue(eq); // Provides useful debugging info.
             // assertTrue(element.isEqualNode(expectedNode)); // Should also be true, but doesn't rely on untested code.
-        } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
             Assert.fail();
         }
