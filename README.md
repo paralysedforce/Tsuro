@@ -10,7 +10,7 @@ This will produce the following two files:
 
 To add a tournament player to a running tournament, run
 ```
-tournamentPlayer.sh <host address> <port number>
+tournamentPlayer.sh <host address> <port number> <Optional: strategy>
 ```
 
 Authors:

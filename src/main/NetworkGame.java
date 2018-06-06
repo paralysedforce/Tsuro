@@ -22,8 +22,12 @@ import javafx.util.Pair;
 import main.Parser.ParserException;
 import main.Parser.ParserUtils;
 import main.Players.APlayer;
+import main.Players.AggressivePlayer;
+import main.Players.LeastSymmetricPlayer;
 import main.Players.MostSymmetricPlayer;
 import main.Players.PlayerHand;
+import main.Players.RandomPlayer;
+import main.Players.ShyPlayer;
 
 /**
  * The Player's representation of the Game Server
@@ -247,8 +251,34 @@ public class NetworkGame {
             String host = args[0];
             System.out.println(host);
             int port = Integer.valueOf(args[1]);
+            APlayer player;
 
-            APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+            if (args.length == 3) {
+                String strategy = args[2];
+                switch (strategy) {
+                    case "random":
+                        player = new RandomPlayer("random", Color.BLUE);
+                        break;
+                    case "symmetric":
+                        player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+                        break;
+                    case "asymmetric":
+                        player = new LeastSymmetricPlayer("asymmetric", Color.BLUE);
+                        break;
+                    case "shy":
+                        player = new ShyPlayer("shy", Color.BLUE);
+                        break;
+                    case "aggressive":
+                        player = new AggressivePlayer("aggressive", Color.BLUE);
+                        break;
+                    default:
+                        System.err.println(strategy + " is not recognized as a strategy. Using random player.");
+                        player = new RandomPlayer("random", Color.BLUE);
+                }
+            } else {
+                player = new RandomPlayer("Random", Color.BLUE);
+            }
+
 
             NetworkGame game = new NetworkGame(host, port, player);
             game.debug = false;
