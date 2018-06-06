@@ -111,7 +111,7 @@ public class Game {
         if(!player.getHand().holdsTile(tile))
             return false;
 
-        if(player.hasSafeMove() && board.willKillPlayer(tile, player.getToken()))
+        if(player.hasSafeMove() && board.willKillPlayer(tile, player))
             return false;
 
         return true;
@@ -124,7 +124,7 @@ public class Game {
         }
     }
 
-
+    /* TODO: MAKE PRIVATE WHEN NOT DEBUGGING */
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
     public Set<APlayer> playTurn(Tile tile, APlayer player) throws ContractException{
@@ -132,6 +132,7 @@ public class Game {
                 throw new ContractException(ContractViolation.PRECONDITION, "Player made an illegal move");
             }
 
+            // Place tile and move players
             Set<Token> failedTokens = board.placeTile(tile, player.getToken());
             Set<APlayer> failedPlayers = new HashSet<>();
 
@@ -143,9 +144,11 @@ public class Game {
             if (failedPlayers.containsAll(remainingPlayers))
                 return failedPlayers;
 
+            // Update hands
             player.getHand().removeTile(tile);
             player.getHand().drawFromDeck();
 
+            // Update deck with eliminated players
             if (!failedPlayers.isEmpty()) {
                 for (APlayer failedPlayer : failedPlayers)
                     failedPlayer.getHand().returnTilesToDeck();
@@ -155,11 +158,39 @@ public class Game {
                 for (APlayer failedPlayer : failedPlayers)
                     eliminatePlayer(failedPlayer);
 
-
                 drawAfterElimination(playerToDrawFirst);
             }
 
             return failedPlayers;
+    }
+
+    /**
+     * Matches the return specs of the assignment, calls playTurn as appropriate
+     * @return null if the game is not over, list of winning players if the game is over.
+     */
+    public HashSet<APlayer> playATurn(Tile tile, APlayer player) throws ContractException {
+
+        // Cheating occurs here and throws ContractException
+        Set<APlayer> playersEliminatedThisTurn = playTurn(tile, player);
+
+        // Check for end game conditions that don't result in one winner in addition to one winner.
+        if(playersEliminatedThisTurn.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
+            return new HashSet<APlayer>(remainingPlayers);
+        }
+        if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
+            return new HashSet<APlayer>(remainingPlayers);
+        }
+
+
+        // Game not ended. Update player lists.
+        if(!eliminatedPlayers.contains(player)){
+            remainingPlayers.remove(player);
+            remainingPlayers.add(player);
+        }
+        this.eliminatedPlayers.addAll(playersEliminatedThisTurn);
+        this.remainingPlayers.removeAll(playersEliminatedThisTurn);
+
+        return null;
     }
 
     public void initializePlayers(){
@@ -182,43 +213,37 @@ public class Game {
         }
 
         while (true) {
-            APlayer player = remainingPlayers.get(0);
-            Tile tile = player.chooseTile(tilePile.getCount());
+            // Get the chosen move
+            APlayer playingPlayer = remainingPlayers.get(0);
+            Tile tile = playingPlayer.chooseTile(tilePile.getCount());
+
+            Set<APlayer> winningPlayers;
             try {
-                Set<APlayer> losingPlayers = playTurn(tile, player);
-                if(losingPlayers.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
-                    break;
-                }
-                if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
-                    break;
-                }
+                // Update winning players
+                winningPlayers = playATurn(tile, playingPlayer);
             }
             catch (ContractException e) {
-                remainingPlayers.remove(player);
-                player = blamePlayer(player);
-                remainingPlayers.add(0, player);
+                // Detect cheating
+                remainingPlayers.remove(playingPlayer);
+                playingPlayer = blamePlayer(playingPlayer);
+                remainingPlayers.add(0, playingPlayer);
                 continue;
             }
 
-            if(!eliminatedPlayers.contains(player)){
-                remainingPlayers.remove(player);
-                remainingPlayers.add(player);
+            if (winningPlayers != null) {
+                Set<Color> winningPlayerColors = new HashSet<>();
+                for (APlayer player : remainingPlayers) {
+                    winningPlayerColors.add(player.getColor());
+                }
+
+                for (APlayer player : remainingPlayers){
+                    player.endGame(winningPlayerColors);
+                }
+
+                return winningPlayers;
+
             }
         }
-
-        Set<Color> winningPlayers = new HashSet<>();
-        for (APlayer player : remainingPlayers) {
-            winningPlayers.add(player.getColor());
-        }
-
-        for (APlayer player : remainingPlayers){
-            player.endGame(winningPlayers);
-        }
-        for (APlayer player : eliminatedPlayers){
-            player.endGame(winningPlayers);
-        }
-
-        return new HashSet<>(remainingPlayers);
     }
 
 
