@@ -124,7 +124,7 @@ public class Game {
                 return failedPlayers;
 
             // Update hands
-            player.getHand().removeTile(tile);
+            // player.getHand().removeTile(tile);
             player.getHand().drawFromDeck();
 
             // Update deck with eliminated players
@@ -305,63 +305,68 @@ public class Game {
         Scanner scanner = new Scanner(System.in);
         //System.err.println("Welcome to Tsuro!");
 
+        while (scanner.hasNextLine()) {
         /* One move */
-        try {
+            try {
             /* Get input from stdin */
-            Element tilePileListElement      = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-            Element remainingPlayersElement  = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-            Element eliminatedPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-            Element boardElement             = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-            Element tileToBePlacedElement    = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element tilePileListElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element remainingPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element eliminatedPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element boardElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element tileToBePlacedElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
 
 
             /* Convert input into Game representations */
-            TilePile tilePile = new TilePile(tilePileListElement);
-            Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayerColor(remainingPlayersElement);
-            List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
-            List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
-            Board board = new Board(boardElement);
-            Tile tileToBePlaced = new Tile(tileToBePlacedElement);
+                TilePile tilePile = new TilePile(tilePileListElement);
+                Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayerColor(remainingPlayersElement);
+                List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
+                List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
+                Board board = new Board(boardElement);
+                Tile tileToBePlaced = new Tile(tileToBePlacedElement);
 
             /* Update Game fields */
-            game.board = board;
-            game.tilePile = tilePile;
-            game.remainingPlayers = remainingPlayers;
-            game.eliminatedPlayers = eliminatedPlayers;
+                game.board = board;
+                game.tilePile = tilePile;
+                game.remainingPlayers = remainingPlayers;
+                game.eliminatedPlayers = eliminatedPlayers;
 
             /* Connect all the components to each other */
-            game.dragonTileOwner = null;
-            for (APlayer player: remainingPlayers){
-                if (player.getColor() == dragonTileOwnerColor) {
-                    game.dragonTileOwner = player;
-                    break;
+                game.dragonTileOwner = null;
+                for (APlayer player : remainingPlayers) {
+                    if (player.getColor() == dragonTileOwnerColor) {
+                        game.dragonTileOwner = player;
+                        break;
+                    }
                 }
-            }
 
-            for (APlayer player: game.remainingPlayers)
-                player.setBoard(board);
+                for (APlayer player : game.remainingPlayers) {
+                    player.setBoard(board);
+                    player.getHand().setDeck(tilePile);
+                }
 
-            for (APlayer player: game.eliminatedPlayers)
-                player.setBoard(board);
+
+                for (APlayer player : game.eliminatedPlayers) {
+                    player.setBoard(board);
+                    player.getHand().setDeck(tilePile);
+                }
 
             /* Make a move */
-            game.playTurn(tileToBePlaced, remainingPlayers.get(0));
+                game.playTurn(tileToBePlaced, remainingPlayers.get(0));
 
             /* Send output to stdout */
-            Document document = ParserUtils.newDocument();
-            System.out.print(ParserUtils.xmlElementToString(tilePile.toXML(document)));
-            System.out.print(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
-            System.out.print(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
-            System.out.print(ParserUtils.xmlElementToString(board.toXML(document)));
-            System.out.print(game.isOver ?
-                    ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
-                    "<false></false>");
+                Document document = ParserUtils.newDocument();
+                System.out.println(ParserUtils.xmlElementToString(tilePile.toXML(document)));
+                System.out.println(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
+                System.out.println(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
+                System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
+                System.out.println(game.isOver ?
+                        ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
+                        "<false></false>");
 
-            scanner.nextLine();
-
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-            return;
+            } catch (ParserConfigurationException | IOException | SAXException e) {
+                e.printStackTrace();
+                return;
+            }
         }
 
 

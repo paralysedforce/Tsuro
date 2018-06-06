@@ -72,7 +72,7 @@ public abstract class APlayer extends IPlayer {
         Token boardToken = board.findToken(color);
 
         // Update player token if necessary
-        if (token != null && boardToken != null) {
+        if (token == null && boardToken != null) {
             this.token = boardToken;
         }
     }
@@ -212,6 +212,7 @@ public abstract class APlayer extends IPlayer {
     /* This doesn't actually implement Parsable, but the usage is similar */
     public static Element toXML(Document document, APlayer player, boolean hasDragonTile) {
         Element splayerElement = document.createElement(hasDragonTile ? "splayer-dragon": "splayer-nodragon");
+
 
         splayerElement.appendChild(player.color.toXML(document));
         splayerElement.appendChild(player.hand.toXML(document));

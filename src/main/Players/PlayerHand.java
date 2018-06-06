@@ -122,6 +122,10 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
         return true;
     }
 
+    public void setDeck(TilePile deck){
+        this.deck = deck;
+    }
+
     @Override
     public Iterator<Tile> iterator() {
         return hand.iterator();
@@ -132,21 +136,22 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
     //================================================================================
     @Override
     public Element toXML(Document document) {
-        return null;
+        Element setElement = document.createElement("set");
+        for (Tile tile: hand){
+            setElement.appendChild(tile.toXML(document));
+        }
+        return setElement;
     }
 
     @Override
     public void fromXML(Element xmlElement) throws IllegalArgumentException {
-        Node tileXml = xmlElement.getFirstChild();
+
         this.hand = new ArrayList<>();
 
-        if (tileXml != null) {
-            Tile t = new Tile();
-            t.fromXML((Element) tileXml);
-            this.hand.add(t);
-        }
+        for (Node tileXml = xmlElement.getFirstChild();
+             tileXml != null;
+             tileXml = tileXml.getNextSibling()) {
 
-        while ((tileXml = tileXml.getNextSibling()) != null) {
             Tile t = new Tile();
             t.fromXML((Element) tileXml);
             this.hand.add(t);
