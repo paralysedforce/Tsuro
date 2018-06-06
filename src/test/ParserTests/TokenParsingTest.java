@@ -29,39 +29,35 @@ import static test.ParserTests.ParserTestUtils.testPawnTemplate;
 public class TokenParsingTest {
     @Test
     public void testTokenLocations() {
-        try {
-            Document doc = ParserUtils.newDocument();
-            RandomPlayer bluePlayer = new RandomPlayer("Will", Color.BLUE);
-            BoardSpace space = new BoardSpace(2, 2);
 
-            // Top
-            Token topToken = new Token(space, 0, bluePlayer);
-            assertElementIsExpected(
-                    topToken.toXML(doc),
-                    String.format(testPawnTemplate, pawnLocTop));
+        Document doc = ParserUtils.newDocument();
+        RandomPlayer bluePlayer = new RandomPlayer("Will", Color.BLUE);
+        BoardSpace space = new BoardSpace(2, 2);
 
-            // Right
-            Token rightToken = new Token(space, 2, bluePlayer);
-            assertElementIsExpected(
-                    rightToken.toXML(doc),
-                    String.format(testPawnTemplate, pawnLocRight));
+        // Top
+        Token topToken = new Token(space, 0, bluePlayer.getColor());
+        assertElementIsExpected(
+                topToken.toXML(doc),
+                String.format(testPawnTemplate, pawnLocTop));
 
-            // Bottom
-            Token bottomToken = new Token(space, 5, bluePlayer);
-            assertElementIsExpected(
-                    bottomToken.toXML(doc),
-                    String.format(testPawnTemplate, pawnLocBottom));
+        // Right
+        Token rightToken = new Token(space, 2, bluePlayer.getColor());
+        assertElementIsExpected(
+                rightToken.toXML(doc),
+                String.format(testPawnTemplate, pawnLocRight));
 
-            // Left
-            Token leftToken = new Token(space, 6, bluePlayer);
-            assertElementIsExpected(
-                    leftToken.toXML(doc),
-                    String.format(testPawnTemplate, pawnLocLeft));
+        // Bottom
+        Token bottomToken = new Token(space, 5, bluePlayer.getColor());
+        assertElementIsExpected(
+                bottomToken.toXML(doc),
+                String.format(testPawnTemplate, pawnLocBottom));
 
-        } catch (ParserConfigurationException e){
-            e.printStackTrace();
-            Assert.fail();
-        }
+        // Left
+        Token leftToken = new Token(space, 6, bluePlayer.getColor());
+        assertElementIsExpected(
+                leftToken.toXML(doc),
+                String.format(testPawnTemplate, pawnLocLeft));
+
     }
 
 

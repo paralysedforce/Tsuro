@@ -218,7 +218,7 @@ public class GameTest {
             @Override
             public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
 
-                this.token = new Token(startingLocation, startingTokenSpace, this);
+                this.token = new Token(startingLocation, startingTokenSpace, getColor());
 
                 return new Pair<>(startingLocation, startingTokenSpace);
             }
@@ -278,7 +278,7 @@ public class GameTest {
         APlayer player = new RandomPlayer("randy", Color.RED) {
             @Override
             public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
-                token = new Token(startingLocation, startingTokenSpace, this);
+                token = new Token(startingLocation, startingTokenSpace, getColor());
 
                 return new Pair<>(startingLocation, startingTokenSpace);
             }
@@ -309,7 +309,7 @@ public class GameTest {
         APlayer player = new RandomPlayer("randy", Color.RED) {
             @Override
             public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
-                token = new Token(startingLocation, startingTokenSpace, this);
+                token = new Token(startingLocation, startingTokenSpace, getColor());
 
                 return new Pair<>(startingLocation, startingTokenSpace);
             }

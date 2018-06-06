@@ -15,15 +15,19 @@ public class Token implements Parsable {
     // Instance Variables
     //================================================================================
     private BoardSpace space;
-    private APlayer player;
+    private Color color;
 
     //================================================================================
     // Constructor
     //================================================================================
-    public Token(BoardSpace startingLocation, int startingTokenSpace, APlayer player) {
+    public Token(BoardSpace startingLocation, int startingTokenSpace, Color color) {
         space = startingLocation;
-        this.player = player;
+        this.color = color;
         space.addToken(this, startingTokenSpace);
+    }
+
+    public Token(Element xmlElement){
+        fromXML(xmlElement);
     }
 
     //================================================================================
@@ -38,8 +42,8 @@ public class Token implements Parsable {
         return space.findToken(this);
     }
 
-    public APlayer getPlayer() {
-        return player;
+    public Color getColor() {
+        return color;
     }
 
 
@@ -69,90 +73,29 @@ public class Token implements Parsable {
 
     public static int getMirroredTokenSpace(int tokenSpace) {
         switch (tokenSpace) {
-            case 0:
-                return 5;
-            case 1:
-                return 4;
-            case 2:
-                return 7;
-            case 3:
-                return 6;
-            case 4:
-                return 1;
-            case 5:
-                return 0;
-            case 6:
-                return 3;
-            case 7:
-                return 2;
+            case 0: return 5;
+            case 1: return 4;
+            case 2: return 7;
+            case 3: return 6;
+            case 4: return 1;
+            case 5: return 0;
+            case 6: return 3;
+            case 7: return 2;
         }
         throw new IllegalArgumentException("Invalid tokenSpace");
     }
 
-
     @Override
-    public Element toXML(Document document) {
-        int tick = getTokenSpace();
-        int row = getBoardSpace().getRow();
-        int col = getBoardSpace().getCol();
-
-        boolean isVertical = (tick / 2) % 2 == 1;
-        Element hvElement;
-        int coord1, coord2;
-        if (isVertical) {
-            hvElement = document.createElement("v");
-
-            coord1 = col;
-            boolean isLeft = tick > 5;
-            if (!isLeft) coord1 += 1;
-
-            coord2 = 2 * row;
-            if (tick == 3 || tick == 6) coord2 += 1;
-        } else {
-            hvElement = document.createElement("h");
-
-            coord1 = row;
-            boolean isTop = tick < 2;
-            if (!isTop) coord1 += 1;
-
-            coord2 = 2 * col;
-            if (tick == 1 || tick == 4) coord2 += 1;
+    public boolean equals(Object obj){
+        if (!(obj instanceof Token)){
+            return false;
         }
 
-        Element coord1Element = document.createElement("n");
-        Element coord2Element = document.createElement("n");
-        coord1Element.appendChild(document.createTextNode(Integer.toString(coord1)));
-        coord2Element.appendChild(document.createTextNode(Integer.toString(coord2)));
-
-        Element pawnLoc = document.createElement("pawn-loc");
-        pawnLoc.appendChild(hvElement);
-        pawnLoc.appendChild(coord1Element);
-        pawnLoc.appendChild(coord2Element);
-
-        Element entryElement = document.createElement("ent");
-
-        if (this.player != null) {
-            entryElement.appendChild(this
-                    .player
-                    .getColor()
-                    .toXML(document));
-        } else {
-            // TODO something else for default
-            entryElement.appendChild(Color.DARKGREEN.toXML(document));
-        }
-        entryElement.appendChild(pawnLoc);
-
-        return entryElement;
+        Token otherToken = (Token) obj;
+        return otherToken.color == color;
     }
 
-    public void setPlayer(APlayer player) {
-        this.player = player;
-    }
 
-    @Override
-    public void fromXML(Element xmlElement) {
-        // TODO
-    }
 
     /**
      * Builds a location from the network definition of location
@@ -212,6 +155,63 @@ public class Token implements Parsable {
             throw e;
         }
     }
+
+    //================================================================================
+    // XML Parsing
+    //================================================================================
+    @Override
+    public Element toXML(Document document) {
+        int tick = getTokenSpace();
+        int row = getBoardSpace().getRow();
+        int col = getBoardSpace().getCol();
+
+        boolean isVertical = (tick / 2) % 2 == 1;
+        Element hvElement;
+        int coord1, coord2;
+        if (isVertical) {
+            hvElement = document.createElement("v");
+
+            coord1 = col;
+            boolean isLeft = tick > 5;
+            if (!isLeft) coord1 += 1;
+
+            coord2 = 2 * row;
+            if (tick == 3 || tick == 6) coord2 += 1;
+        } else {
+            hvElement = document.createElement("h");
+
+            coord1 = row;
+            boolean isTop = tick < 2;
+            if (!isTop) coord1 += 1;
+
+            coord2 = 2 * col;
+            if (tick == 1 || tick == 4) coord2 += 1;
+        }
+
+        Element coord1Element = document.createElement("n");
+        Element coord2Element = document.createElement("n");
+        coord1Element.appendChild(document.createTextNode(Integer.toString(coord1)));
+        coord2Element.appendChild(document.createTextNode(Integer.toString(coord2)));
+
+        Element pawnLoc = document.createElement("pawn-loc");
+        pawnLoc.appendChild(hvElement);
+        pawnLoc.appendChild(coord1Element);
+        pawnLoc.appendChild(coord2Element);
+
+        Element entryElement = document.createElement("ent");
+
+
+        entryElement.appendChild(color.toXML(document));
+        entryElement.appendChild(pawnLoc);
+
+        return entryElement;
+    }
+
+    @Override
+    public void fromXML(Element xmlElement) {
+        // TODO
+    }
+
 
     public static String pawnLocFromLocation(Pair<BoardSpace, Integer> playerLocation) {
         int row = playerLocation.getKey().getRow();

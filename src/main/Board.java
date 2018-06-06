@@ -10,7 +10,6 @@ import java.util.Set;
 import javafx.util.Pair;
 import main.Parser.ParserException;
 import main.Players.APlayer;
-import main.Players.PlaceholderPlayer;
 
 /**
  *
@@ -31,6 +30,10 @@ public class Board implements Parsable{
                 spaces[i][j] = new BoardSpace(i, j);
             }
         }
+    }
+
+    public Board(Element xmlElement){
+        fromXML(xmlElement);
     }
 
     //================================================================================
@@ -62,8 +65,8 @@ public class Board implements Parsable{
 
     // Returns true if placing the tile in front of the token will lead to the player's death
     // Does not actually place the tile
-    public boolean willKillPlayer(Tile tile, APlayer player) {
-        Token token = player.getToken();
+    public boolean willKillPlayer(Tile tile, Token token) {
+
         BoardSpace originalSpace = token.getBoardSpace();
         int originalRow = originalSpace.getRow();
         int originalCol = originalSpace.getCol();
@@ -72,13 +75,12 @@ public class Board implements Parsable{
         int curTokenSpace = token.getTokenSpace();
 
         try {
-
             // Trace out a path on the board
             while (true){
 
                 // Each time we cross the original space,
                 //  we need to use the information from the input tile
-                if (curSpace == originalSpace || (originalRow == curSpace.getRow() && originalCol == curSpace.getCol())) {
+                if (curSpace.getRow() == originalRow && curSpace.getCol() == originalCol) {
                     // Move to the space across the tile
                     curTokenSpace = tile.findMatch(curTokenSpace);
                     curSpace = getNextSpace(curSpace, curTokenSpace);
@@ -110,10 +112,14 @@ public class Board implements Parsable{
 
     // Places the tile in front of the player, regardless of whether it will kill the player
     //   Returns the Set of tokens driven off the board
-    public Set<Token> placeTile(Tile tile, APlayer player) {
+    public Set<Token> placeTile(Tile tile, Token playerToken) {
+        if (playerToken.getBoardSpace().hasTile()){
+            throw new ContractException(ContractViolation.PRECONDITION,
+                    "Token should be on empty Boardspace");
+        }
 
         // Place the tile on the space
-        BoardSpace space = player.getToken().getBoardSpace();
+        BoardSpace space = playerToken.getBoardSpace();
         space.setTile(tile);
 
         // Gather every token currently on the space
@@ -131,6 +137,11 @@ public class Board implements Parsable{
             }
         }
 
+        if (playerToken.getBoardSpace() != null && playerToken.getBoardSpace().hasTile()){
+            throw new ContractException(ContractViolation.POSTCONDITION,
+                    "Token should be eliminated or on empty Boardspace");
+        }
+
         return eliminatedPlayers;
     }
 
@@ -143,56 +154,32 @@ public class Board implements Parsable{
             }
         }
 
+        // Tile is not on board
         return null;
     }
 
-    /**
-     * Updates the token at t's space to be owned by player
-     * @param t token of player that should replace a current token.
-     *
-     * @return true if successful, false otherwise
-     */
-    public boolean updateToken(Token t) {
-        BoardSpace space = t.getBoardSpace();
-        int row = space.getRow();
-        int col = space.getCol();
-        int tick = t.getTokenSpace();
-
-        Set<Token> onSpace = this.getBoardSpace(row, col).getTokensOnSpace();
-
-        // Look for token to be replaced
-        for (Token token : onSpace) {
-            if (token.getTokenSpace() == tick) {
-                if (token.getPlayer().getColor() == t.getPlayer().getColor()) {
-                    // Found token that needs replacing
-                    space.addToken(t, tick);
-                    return true;
-                }
-            }
-        }
-        return false;
+    // TODO: These should eventually should be refactored out, but keep it here for now
+    public Set<Token> placeTile(Tile tile, APlayer player){
+        return placeTile(tile, player.getToken());
+    }
+    public boolean willKillPlayer(Tile tile, APlayer player) {
+        return willKillPlayer(tile, player.getToken());
     }
 
-    public int tokenCount() {
-        int total = 0;
-        for (int i=0; i < 6; i++) {
-            for (int j=0; j<6; j++) {
-                total += getBoardSpace(i, j).getTokensOnSpace().size();
-            }
-        }
-        return total;
-    }
 
     public Token findToken(Color color) {
-        for (int i=0; i < 6; i++) {
-            for (int j=0; j<6; j++) {
-                for (Token t : getBoardSpace(i, j).getTokensOnSpace()) {
-                    if (t.getPlayer().getColor() == color) {
-                        return t;
+        for (int i = 0; i < BOARD_LENGTH; i++) {
+            for (int j = 0; j < BOARD_LENGTH; j++) {
+
+                for (Token token : getBoardSpace(i, j).getTokensOnSpace()) {
+                    if (token.getColor() == color) {
+                        return token;
                     }
                 }
             }
         }
+
+        // Token not on board
         return null;
     }
 
@@ -272,6 +259,11 @@ public class Board implements Parsable{
         return isOnEdge(row, col, tokenSpace);
     }
 
+
+    //================================================================================
+    // XML Parsing
+    //================================================================================
+
     @Override
     public Element toXML(Document document) {
         Element boardElement = document.createElement("board");
@@ -322,7 +314,6 @@ public class Board implements Parsable{
         }
 
         // Update the pawns
-        int pawn_counter = 0;
         for (Node pawnEntNode = pawnsElement.getFirstChild();
                 pawnEntNode != null;
                 pawnEntNode = pawnEntNode.getNextSibling()) {
@@ -342,10 +333,8 @@ public class Board implements Parsable{
             Pair<BoardSpace, Integer> location =
                     Token.locationFromPawnLoc(this, isHorizontal, coord1, coord2);
 
-            // Creates a token that places itself on the board
-            APlayer placeholder = new PlaceholderPlayer("placeholder", color);
-            new Token(location.getKey(), location.getValue(), placeholder);
-            pawn_counter += 1;
+            // Creates a token that places itself on the board that
+            new Token(location.getKey(), location.getValue(), color);
         }
     }
 }

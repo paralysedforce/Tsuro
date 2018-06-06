@@ -31,13 +31,13 @@ public class ParserUtils {
         debug = debugVal;
     }
 
-    /**
-     * Document generator
-     *
-     * @return Document for use in tests.
-     */
-    public static Document newDocument() throws ParserConfigurationException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    public static Document newDocument() {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e){
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
     /**
@@ -64,8 +64,9 @@ public class ParserUtils {
     }
 
     private static final String[] UnorderedTags = {"set", "tile"};
+
     /**
-     * Checks that two nodes have the same name and the same children. Does not check attriutes.
+     * Checks that two nodes have the same name and the same children. Does not check attributes.
      *
      * @param node1 Node for comparison
      * @param node2 Node for comparison
@@ -112,6 +113,7 @@ public class ParserUtils {
             return compareOrderedChildren(node1, node2);
     }
 
+
     public static Node nodeFromString(String xml) throws ParserConfigurationException, IOException, SAXException {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
                 new ByteArrayInputStream(xml.getBytes("UTF-8"))
@@ -148,26 +150,6 @@ public class ParserUtils {
 
         return parent;
     }
-
-    /*public static List<APlayer> playerListFromNode(Node node){
-
-        if (!node.getTextContent().equals("list")){
-            throw new IllegalArgumentException();
-        }
-
-        List<APlayer> parsedPlayerList = new ArrayList<APlayer>();
-        for (Node child = node.getFirstChild();
-             child != null;
-             child = child.getNextSibling()){
-
-            // Parse the child
-            APlayer parsedChild = new APlayer();
-            parsedChild.fromXML((Element) child);
-            parsedTileList.add(parsedChild);
-        }
-
-        return parsedTileList;
-    }*/
 
 
     //================================================================================
@@ -213,12 +195,12 @@ public class ParserUtils {
     }
 
 
-    public static APlayer findDragonTilePlayer(Element remainingPlayersElement) {
+    public static Color findDragonTilePlayerColor(Element remainingPlayersElement) {
         for (Node child = remainingPlayersElement.getFirstChild();
                 child != null;
                 child = child.getNextSibling()){
             if (child.getTextContent().equals("splayer-dragon")){
-                return APlayer.fromXML((Element) child);
+                return APlayer.fromXML((Element) child).getColor();
             }
         }
 
@@ -239,18 +221,18 @@ public class ParserUtils {
 
             return xmlElementToString(listElement);
 
-        } catch (ParserConfigurationException | TransformerException e) {
+        } catch (TransformerException e) {
             e.printStackTrace();
             throw new IllegalArgumentException();
         }
     }
 
-    public static List<APlayer> APlayerListFromNode(Element aplayerListElement) {
-        if (aplayerListElement.getTextContent().equals("list"))
+    public static List<APlayer> APlayerListFromNode(Element aPlayerListElement) {
+        if (aPlayerListElement.getTextContent().equals("list"))
             throw new IllegalArgumentException();
 
         List<APlayer> players = new ArrayList<>();
-        for (Node child = aplayerListElement.getFirstChild();
+        for (Node child = aPlayerListElement.getFirstChild();
              child != null;
              child = child.getNextSibling()){
 

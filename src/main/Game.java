@@ -102,7 +102,6 @@ public class Game {
 
 
     // For testing purposes only
-    // TODO: Remove in production
     public void registerPlayer(APlayer player){
         remainingPlayers.add(player);
     }
@@ -112,7 +111,7 @@ public class Game {
         if(!player.getHand().holdsTile(tile))
             return false;
 
-        if(player.hasSafeMove() && board.willKillPlayer(tile, player))
+        if(player.hasSafeMove() && board.willKillPlayer(tile, player.getToken()))
             return false;
 
         return true;
@@ -125,18 +124,21 @@ public class Game {
         }
     }
 
-    /* TODO: MAKE PRIVATE WHEN NOT DEBUGGING */
+
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
     public Set<APlayer> playTurn(Tile tile, APlayer player) throws ContractException{
             if (!isLegalMove(tile, player)) {
-                throw new ContractException("Player made an illegal move");
+                throw new ContractException(ContractViolation.PRECONDITION, "Player made an illegal move");
             }
 
-            Set<Token> failedTokens = board.placeTile(tile, player);
+            Set<Token> failedTokens = board.placeTile(tile, player.getToken());
             Set<APlayer> failedPlayers = new HashSet<>();
-            for (Token failedToken : failedTokens)
-                failedPlayers.add(failedToken.getPlayer());
+
+            for (APlayer possiblyFailedPlayer: remainingPlayers){
+                if (failedTokens.contains(possiblyFailedPlayer.getToken()))
+                    failedPlayers.add(possiblyFailedPlayer);
+            }
 
             if (failedPlayers.containsAll(remainingPlayers))
                 return failedPlayers;
@@ -288,13 +290,13 @@ public class Game {
     }
 
 
-
     //================================================================================
     // Main
     //================================================================================
 
     /* Runs a simple command line UI to play a game */
     public static void main(String[] args){
+        Game.resetGame();
         Game game = getGame();
         Scanner scanner = new Scanner(System.in);
         System.err.println("Welcome to Tsuro!");
@@ -313,23 +315,25 @@ public class Game {
             TilePile tilePile = new TilePile();
             tilePile.fromXML(tilePileListElement);
 
-            Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayer(remainingPlayersElement).getColor();
+            Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayerColor(remainingPlayersElement);
             List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
             List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
-
-
-            Board board = new Board();
-            board.fromXML(boardElement);
-
-            Tile tileToBePlaced = new Tile();
-            tileToBePlaced.fromXML(tileToBePlacedElement);
+            Board board = new Board(boardElement);
+            Tile tileToBePlaced = new Tile(tileToBePlacedElement);
 
             /* Update Game fields */
             game.board = board;
             game.tilePile = tilePile;
             game.remainingPlayers = remainingPlayers;
             game.eliminatedPlayers = eliminatedPlayers;
-            game.dragonTileOwner = board.findToken(dragonTileOwnerColor).getPlayer();
+
+            game.dragonTileOwner = null;
+            for (APlayer player: remainingPlayers){
+                if (player.getColor() == dragonTileOwnerColor) {
+                    game.dragonTileOwner = player;
+                    break;
+                }
+            }
 
             /* Make a move */
             game.playTurn(tileToBePlaced, remainingPlayers.get(0));

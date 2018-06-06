@@ -27,19 +27,22 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
     public PlayerHand(){
         this.deck = Game.getGame().getTilePile();
         this.hand = new ArrayList<>();
-
         for (int i = 0; i < MAX_TILES_IN_HAND; i++){
             drawFromDeck();
         }
     }
 
+
     public Tile getTile(int i){
+
+        // Keep the appearance of a 3-element array
         if (0 <= i && i < 3) {
             if (i > hand.size() - 1)
                 return null;
 
             return hand.get(i);
         }
+
         else
             throw new IndexOutOfBoundsException("Illegal Hand Access");
     }
@@ -50,7 +53,7 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
 
 
         // The reason the code has this check is for the benefit of testing
-        // Rework it somehow
+        // TODO: Rework it somehow
         Tile tile = deck.drawFromDeck();
         if (tile != null)
             hand.add(tile);

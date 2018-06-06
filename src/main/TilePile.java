@@ -17,20 +17,23 @@ import java.util.*;
  */
 public class TilePile implements Parsable {
 
-    //================================================================================
-    // Singleton Design Pattern
-    //================================================================================
-
     final private String DEFAULT_FILE_PATH = "tiles.txt";
 
+    //================================================================================
+    // Constructor
+    //================================================================================
     public TilePile(){
         tiles = new LinkedList<>();
-        fillTiles(DEFAULT_FILE_PATH);
+        fillTilesFromFile(DEFAULT_FILE_PATH);
     }
 
     public TilePile(String filename){
         tiles = new LinkedList<>();
-        fillTiles(filename);
+        fillTilesFromFile(filename);
+    }
+
+    public TilePile(Element xmlElement){
+        fromXML(xmlElement);
     }
 
     //=====b===========================================================================
@@ -79,7 +82,7 @@ public class TilePile implements Parsable {
     //================================================================================
 
     // Initialize the TilePile using the tiles specified in the given file
-    private void fillTiles(String filename) {
+    private void fillTilesFromFile(String filename) {
         try {
             File file = new File(filename);
             FileReader fileReader = new FileReader(file);
@@ -90,7 +93,6 @@ public class TilePile implements Parsable {
                 Tile newTile = new Tile(line);
                 tiles.addLast(newTile);
             }
-
         }
         catch (IOException e){
             e.printStackTrace();

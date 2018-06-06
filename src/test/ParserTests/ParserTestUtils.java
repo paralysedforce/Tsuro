@@ -74,10 +74,10 @@ class ParserTestUtils {
             "<ent>" +
                 "<xy>" +
                     "<x>" +
-                        "<n>2</n>" +
+                        "2" +
                     "</x>" +
                     "<y>" +
-                        "<n>1</n>" +
+                        "1" +
                     "</y>" +
                 "</xy>" +
                 testTileXml +

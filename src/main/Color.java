@@ -18,7 +18,8 @@ public enum Color {
         str = s;
     }
 
-    public String str() {
+    @Override
+    public String toString() {
         return str;
     }
 
@@ -29,8 +30,8 @@ public enum Color {
     }
 
 
-    public static Color fromXML(Element colorNode) {
-        switch (colorNode.getTextContent()) {
+    public static Color fromXML(Element colorElement) {
+        switch (colorElement.getTextContent()) {
             case "green":
                 return GREEN;
             case "red":
@@ -48,7 +49,7 @@ public enum Color {
             case "purple":
                 return PURPLE;
             default:
-                throw new ParserException("Unknown color in element: " + colorNode.getTextContent());
+                throw new ParserException("Unknown color in element: " + colorElement.getTextContent());
         }
     }
 }

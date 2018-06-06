@@ -5,10 +5,9 @@ package main;
  */
 public class ContractException extends RuntimeException {
 
-    public ContractException() { }
+    public ContractException(ContractViolation violation) { super(violation.toString());}
 
-    public ContractException(String message) {
-        super(message);
+    public ContractException(ContractViolation violation, String message) {
+        super(violation.toString() + ": " + message);
     }
-
 }

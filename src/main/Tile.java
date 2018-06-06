@@ -25,15 +25,15 @@ public class Tile implements Parsable {
     //================================================================================
 
     private final int ROTATIONS_PER_CYCLE = 4;
-    private LinkedHashSet<TileConnection> connections;
+    private HashSet<TileConnection> connections;
 
     //================================================================================
     // Constructors
     //================================================================================
 
     public Tile() {
-        // Default constructor. Should only be used prior to building from an XML object.
-        this.connections = new LinkedHashSet<>();
+        // Default constructor.
+        this.connections = new HashSet<>();
     }
 
     /**
@@ -41,7 +41,7 @@ public class Tile implements Parsable {
      * @param xmlElement Element with specs for this Tile.
      */
     public Tile(Element xmlElement) {
-        this.connections = new LinkedHashSet<>();
+        this.connections = new HashSet<>();
         this.fromXML(xmlElement);
     }
 
@@ -110,7 +110,7 @@ public class Tile implements Parsable {
         /* Important: modifying the state of a Hash Table in a way that changes hashes will
             cause the hash table to be unusable! Reassign connections to a new HashSet instead.
          */
-        LinkedHashSet<TileConnection> newConnections = new LinkedHashSet<>();
+        HashSet<TileConnection> newConnections = new HashSet<>();
         for (TileConnection connection : connections){
             connection.rotateClockwise();
             newConnections.add(connection);
@@ -296,9 +296,13 @@ public class Tile implements Parsable {
         }
 
 
+        //================================================================================
+        // XML Parsing
+        //================================================================================
+
         @Override
         public Element toXML(Document document) {
-            // Connection ontains two number elements
+            // Connection contains two number elements
             Element connectionElement = document.createElement("connect");
 
             Element endpointAElement = document.createElement("n");

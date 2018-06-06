@@ -1,5 +1,7 @@
 package main.Players;
 
+import main.Parser.ParserException;
+import main.Parser.ParserUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +21,7 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import javafx.util.Pair;
 import main.Board;
@@ -38,10 +41,6 @@ public class NetworkPlayer extends APlayer {
 
     /**
      * Listens on portNumber and communicates over a network after calling that.
-     * @param name
-     * @param color
-     * @param portNumber
-     * @throws IOException
      */
     public NetworkPlayer(String name, Color color, int portNumber) throws IOException {
         super(name, color);
@@ -53,6 +52,7 @@ public class NetworkPlayer extends APlayer {
 
     /**
      * Constructs streams from Reader/Writer pair for use in testing.
+     *
      * @param name
      * @param color
      * @param reader
@@ -64,10 +64,15 @@ public class NetworkPlayer extends APlayer {
         toClient = new PrintWriter(writer);
     }
 
+
+    //================================================================================
+    // Network Handlers
+    //================================================================================
+
     @Override
     public String getName() {
         try {
-            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Document d = ParserUtils.newDocument();
             // Note: we can use \r\n in println because \r is whitespace and should be ignored.
             toClient.println(
                     NetworkMessage.xmlElementToString(
@@ -75,8 +80,7 @@ public class NetworkPlayer extends APlayer {
                     ));
 
             String response = fromClient.readLine();
-
-            Node responseNode = NetworkMessage.nodeFromString(response);
+            Node responseNode = ParserUtils.nodeFromString(response);
             return responseNode.getTextContent();
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -89,23 +93,22 @@ public class NetworkPlayer extends APlayer {
     public void initialize(Color color, List<Color> colors) {
         super.initialize(color, colors);
         try {
-            Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element initializeElement = NetworkMessage.INITIALIZE.getMessageRootElement(d);
-            initializeElement.appendChild(this.getColor().toXML(d));
+            Document document = ParserUtils.newDocument();
+            Element initializeElement = NetworkMessage.INITIALIZE.getMessageRootElement(document);
+            initializeElement.appendChild(color.toXML(document));
 
-            Element colorListElement = d.createElement("list");
+            Element colorListElement = document.createElement("list");
             for (Color aColor : colors) {
-                colorListElement.appendChild(aColor.toXML(d));
+                colorListElement.appendChild(aColor.toXML(document));
             }
 
             initializeElement.appendChild(colorListElement);
+            toClient.println(ParserUtils.xmlElementToString(initializeElement));
+            String responseXML = fromClient.readLine();
+            // Check to make sure that the response is void
 
-            toClient.println(NetworkMessage.xmlElementToString(initializeElement));
 
-            String response = fromClient.readLine();
-            // TODO: Maybe add a check to make sure the response is void?
-
-        } catch (ParserConfigurationException | IOException e) {
+        } catch (IOException | TransformerException e) {
             e.printStackTrace();
         }
 
@@ -116,46 +119,27 @@ public class NetworkPlayer extends APlayer {
         try {
             Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
-            toClient.println(
-                    "<" + NetworkMessage.PLACE_PAWN.getTag() + ">" +
-                            NetworkMessage.xmlElementToString(board.toXML(d)) +
-                            "</" + NetworkMessage.PLACE_PAWN.getTag() + ">"
-            );
+            // Construct the request
+            String openingTag = String.format("<%s>", NetworkMessage.PLACE_PAWN.getTag());
+            String content = NetworkMessage.xmlElementToString(board.toXML(d));
+            String closingTag = String.format("</%s>", NetworkMessage.PLACE_PAWN.getTag());
+            String request = openingTag + content + closingTag;
+
+            // Send to the client and listen for a response
+            toClient.println(request);
             String response = fromClient.readLine();
 
-            Node e = NetworkMessage.nodeFromString(response);
-            boolean isHorizontal;
-            int coord1, coord2;
+            // Parse the response
+            Node responseXml = ParserUtils.nodeFromString(response);
+            return parseStartingLocationResponse(responseXml);
 
-            if (e.getNodeName().equals(NetworkMessage.PAWN_LOC.getTag())) {
-                Node orientationNode = e.getFirstChild();
-                if (orientationNode.getNodeName().equals("h") ||
-                        orientationNode.getNodeName().equals("v")) {
-                    isHorizontal = orientationNode.getNodeName().equals("h");
-
-                    Node coord1Node = orientationNode.getNextSibling();
-                    if (coord1Node.getNodeName().equals("n")) {
-                        coord1 = Integer.valueOf(coord1Node.getTextContent());
-
-                        Node coord2Node = coord1Node.getNextSibling();
-                        if (coord2Node.getNodeName().equals("n")) {
-                            coord2 = Integer.valueOf(coord2Node.getTextContent());
-
-                            return Token.locationFromPawnLoc(board, isHorizontal, coord1, coord2);
-                        }
-                    }
-                }
-            }
-
-            // Default to returning a random location
-            System.err.println("Couldn't parse location: " + response);
-            return RandomPlayer.getRandomStartingLocation(new Random(), board);
-        } catch (ParserConfigurationException | IOException | SAXException e) {
+        } catch (ParserConfigurationException | IOException | SAXException | ParserException e) {
             e.printStackTrace();
             // Randomly choose a starting location
             return RandomPlayer.getRandomStartingLocation(new Random(), board);
         }
     }
+
 
     @Override
     Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
@@ -216,6 +200,43 @@ public class NetworkPlayer extends APlayer {
 
         } catch (ParserConfigurationException | IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    //================================================================================
+    // Private helpers
+    //================================================================================
+
+    private Pair<BoardSpace, Integer> parseStartingLocationResponse(Node responseXml) {
+
+        if (!responseXml.getNodeName().equals(NetworkMessage.PAWN_LOC.getTag()))
+            throw new ParserException();
+
+        Node hvNode = responseXml.getFirstChild();
+        Node coord1Node = hvNode.getNextSibling();
+        Node coord2Node = coord1Node.getNextSibling();
+
+        String hvNodeName = hvNode.getNodeName();
+
+        if (!(hvNodeName.equals("h") || hvNodeName.equals("v")))
+            throw new ParserException();
+
+        if (!coord1Node.getNodeName().equals("n") || !coord2Node.getNodeName().equals("n"))
+            throw new ParserException();
+
+        boolean isHorizontal = hvNodeName.equals("h");
+        int coord1 = Integer.valueOf(coord1Node.getTextContent());
+        int coord2 = Integer.valueOf(coord2Node.getTextContent());
+
+        return Token.locationFromPawnLoc(board, isHorizontal, coord1, coord2);
+    }
+
+    private boolean responseIsVoid(String response) {
+        try {
+            return ParserUtils.nodeFromString(response).getNodeName().equals("void");
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+            return false;
         }
 
     }

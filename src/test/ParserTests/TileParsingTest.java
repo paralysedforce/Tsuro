@@ -4,6 +4,7 @@ import main.BoardSpace;
 import main.Parser.ParserUtils;
 import main.Tile;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,8 +22,6 @@ import static test.ParserTests.ParserTestUtils.*;
  * Created by vyasalwar on 5/22/18.
  */
 public class TileParsingTest {
-
-    // Helpful objects
 
 
     @Test
@@ -53,15 +52,11 @@ public class TileParsingTest {
 
     @Test
     public void testBoardSpaceToXml() {
-        try {
-            Document doc = ParserUtils.newDocument();
-            testBoardSpace.setTile(testTile);
-            Element element = testBoardSpace.toXML(doc);
-            assertElementIsExpected(element, testSpaceXml);
-        } catch (ParserConfigurationException e){
-            e.printStackTrace();
-            Assert.fail();
-        }
+
+        Document doc = ParserUtils.newDocument();
+        testBoardSpace.setTile(testTile);
+        Element element = testBoardSpace.toXML(doc);
+        assertElementIsExpected(element, testSpaceXml);
     }
 
     @Test

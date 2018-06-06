@@ -65,10 +65,10 @@ public class NetworkPlayerTest {
 
     private String getInitializationRequest() {
         return "<" + NetworkMessage.INITIALIZE.getTag() + ">" +
-                "<color>" + Color.BLUE.str() + "</color>" +
+                "<color>" + Color.BLUE.toString() + "</color>" +
                 "<list>" +
-                "<color>" + Color.BLUE.str() + "</color>" +
-                "<color>" + Color.SIENNA.str() + "</color>" +
+                "<color>" + Color.BLUE.toString() + "</color>" +
+                "<color>" + Color.SIENNA.toString() + "</color>" +
                 "</list>" +
                 "</" + NetworkMessage.INITIALIZE.getTag() + ">\n";
     }

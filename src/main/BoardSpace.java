@@ -12,8 +12,6 @@ import java.util.*;
  */
 public class BoardSpace implements Parsable {
 
-    private final int NUM_SPACES = 8;
-
     //================================================================================
     // Instance variables
     //================================================================================
@@ -26,14 +24,18 @@ public class BoardSpace implements Parsable {
     // Constructors
     //================================================================================
     public BoardSpace(int row, int col) {
+        if (!Board.isValidCoordinate(row, col)) {
+            throw new IllegalArgumentException(String.format("Invalid Tile Access: (%d, %d)", row, col));
+        }
+
         tile = null;
         tokenSpaces = new HashMap<>();
         this.row = row;
         this.col = col;
+    }
 
-        if (!Board.isValidCoordinate(row, col)) {
-            throw new IllegalArgumentException("Invalid Tile Access");
-        }
+    public BoardSpace(Element xmlElement){
+        fromXML(xmlElement);
     }
 
 
@@ -88,7 +90,6 @@ public class BoardSpace implements Parsable {
         }
     }
 
-    // Move
     public void advanceToken(Token token) {
         if (hasTile()) {
             int endpoint = findToken(token);
@@ -126,14 +127,17 @@ public class BoardSpace implements Parsable {
 
     }
 
+    //================================================================================
+    // XML Parsing
+    //================================================================================
 
     @Override
     public Element toXML(Document document) {
         if (!hasTile())
-            throw new ContractException("toXML called on a Boardspace without a tile");
+            throw new ContractException(ContractViolation.PRECONDITION,
+                    "toXML called on a Boardspace without a tile");
 
         Element entryElement = document.createElement("ent");
-
 
         Element xyElement = document.createElement("xy");
         Element xElement = document.createElement("x");
@@ -153,6 +157,7 @@ public class BoardSpace implements Parsable {
         return entryElement;
     }
 
+    // TODO
     @Override
     public void fromXML(Element xmlElement) {
 

@@ -71,10 +71,10 @@ public abstract class APlayer extends IPlayer {
     public void setBoard(Board board) {
         this.board = board;
         Token boardToken = board.findToken(color);
+
         // Update player token if necessary
         if (token != null && boardToken != null) {
             this.token = boardToken;
-            boardToken.setPlayer(this);
         }
     }
 
@@ -84,10 +84,10 @@ public abstract class APlayer extends IPlayer {
     //================================================================================
     public Pair<BoardSpace, Integer> placeToken() {
         if (curState != State.INITIALIZED)
-            throw new ContractException();
+            throw new ContractException(ContractViolation.SEQUENTIAL);
 
         Pair<BoardSpace, Integer> startingTokenLocation = getStartingLocation(board);
-        token = new Token(startingTokenLocation.getKey(), startingTokenLocation.getValue(), this);
+        token = new Token(startingTokenLocation.getKey(), startingTokenLocation.getValue(), color);
         curState = State.TURNPLAYABLE;
 
         return startingTokenLocation;
@@ -96,9 +96,9 @@ public abstract class APlayer extends IPlayer {
     //Same as placeToken but with a provided location for testing
     public Pair<BoardSpace, Integer> placeToken(BoardSpace startingLocation, int startingTokenSpace){
         if (curState != State.INITIALIZED)
-            throw new ContractException();
+            throw new ContractException(ContractViolation.SEQUENTIAL);
 
-        token = new Token(startingLocation, startingTokenSpace, this);
+        token = new Token(startingLocation, startingTokenSpace, color);
         curState = State.TURNPLAYABLE;
 
         return new Pair<>(startingLocation, startingTokenSpace);
@@ -106,7 +106,7 @@ public abstract class APlayer extends IPlayer {
 
     public final void initialize(List<Color> otherPlayers){
         if (!(curState == State.UNINITIALIZED || curState == State.GAMEENDED))
-            throw new ContractException();
+            throw new ContractException(ContractViolation.SEQUENTIAL);
 
         // Allow subclasses to further implement this method
         this.initialize(this.color, otherPlayers);
@@ -117,7 +117,7 @@ public abstract class APlayer extends IPlayer {
 
     public void endGame(Set<Color> colors){
         if (curState != State.TURNPLAYABLE)
-            throw new ContractException();
+            throw new ContractException(ContractViolation.SEQUENTIAL);
 
         // Do something if subclass deems appropriate
         this.endGame(board, colors);
@@ -128,7 +128,8 @@ public abstract class APlayer extends IPlayer {
     // Enforces Sequential contract but delegates picking the tile to chooseTileHelper
     public Tile chooseTile(int numTilesLeft){
         if (curState != State.TURNPLAYABLE)// || !hand.isValid())
-            throw new ContractException("State is " + curState + " and hand is valid=" + hand.isValid());
+            throw new ContractException(ContractViolation.SEQUENTIAL,
+                    "State is " + curState + " and hand is valid=" + hand.isValid());
 
         Set<Tile> hand = new HashSet<>();
         for (Tile aTile : this.hand) {
@@ -147,7 +148,7 @@ public abstract class APlayer extends IPlayer {
     }
 
     public boolean isSafeMove(Tile tile){
-        return !board.willKillPlayer(tile, this);
+        return !board.willKillPlayer(tile, token);
     }
 
     public boolean hasSafeMove(){
