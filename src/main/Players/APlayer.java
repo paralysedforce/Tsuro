@@ -1,14 +1,22 @@
 package main.Players;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javafx.util.Pair;
-import main.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import main.Board;
+import main.BoardSpace;
+import main.Color;
+import main.ContractException;
+import main.ContractViolation;
+import main.Game;
+import main.Tile;
+import main.Token;
 
 public abstract class APlayer extends IPlayer {
 
@@ -72,7 +80,7 @@ public abstract class APlayer extends IPlayer {
         Token boardToken = board.findToken(color);
 
         // Update player token if necessary
-        if (token == null && boardToken != null) {
+        if (boardToken != null) {
             this.token = boardToken;
         }
     }
