@@ -45,6 +45,7 @@ public class NetworkGame {
     private BufferedReader reader;
     private PrintWriter writer;
 
+    private boolean debug = false;
     //================================================================================
     // Constructors
     //================================================================================
@@ -104,7 +105,7 @@ public class NetworkGame {
     private String forwardRequestToAPlayer(String request) throws IOException {
         try {
             Node root = ParserUtils.nodeFromString(request);
-            System.out.println(root.getNodeName() + " for " + aplayer.getColor());
+            if (debug) System.out.println(root.getNodeName() + " for " + aplayer.getColor());
             switch (root.getNodeName()) {
                 case "get-name":
                     return getNameHandler(root);
@@ -182,9 +183,9 @@ public class NetworkGame {
 
         aplayer.setBoard(board);
 
-        System.out.println("INTERNAL BOARD:");
+        if (debug) System.out.println("INTERNAL BOARD:");
         try {
-            System.out.println(ParserUtils.xmlElementToString(board.toXML(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument())));
+            if (debug) System.out.println(ParserUtils.xmlElementToString(board.toXML(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument())));
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -202,8 +203,8 @@ public class NetworkGame {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element returnedTileElement = tile.toXML(document);
 
-            System.out.println("RESPONSE TILE:");
-            System.out.println(ParserUtils.xmlElementToString(returnedTileElement));
+            if (debug) System.out.println("RESPONSE TILE:");
+            if (debug) System.out.println(ParserUtils.xmlElementToString(returnedTileElement));
 
             return ParserUtils.xmlElementToString(returnedTileElement);
 
@@ -249,7 +250,9 @@ public class NetworkGame {
 
             APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
 
-            new NetworkGame(host, port, player).handleInstructions();
+            NetworkGame game = new NetworkGame(host, port, player);
+            game.debug = false;
+            game.handleInstructions();
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println("Required arguments are hostname and port");
         }
