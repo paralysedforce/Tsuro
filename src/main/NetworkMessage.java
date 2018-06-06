@@ -32,4 +32,8 @@ public enum NetworkMessage {
     public String getTag() {
         return str;
     }
+
+    public Element getMessageRootElement(Document document) {
+        return document.createElement(str);
+    }
 }

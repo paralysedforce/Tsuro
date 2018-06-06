@@ -75,7 +75,7 @@ public class NetworkPlayer extends APlayer {
             Document d = ParserUtils.newDocument();
             // Note: we can use \r\n in println because \r is whitespace and should be ignored.
             toClient.println(
-                    NetworkMessage.xmlElementToString(
+                    ParserUtils.xmlElementToString(
                             NetworkMessage.GET_NAME.getMessageRootElement(d)
                     ));
 

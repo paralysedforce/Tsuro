@@ -16,6 +16,7 @@ public class Token implements Parsable {
     //================================================================================
     private BoardSpace space;
     private Color color;
+    private boolean alive;
 
     //================================================================================
     // Constructor
@@ -23,6 +24,7 @@ public class Token implements Parsable {
     public Token(BoardSpace startingLocation, int startingTokenSpace, Color color) {
         space = startingLocation;
         this.color = color;
+        this.alive = true;
         space.addToken(this, startingTokenSpace);
     }
 
@@ -46,20 +48,24 @@ public class Token implements Parsable {
         return color;
     }
 
+    public boolean isAlive(){ return alive;}
+
 
     //================================================================================
     // Public Methods
     //================================================================================
 
-    // Removes the token from the board altogether
+    // Removes the token
     //   Should only be called when a player loses
-    public void removeFromBoard() {
-        space.removeToken(this);
-        space = null;
+    public void removeFromPlay() {
+        this.alive = false;
     }
 
     // Places the token at the given location
     public void moveToken(BoardSpace boardSpace, int tokenSpace) {
+        if (!alive)
+            return;
+
         space.removeToken(this);
         boardSpace.addToken(this, tokenSpace);
         space = boardSpace;

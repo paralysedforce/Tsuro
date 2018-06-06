@@ -133,11 +133,11 @@ public class Board implements Parsable{
             // Eliminate the token if necessary
             if (isOnEdge(token)) {
                 eliminatedPlayers.add(token);
-                token.removeFromBoard();
+                token.removeFromPlay();
             }
         }
 
-        if (playerToken.getBoardSpace() != null && playerToken.getBoardSpace().hasTile()){
+        if (playerToken.isAlive() && playerToken.getBoardSpace().hasTile()){
             throw new ContractException(ContractViolation.POSTCONDITION,
                     "Token should be eliminated or on empty Boardspace");
         }

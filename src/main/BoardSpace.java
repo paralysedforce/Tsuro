@@ -82,7 +82,7 @@ public class BoardSpace implements Parsable {
         return tile != null;
     }
 
-    // Move all tokens on the tile to their opposite endpoints
+    // Move all living tokens on the tile to their opposite endpoints
     public void advanceTokens() {
         Set<Token> tokensOnSpace = getTokensOnSpace();
         for (Token token : tokensOnSpace) {
@@ -91,7 +91,7 @@ public class BoardSpace implements Parsable {
     }
 
     public void advanceToken(Token token) {
-        if (hasTile()) {
+        if (token.isAlive() && hasTile()) {
             int endpoint = findToken(token);
             tokenSpaces.replace(token, tile.findMatch(endpoint));
         }
