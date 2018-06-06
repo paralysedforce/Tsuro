@@ -16,13 +16,12 @@ public abstract class APlayer extends IPlayer {
     // Instance Variables
     //================================================================================
 
-
-    private String name;
-    private Color color;
-    private List<Color> otherPlayers;
     private State curState;
-    protected Token token;
 
+    protected String name;
+    protected Token token;
+    protected Color color;
+    protected List<Color> turnOrder;
     protected PlayerType playerType;
     protected PlayerHand hand;
     protected Board board;
@@ -42,7 +41,7 @@ public abstract class APlayer extends IPlayer {
     public APlayer(APlayer other){
         name = other.name;
         color = other.color;
-        otherPlayers = new ArrayList<>(other.otherPlayers);
+        turnOrder = new ArrayList<>(other.turnOrder);
         curState = other.curState;
         token = other.token;
         board = other.board;
@@ -108,10 +107,7 @@ public abstract class APlayer extends IPlayer {
         if (!(curState == State.UNINITIALIZED || curState == State.GAMEENDED))
             throw new ContractException(ContractViolation.SEQUENTIAL);
 
-        // Allow subclasses to further implement this method
-        this.initialize(this.color, otherPlayers);
-
-        this.otherPlayers = new ArrayList<>(otherPlayers);
+        this.turnOrder = new ArrayList<>(otherPlayers);
         this.curState = State.INITIALIZED;
     }
 
@@ -210,7 +206,7 @@ public abstract class APlayer extends IPlayer {
     private enum State {UNINITIALIZED, INITIALIZED, TURNPLAYABLE, GAMEENDED};
 
     //================================================================================
-    // Static SPlayer Parsing Methods
+    // Static XML Parsing
     //================================================================================
 
     /* This doesn't actually implement Parsable, but the usage is similar */
@@ -225,8 +221,8 @@ public abstract class APlayer extends IPlayer {
 
 
     public static APlayer fromXML(Element aplayerElement) {
-        if (!aplayerElement.getTextContent().equals("splayer-dragon") ||
-            !aplayerElement.getTextContent().equals("splayer-nodragon"))
+        if (!aplayerElement.getNodeName().equals("splayer-dragon") &&
+            !aplayerElement.getNodeName().equals("splayer-nodragon"))
             throw new IllegalArgumentException();
 
 
@@ -234,9 +230,7 @@ public abstract class APlayer extends IPlayer {
         Element handElement = (Element) colorElement.getNextSibling();
 
         Color color = Color.fromXML(colorElement);
-        PlayerHand hand = new PlayerHand();
-        hand.fromXML(handElement);
-
+        PlayerHand hand = new PlayerHand(handElement);
         APlayer randomPlayer = new RandomPlayer("parsed_player", color);
         randomPlayer.setHand(hand);
 

@@ -1,5 +1,6 @@
 package main.Players;
 
+import main.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -7,11 +8,6 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import main.Game;
-import main.Parsable;
-import main.Tile;
-import main.TilePile;
 
 /**
  * Represents the current tiles held by an APlayer at any time
@@ -24,6 +20,10 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
     private TilePile deck;
     protected List<Tile> hand;
 
+    //================================================================================
+    // Constructors
+    //================================================================================
+
     public PlayerHand(){
         this.deck = Game.getGame().getTilePile();
         this.hand = new ArrayList<>();
@@ -32,6 +32,13 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
         }
     }
 
+    public PlayerHand(Element xmlElement){
+        fromXML(xmlElement);
+    }
+
+    //================================================================================
+    // Public methods
+    //================================================================================
 
     public Tile getTile(int i){
 
@@ -57,6 +64,10 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
         Tile tile = deck.drawFromDeck();
         if (tile != null)
             hand.add(tile);
+
+        /*if (!isValid())
+            throw new ContractException(ContractViolation.POSTCONDITION,
+                    "Invalid hand after drawing");*/
     }
 
     public void returnTilesToDeck(){
@@ -86,15 +97,21 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
         return hand.contains(tile);
     }
 
+
+    // Enforces correctness on a tile
     public boolean isValid(){
+
+        // Hand is not too large
         if (hand.size() > 3)
             return false;
 
+        // No tile in the hand is on the board
         for (Tile tile: hand){
             if (Game.getGame().getBoard().findLocationOfTile(tile) != null)
                 return false;
         }
 
+        // All tiles are distinct
         for (int i = 0; i < hand.size(); i++){
             for (int j = i + 1; j < hand.size(); j++ ){
                 if (getTile(i).equals(getTile(j)))
@@ -110,6 +127,9 @@ public class PlayerHand implements Iterable<Tile>, Parsable{
         return hand.iterator();
     }
 
+    //================================================================================
+    // XML Parsing
+    //================================================================================
     @Override
     public Element toXML(Document document) {
         return null;

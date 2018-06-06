@@ -24,15 +24,11 @@ public class Board implements Parsable{
     //================================================================================
 
     public Board() {
-        this.spaces = new BoardSpace[BOARD_LENGTH][BOARD_LENGTH];
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_LENGTH; j++) {
-                spaces[i][j] = new BoardSpace(i, j);
-            }
-        }
+        initializeSpaces();
     }
 
     public Board(Element xmlElement){
+        initializeSpaces();
         fromXML(xmlElement);
     }
 
@@ -158,7 +154,7 @@ public class Board implements Parsable{
         return null;
     }
 
-    // TODO: These should eventually should be refactored out, but keep it here for now
+    // TODO: These should eventually should be refactored out to take Tokens instead of APlayers
     public Set<Token> placeTile(Tile tile, APlayer player){
         return placeTile(tile, player.getToken());
     }
@@ -186,6 +182,16 @@ public class Board implements Parsable{
     //================================================================================
     // Private Helpers
     //================================================================================
+
+    private void initializeSpaces() {
+        this.spaces = new BoardSpace[BOARD_LENGTH][BOARD_LENGTH];
+        for (int i = 0; i < BOARD_LENGTH; i++) {
+            for (int j = 0; j < BOARD_LENGTH; j++) {
+                spaces[i][j] = new BoardSpace(i, j);
+            }
+        }
+    }
+
 
     // Gets the adjacent space of an arbitrary board space and token space.
     private BoardSpace getNextSpace(BoardSpace boardSpace, int tokenSpace) {

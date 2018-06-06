@@ -5,13 +5,14 @@
 default: exec
 
 exec: all
-	@echo -en '#!/bin/sh\n\njava -cp ./out main/Game' > run.sh
-	@echo -en '#!/bin/sh\n\njava -cp ./out main/NetworkGame "$$@"' > tournamentPlayer.sh
+	@echo '#!/bin/sh\n\njava -cp ./out main/Game' > run.sh
+	@echo '#!/bin/sh\n\njava -cp ./out main/NetworkGame "$$@"' > tournamentPlayer.sh
+	chmod 755 *.sh
 
 all:
-		mkdir out;
+		mkdir -p out;
 		javac -d out \
-		-cp "lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar;lib/junit/junit/4.12/junit-4.12.jar;lib/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19.jar" \
+		-cp "lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:lib/junit/junit/4.12/junit-4.12.jar:lib/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19.jar" \
 		src/main/Parser/*.java \
 		src/main/Players/*.java \
 		src/main/*.java \
@@ -21,7 +22,7 @@ all:
 
 
 clean:
-	rm -r out
+	rm -rf out
 	rm run.sh
 	rm tournamentPlayer.sh
 
@@ -30,4 +31,4 @@ run: all
 	java -cp . main/main;
 
 test: all
-	java -cp "out;lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar;lib/junit/junit/4.12/junit-4.12.jar" org.junit.runner.JUnitCore test.AllTestSuite
+	java -cp "out:lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:lib/junit/junit/4.12/junit-4.12.jar" org.junit.runner.JUnitCore test.AllTestSuite

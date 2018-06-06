@@ -7,6 +7,11 @@ import main.Color;
 import main.Tile;
 
 /**
+ * Score every tile independently by some criteron, and pick the maximum value among them
+ *
+ * Note: Try to make Heuristics static methods rather than methods. That way other automated players
+ *    can poach heuristics from other players rather than having to implement them by themselves.
+ *
  * Created by vyasalwar on 5/3/18.
  */
 public abstract class TileHeuristicPlayer extends APlayer {

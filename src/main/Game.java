@@ -80,27 +80,6 @@ public class Game {
     // Public Methods
     //================================================================================
 
-    // Adds a player to a new game
-    public void registerPlayer(String name, Color color, PlayerType type){
-        APlayer aplayer;
-        switch(type) {
-            case RANDOM:
-                aplayer = new RandomPlayer(name, color);
-                break;
-            case MOSTSYMMETRIC:
-                aplayer = new MostSymmetricPlayer(name, color);
-                break;
-            case LEASTSYMMETRIC:
-                aplayer = new LeastSymmetricPlayer(name, color);
-                break;
-            default:
-                throw new IllegalArgumentException("player type given was not valid");
-        }
-
-        remainingPlayers.add(aplayer);
-    }
-
-
     // For testing purposes only
     public void registerPlayer(APlayer player){
         remainingPlayers.add(player);
@@ -108,8 +87,8 @@ public class Game {
 
     // Determine whether a player has the ability to play the move.
     public boolean isLegalMove(Tile tile, APlayer player){
-        if(!player.getHand().holdsTile(tile))
-            return false;
+        /*if(!player.getHand().holdsTile(tile))
+            return false;*/
 
         if(player.hasSafeMove() && board.willKillPlayer(tile, player))
             return false;
@@ -324,7 +303,7 @@ public class Game {
         Game.resetGame();
         Game game = getGame();
         Scanner scanner = new Scanner(System.in);
-        System.err.println("Welcome to Tsuro!");
+        //System.err.println("Welcome to Tsuro!");
 
         /* One move */
         try {
@@ -337,9 +316,7 @@ public class Game {
 
 
             /* Convert input into Game representations */
-            TilePile tilePile = new TilePile();
-            tilePile.fromXML(tilePileListElement);
-
+            TilePile tilePile = new TilePile(tilePileListElement);
             Color dragonTileOwnerColor = ParserUtils.findDragonTilePlayerColor(remainingPlayersElement);
             List<APlayer> remainingPlayers = ParserUtils.APlayerListFromNode(remainingPlayersElement);
             List<APlayer> eliminatedPlayers = ParserUtils.APlayerListFromNode(eliminatedPlayersElement);
@@ -352,6 +329,7 @@ public class Game {
             game.remainingPlayers = remainingPlayers;
             game.eliminatedPlayers = eliminatedPlayers;
 
+            /* Connect all the components to each other */
             game.dragonTileOwner = null;
             for (APlayer player: remainingPlayers){
                 if (player.getColor() == dragonTileOwnerColor) {
@@ -360,19 +338,26 @@ public class Game {
                 }
             }
 
+            for (APlayer player: game.remainingPlayers)
+                player.setBoard(board);
+
+            for (APlayer player: game.eliminatedPlayers)
+                player.setBoard(board);
+
             /* Make a move */
             game.playTurn(tileToBePlaced, remainingPlayers.get(0));
 
             /* Send output to stdout */
             Document document = ParserUtils.newDocument();
-            System.out.println(ParserUtils.xmlElementToString(tilePile.toXML(document)));
-            System.out.println(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
-            System.out.println(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
-            System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
-            System.out.println(game.isOver ?
+            System.out.print(ParserUtils.xmlElementToString(tilePile.toXML(document)));
+            System.out.print(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
+            System.out.print(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
+            System.out.print(ParserUtils.xmlElementToString(board.toXML(document)));
+            System.out.print(game.isOver ?
                     ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
                     "<false></false>");
 
+            scanner.nextLine();
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();

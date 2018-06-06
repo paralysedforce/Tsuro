@@ -131,7 +131,7 @@ public class ParserUtils {
 
     public static List<Tile> tileListFromNode(Node node){
 
-        if (!node.getTextContent().equals("list")){
+        if (!node.getNodeName().equals("list")){
             throw new IllegalArgumentException();
         }
 
