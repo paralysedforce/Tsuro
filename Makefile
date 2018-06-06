@@ -6,8 +6,10 @@ default: exec
 
 exec: all
 	@echo -en '#!/bin/sh\n\njava -cp ./out main/Game' > run.sh
+	@echo -en '#!/bin/sh\n\njava -cp ./out main/NetworkGame "$$@"' > tournamentPlayer.sh
 
 all:
+		mkdir out;
 		javac -d out \
 		-cp "lib/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar;lib/junit/junit/4.12/junit-4.12.jar;lib/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19.jar" \
 		src/main/Parser/*.java \
@@ -19,7 +21,9 @@ all:
 
 
 clean:
-	rm -r out/*
+	rm -r out
+	rm run.sh
+	rm tournamentPlayer.sh
 
 run: all
 	@cd out; \

@@ -1,14 +1,19 @@
-# team1-working
+# team26-working
 
-The equivalent to the play-a-turn function is in main.Actions.java
-```java
-public static PlayReturn PlayATurn(main.TilePile tilePile, List<Player> remainingPlayers, List<Player> eliminatedPlayers, main.Board board, main.Tile tile)
+This project was written in Java 8 and includes all of its dependencies.
+
+To compile this project, just run ```make```.
+This will produce the following two files:
+
+- run.sh: can be run against test-play-a-turn
+- tournamentPlayer.sh: can be run to connect a player to a tournament
+
+To add a tournament player to a running tournament, run
 ```
-The equivalent to the is-legal? function is in main.Board.java
-```java
-public boolean isLegalMove(main.Tile tile, Player player)
+tournamentPlayer.sh <host address> <port number>
 ```
 
 Authors:
+
   - Vyas Alwar (VyasAlwar2018@u.northwestern.edu)
-  - Keith Kravis (KeithKravis2018@u.northwestern.edu)
+  - William Stogin (wstogin@u.northwestern.edu)

@@ -233,24 +233,17 @@ public class NetworkGame {
     //================================================================================
 
     public static void main(String[] args) {
-        String host = args[0];
-        int port = Integer.valueOf(args[1]);
-//        APlayer mockPlayer = new RandomPlayer("randy", Color.BLUE) {
-//            @Override
-//            protected Tile chooseTile(Board board, Set<Tile> hand, int remainingTiles) {
-//                Set<Tile> moves = getLegalMoves();
-//                System.out.println("Number of legal moves: " + moves.size());
-//
-//                System.out.println("Choosing tile at location row: " + token.getBoardSpace().getRow() + " col: " + token.getBoardSpace().getCol());
-//                if (moves.size() > 0)
-//                    return moves.iterator().next();
-//                else
-//                    return this.hand.getTile(0);
-//            }
-//        };
-        APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+        try {
+            String host = args[0];
+            System.out.println(host);
+            int port = Integer.valueOf(args[1]);
 
-        new NetworkGame(host, port, player).handleInstructions();
+            APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+
+            new NetworkGame(host, port, player).handleInstructions();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Required arguments are hostname and port");
+        }
     }
 
 }
