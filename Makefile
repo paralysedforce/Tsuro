@@ -6,6 +6,7 @@ default: exec
 
 exec: all
 	@echo -en '#!/bin/sh\n\njava -cp ./out main/Game' > run.sh
+	@echo -en '#!/bin/sh\n\njava -cp ./out main/NetworkGame "$$@"' > tournamentPlayer.sh
 
 all:
 		javac -d out \
@@ -21,6 +22,7 @@ all:
 clean:
 	rm -r out/*
 	rm run.sh
+	rm tournamentPlayer.sh
 
 run: all
 	@cd out; \
