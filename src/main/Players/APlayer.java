@@ -72,7 +72,7 @@ public abstract class APlayer extends IPlayer {
         Token boardToken = board.findToken(color);
 
         // Update player token if necessary
-        if (token == null && boardToken != null) {
+        if (boardToken != null) {
             this.token = boardToken;
         }
     }

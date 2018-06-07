@@ -36,7 +36,6 @@ public class NetworkPlayerTest {
         Reader r = new StringReader("<player-name>name!</player-name>\n");
         Writer w = new StringWriter();
         APlayer player = new NetworkPlayer("Name", Color.BLUE, r, w);
-
         Assert.assertEquals(player.getName(), "name!");
 
         Assert.assertEquals(
@@ -52,7 +51,7 @@ public class NetworkPlayerTest {
 
         Reader r = new StringReader(xmlResponse);
         Writer w = new StringWriter();
-        APlayer player = initiizeNetworkPlayer(r, w);
+        APlayer player = initializeNetworkPlayer(r, w);
 
         Assert.assertEquals(player.getColor(), Color.BLUE);
         Assert.assertEquals(
@@ -78,7 +77,7 @@ public class NetworkPlayerTest {
         return "<void></void>\n";
     }
 
-    private APlayer initiizeNetworkPlayer(Reader r, Writer w) {
+    private APlayer initializeNetworkPlayer(Reader r, Writer w) {
         APlayer player = new NetworkPlayer("Testname", Color.BLUE, r, w);
         player.initialize(getInitializationColors());
         return player;
@@ -95,7 +94,7 @@ public class NetworkPlayerTest {
                         "</pawn-loc>\r\n"
         );
         Writer w = new StringWriter();
-        APlayer player = initiizeNetworkPlayer(r, w);
+        APlayer player = initializeNetworkPlayer(r, w);
 
         Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         String expectedPlacementRequestBoard =
@@ -119,11 +118,6 @@ public class NetworkPlayerTest {
         );
     }
 
-    @Ignore
-    @Test
-    public void testPlayTurn() {
-        throw new NotImplementedException();
-    }
 
     @Test
     public void testEndGame() {
@@ -131,7 +125,7 @@ public class NetworkPlayerTest {
             Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Reader r = new StringReader("<void></void>");
             Writer w = new StringWriter();
-            APlayer player = initiizeNetworkPlayer(r, w);
+            APlayer player = initializeNetworkPlayer(r, w);
             String expectedRequestBoard =
                     ParserUtils.xmlElementToString(Game.getGame().getBoard().toXML(d));
             String expectedColors =

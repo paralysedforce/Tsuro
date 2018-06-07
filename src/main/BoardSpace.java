@@ -24,10 +24,6 @@ public class BoardSpace implements Parsable {
     // Constructors
     //================================================================================
     public BoardSpace(int row, int col) {
-        if (!Board.isValidCoordinate(row, col)) {
-            throw new IllegalArgumentException(String.format("Invalid Tile Access: (%d, %d)", row, col));
-        }
-
         tile = null;
         tokenSpaces = new HashMap<>();
         this.row = row;

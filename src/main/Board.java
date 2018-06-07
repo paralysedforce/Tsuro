@@ -48,13 +48,39 @@ public class Board implements Parsable{
         return spaces[row][col];
     }
 
+    public BoardSpace findLocationOfTile(Tile tile){
+        for (int row = 0; row < BOARD_LENGTH; row++) {
+            for (int col = 0; col < BOARD_LENGTH; col++) {
+                BoardSpace space = getBoardSpace(row, col);
+                if (space.hasTile() && space.getTile().equals(tile))
+                    return space;
+            }
+        }
+
+        // Tile is not on board
+        return null;
+    }
+
+    public Token findToken(Color color) {
+        for (int i = 0; i < BOARD_LENGTH; i++) {
+            for (int j = 0; j < BOARD_LENGTH; j++) {
+                for (Token token : getBoardSpace(i, j).getTokensOnSpace()) {
+                    if (token.getColor() == color) {
+                        return token;
+                    }
+                }
+            }
+        }
+
+        // Token not on board
+        return null;
+    }
+
     //================================================================================
     // Public methods
     //================================================================================
 
-    /**
-     * Returns true if there is a tile on the row and col
-     */
+
     public boolean hasTile(int row, int col) {
         return getBoardSpace(row, col).hasTile();
     }
@@ -141,19 +167,6 @@ public class Board implements Parsable{
         return eliminatedPlayers;
     }
 
-    public BoardSpace findLocationOfTile(Tile tile){
-        for (int row = 0; row < BOARD_LENGTH; row++) {
-            for (int col = 0; col < BOARD_LENGTH; col++) {
-                BoardSpace space = getBoardSpace(row, col);
-                if (space.hasTile() && space.getTile().equals(tile))
-                    return space;
-            }
-        }
-
-        // Tile is not on board
-        return null;
-    }
-
     // TODO: These should eventually should be refactored out to take Tokens instead of APlayers
     public Set<Token> placeTile(Tile tile, APlayer player){
         return placeTile(tile, player.getToken());
@@ -162,22 +175,6 @@ public class Board implements Parsable{
         return willKillPlayer(tile, player.getToken());
     }
 
-
-    public Token findToken(Color color) {
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_LENGTH; j++) {
-
-                for (Token token : getBoardSpace(i, j).getTokensOnSpace()) {
-                    if (token.getColor() == color) {
-                        return token;
-                    }
-                }
-            }
-        }
-
-        // Token not on board
-        return null;
-    }
 
     //================================================================================
     // Private Helpers
@@ -240,7 +237,7 @@ public class Board implements Parsable{
     }
 
     // Returns true if the row and col pair are a valid address in the board
-    public static boolean isValidCoordinate(int row, int col) {
+    private static boolean isValidCoordinate(int row, int col) {
         return (0 <= row && row < BOARD_LENGTH) && (0 <= col && col < BOARD_LENGTH);
     }
 
@@ -262,6 +259,7 @@ public class Board implements Parsable{
         int row = token.getBoardSpace().getRow();
         int col = token.getBoardSpace().getCol();
         int tokenSpace = token.getTokenSpace();
+
         return isOnEdge(row, col, tokenSpace);
     }
 

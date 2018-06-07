@@ -23,6 +23,10 @@ public enum Color {
         return str;
     }
 
+    //================================================================================
+    // XML Parsing
+    //================================================================================
+
     public Element toXML(Document document) {
         Element tag = document.createElement("color");
         tag.appendChild(document.createTextNode(str));
@@ -32,22 +36,14 @@ public enum Color {
 
     public static Color fromXML(Element colorElement) {
         switch (colorElement.getTextContent()) {
-            case "green":
-                return GREEN;
-            case "red":
-                return RED;
-            case "orange":
-                return ORANGE;
-            case "blue":
-                return BLUE;
-            case "sienna":
-                return SIENNA;
-            case "hotpink":
-                return HOTPINK;
-            case "darkgreen":
-                return DARKGREEN;
-            case "purple":
-                return PURPLE;
+            case "green":     return GREEN;
+            case "red":       return RED;
+            case "orange":    return ORANGE;
+            case "blue":      return BLUE;
+            case "sienna":    return SIENNA;
+            case "hotpink":   return HOTPINK;
+            case "darkgreen": return DARKGREEN;
+            case "purple":    return PURPLE;
             default:
                 throw new ParserException("Unknown color in element: " + colorElement.getTextContent());
         }

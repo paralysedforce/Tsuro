@@ -9,11 +9,7 @@ import java.util.Set;
 
 import main.Parser.ParserUtils;
 import main.Players.APlayer;
-import main.Players.LeastSymmetricPlayer;
-import main.Players.MostSymmetricPlayer;
-import main.Players.PlayerType;
 import main.Players.RandomPlayer;
-import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -105,7 +101,6 @@ public class Game {
         }
     }
 
-    /* TODO: Combine with playATurn */
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
     public Set<APlayer> playTurn(Tile tile, APlayer player) throws ContractException{
@@ -216,7 +211,6 @@ public class Game {
                 continue;
             }
         }
-
 
         /* Inform every player the colors of the winning players */
         Set<Color> winningPlayerColors = new HashSet<>();
