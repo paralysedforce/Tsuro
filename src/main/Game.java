@@ -34,9 +34,9 @@ public class Game {
        this.board = new Board();
        this.remainingPlayers = new ArrayList<>();
        this.eliminatedPlayers = new ArrayList<>();
+       this.winningPlayers = new ArrayList<>();
        this.tilePile = new TilePile();
        dragonTileOwner = null;
-       this.isOver = false;
    }
 
     public static Game getGame(){
@@ -54,9 +54,9 @@ public class Game {
     private Board board;
     private List<APlayer> remainingPlayers;
     private List<APlayer> eliminatedPlayers;
+    private List<APlayer> winningPlayers;
     private TilePile tilePile;
     private APlayer dragonTileOwner;
-    private boolean isOver;
 
     //================================================================================
     // Getters
@@ -68,6 +68,8 @@ public class Game {
     public TilePile getTilePile() {
         return tilePile;
     }
+
+    public boolean isOver(){ return !winningPlayers.isEmpty();}
 
     //================================================================================
     // Setters
@@ -121,8 +123,12 @@ public class Game {
             }
 
             if (failedPlayers.containsAll(remainingPlayers)) {
-                game.isOver = true;
-                return failedPlayers;
+
+                for (APlayer failedPlayer: failedPlayers){
+                    failedPlayer.getHand().returnTilesToDeck();
+                }
+
+                winningPlayers = new ArrayList<>(failedPlayers);
             }
 
             // Update hands
@@ -139,7 +145,8 @@ public class Game {
                 for (APlayer failedPlayer : failedPlayers)
                     eliminatePlayer(failedPlayer);
 
-                drawAfterElimination(playerToDrawFirst);
+                if (!isOver())
+                    drawAfterElimination(playerToDrawFirst);
             }
 
             return failedPlayers;
@@ -156,15 +163,14 @@ public class Game {
 
         // Check for end game conditions that don't result in one winner in addition to one winner.
         if (playersEliminatedThisTurn.containsAll(remainingPlayers)){
-            game.isOver = true;
+            winningPlayers = new ArrayList<>(remainingPlayers);
             return;
         }
 
         if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
-            game.isOver = true;
+            winningPlayers = new ArrayList<>(remainingPlayers);
             return;
         }
-
 
         // Game not ended. Update player lists.
         if(!eliminatedPlayers.contains(player)){
@@ -172,15 +178,9 @@ public class Game {
             remainingPlayers.add(player);
         }
 
-        this.eliminatedPlayers.addAll(playersEliminatedThisTurn);
-        this.remainingPlayers.removeAll(playersEliminatedThisTurn);
-
         if (remainingPlayers.size() <= 1){
-            game.isOver = true;
-            return;
+            winningPlayers = new ArrayList<>(remainingPlayers);
         }
-
-        game.isOver = false;
     }
 
     public void initializePlayers(){
@@ -202,40 +202,39 @@ public class Game {
             player.placeToken();
         }
 
-        while (true) {
+        while (!isOver()) {
             // Get the chosen move
             APlayer playingPlayer = remainingPlayers.get(0);
             Tile tile = playingPlayer.chooseTile(tilePile.getCount());
 
-            List<APlayer> winningPlayers = null;
             try {
                 // Update winning players
                 playATurn(tile, playingPlayer);
-                if (game.isOver){
-                    winningPlayers = game.remainingPlayers;
-                }
-            }
-            catch (ContractException e) {
+            } catch (ContractException e) {
                 // Detect cheating
                 remainingPlayers.remove(playingPlayer);
                 playingPlayer = blamePlayer(playingPlayer);
                 remainingPlayers.add(0, playingPlayer);
                 continue;
             }
-
-            if (winningPlayers != null) {
-                Set<Color> winningPlayerColors = new HashSet<>();
-                for (APlayer player : remainingPlayers) {
-                    winningPlayerColors.add(player.getColor());
-                }
-
-                for (APlayer player : remainingPlayers){
-                    player.endGame(winningPlayerColors);
-                }
-
-                return winningPlayers;
-            }
         }
+
+
+        /* Inform every player the colors of the winning players */
+        Set<Color> winningPlayerColors = new HashSet<>();
+        for (APlayer player : winningPlayers) {
+            winningPlayerColors.add(player.getColor());
+        }
+
+        for (APlayer player : remainingPlayers){
+            player.endGame(winningPlayerColors);
+        }
+        for (APlayer player : eliminatedPlayers){
+            player.endGame(winningPlayerColors);
+        }
+
+        return winningPlayers;
+
     }
 
 
@@ -302,8 +301,8 @@ public class Game {
         eliminatedPlayers.add(eliminatedPlayer);
     }
 
-    private APlayer blamePlayer(APlayer splayer){
-        return new RandomPlayer(splayer);
+    private APlayer blamePlayer(APlayer aplayer){
+        return new RandomPlayer(aplayer);
     }
 
 
@@ -311,14 +310,16 @@ public class Game {
     // Main
     //================================================================================
 
-    /* Runs a simple command line UI to play a game */
     public static void main(String[] args){
+
         Game.resetGame();
-        Game game = getGame();
+        game = getGame();
         Scanner scanner = new Scanner(System.in);
         //System.err.println("Welcome to Tsuro!");
 
         while (scanner.hasNextLine()) {
+
+
         /* One move */
             try {
                 /* Get input from stdin */
@@ -342,6 +343,7 @@ public class Game {
                 game.tilePile = tilePile;
                 game.remainingPlayers = remainingPlayers;
                 game.eliminatedPlayers = eliminatedPlayers;
+                game.winningPlayers = new ArrayList<>();
 
             /* Connect all the components to each other */
                 game.dragonTileOwner = null;
@@ -373,8 +375,8 @@ public class Game {
                 System.out.println(ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner));
                 System.out.println(ParserUtils.APlayerListToString(eliminatedPlayers, game.dragonTileOwner));
                 System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
-                System.out.println(game.isOver ?
-                        ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
+                System.out.println(game.isOver() ?
+                        ParserUtils.APlayerListToString(game.winningPlayers, game.dragonTileOwner) :
                         "<false></false>"
                 );
 
@@ -383,9 +385,5 @@ public class Game {
                 return;
             }
         }
-
-
-
-
     }
 }
