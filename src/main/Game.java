@@ -116,50 +116,54 @@ public class Game {
             // Place tile and move players
             Set<Token> failedTokens = board.placeTile(tile, player.getToken());
             Set<APlayer> failedPlayers = new HashSet<>();
-
             for (APlayer possiblyFailedPlayer: remainingPlayers){
                 if (failedTokens.contains(possiblyFailedPlayer.getToken()))
                     failedPlayers.add(possiblyFailedPlayer);
             }
 
             if (failedPlayers.containsAll(remainingPlayers)) {
-
                 for (APlayer failedPlayer: failedPlayers){
                     failedPlayer.getHand().returnTilesToDeck();
+                    eliminatePlayer(failedPlayer);
                 }
 
                 winningPlayers = new ArrayList<>(failedPlayers);
+                return failedPlayers;
             }
 
-            // Update hands
-            // player.getHand().removeTile(tile);
-            player.getHand().drawFromDeck();
+            // There are still some living players on the board
+            else {
+                // Update hands
+                // player.getHand().removeTile(tile);
+                player.getHand().drawFromDeck();
 
-            // Update deck with eliminated players
-            if (!failedPlayers.isEmpty()) {
-                for (APlayer failedPlayer : failedPlayers)
-                    failedPlayer.getHand().returnTilesToDeck();
+                // Update deck with eliminated players
+                if (!failedPlayers.isEmpty()) {
+                    for (APlayer failedPlayer : failedPlayers)
+                        failedPlayer.getHand().returnTilesToDeck();
 
-                APlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
+                    APlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
 
-                for (APlayer failedPlayer : failedPlayers)
-                    eliminatePlayer(failedPlayer);
+                    for (APlayer failedPlayer : failedPlayers)
+                        eliminatePlayer(failedPlayer);
 
-                if (!isOver())
                     drawAfterElimination(playerToDrawFirst);
-            }
+                }
 
-            return failedPlayers;
+                return failedPlayers;
+            }
     }
 
     /**
      * Matches the return specs of the assignment, calls playTurn as appropriate
      * @return null if the game is not over, list of winning players if the game is over.
      */
-    public void playATurn(Tile tile, APlayer player) throws ContractException {
-
+    public void handleWinners(Tile tile, APlayer player) throws ContractException {
         // Cheating occurs here and throws ContractException
         Set<APlayer> playersEliminatedThisTurn = playTurn(tile, player);
+
+        if (isOver())
+            return;
 
         // Check for end game conditions that don't result in one winner in addition to one winner.
         if (playersEliminatedThisTurn.containsAll(remainingPlayers)){
@@ -172,13 +176,7 @@ public class Game {
             return;
         }
 
-        // Game not ended. Update player lists.
-        if(!eliminatedPlayers.contains(player)){
-            remainingPlayers.remove(player);
-            remainingPlayers.add(player);
-        }
-
-        if (remainingPlayers.size() <= 1){
+        if (remainingPlayers.size() == 1){
             winningPlayers = new ArrayList<>(remainingPlayers);
         }
     }
@@ -209,7 +207,7 @@ public class Game {
 
             try {
                 // Update winning players
-                playATurn(tile, playingPlayer);
+                handleWinners(tile, playingPlayer);
             } catch (ContractException e) {
                 // Detect cheating
                 remainingPlayers.remove(playingPlayer);
@@ -367,7 +365,7 @@ public class Game {
 
 
             /* Make a move */
-                game.playATurn(tileToBePlaced, remainingPlayers.get(0));
+                game.handleWinners(tileToBePlaced, remainingPlayers.get(0));
 
             /* Send output to stdout */
                 Document document = ParserUtils.newDocument();
