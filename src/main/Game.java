@@ -103,7 +103,7 @@ public class Game {
         }
     }
 
-    /* TODO: MAKE PRIVATE WHEN NOT DEBUGGING */
+    /* TODO: Combine with playATurn */
     // Deal with when the player place the tile on the board
     //   Returns a set of players who have lost after the tile is placed
     public Set<APlayer> playTurn(Tile tile, APlayer player) throws ContractException{
@@ -120,8 +120,10 @@ public class Game {
                     failedPlayers.add(possiblyFailedPlayer);
             }
 
-            if (failedPlayers.containsAll(remainingPlayers))
+            if (failedPlayers.containsAll(remainingPlayers)) {
+                game.isOver = true;
                 return failedPlayers;
+            }
 
             // Update hands
             // player.getHand().removeTile(tile);
@@ -147,17 +149,20 @@ public class Game {
      * Matches the return specs of the assignment, calls playTurn as appropriate
      * @return null if the game is not over, list of winning players if the game is over.
      */
-    public HashSet<APlayer> playATurn(Tile tile, APlayer player) throws ContractException {
+    public void playATurn(Tile tile, APlayer player) throws ContractException {
 
         // Cheating occurs here and throws ContractException
         Set<APlayer> playersEliminatedThisTurn = playTurn(tile, player);
 
         // Check for end game conditions that don't result in one winner in addition to one winner.
-        if(playersEliminatedThisTurn.containsAll(remainingPlayers) || remainingPlayers.size() <= 1){
-            return new HashSet<APlayer>(remainingPlayers);
+        if (playersEliminatedThisTurn.containsAll(remainingPlayers)){
+            game.isOver = true;
+            return;
         }
+
         if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
-            return new HashSet<APlayer>(remainingPlayers);
+            game.isOver = true;
+            return;
         }
 
 
@@ -166,10 +171,16 @@ public class Game {
             remainingPlayers.remove(player);
             remainingPlayers.add(player);
         }
+
         this.eliminatedPlayers.addAll(playersEliminatedThisTurn);
         this.remainingPlayers.removeAll(playersEliminatedThisTurn);
 
-        return null;
+        if (remainingPlayers.size() <= 1){
+            game.isOver = true;
+            return;
+        }
+
+        game.isOver = false;
     }
 
     public void initializePlayers(){
@@ -184,7 +195,7 @@ public class Game {
 
 
     // Main game loop
-    public Set<APlayer> playGame(){
+    public List<APlayer> playGame(){
         initializePlayers();
 
         for (APlayer player: remainingPlayers) {
@@ -196,10 +207,13 @@ public class Game {
             APlayer playingPlayer = remainingPlayers.get(0);
             Tile tile = playingPlayer.chooseTile(tilePile.getCount());
 
-            Set<APlayer> winningPlayers;
+            List<APlayer> winningPlayers = null;
             try {
                 // Update winning players
-                winningPlayers = playATurn(tile, playingPlayer);
+                playATurn(tile, playingPlayer);
+                if (game.isOver){
+                    winningPlayers = game.remainingPlayers;
+                }
             }
             catch (ContractException e) {
                 // Detect cheating
@@ -220,7 +234,6 @@ public class Game {
                 }
 
                 return winningPlayers;
-
             }
         }
     }
@@ -308,12 +321,12 @@ public class Game {
         while (scanner.hasNextLine()) {
         /* One move */
             try {
-            /* Get input from stdin */
-                Element tilePileListElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-                Element remainingPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                /* Get input from stdin */
+                Element tilePileListElement      = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element remainingPlayersElement  = (Element) ParserUtils.nodeFromString(scanner.nextLine());
                 Element eliminatedPlayersElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-                Element boardElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
-                Element tileToBePlacedElement = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element boardElement             = (Element) ParserUtils.nodeFromString(scanner.nextLine());
+                Element tileToBePlacedElement    = (Element) ParserUtils.nodeFromString(scanner.nextLine());
 
 
             /* Convert input into Game representations */
@@ -350,8 +363,9 @@ public class Game {
                     player.getHand().setDeck(tilePile);
                 }
 
+
             /* Make a move */
-                game.playTurn(tileToBePlaced, remainingPlayers.get(0));
+                game.playATurn(tileToBePlaced, remainingPlayers.get(0));
 
             /* Send output to stdout */
                 Document document = ParserUtils.newDocument();
@@ -361,7 +375,8 @@ public class Game {
                 System.out.println(ParserUtils.xmlElementToString(board.toXML(document)));
                 System.out.println(game.isOver ?
                         ParserUtils.APlayerListToString(remainingPlayers, game.dragonTileOwner) :
-                        "<false></false>");
+                        "<false></false>"
+                );
 
             } catch (ParserConfigurationException | IOException | SAXException e) {
                 e.printStackTrace();
