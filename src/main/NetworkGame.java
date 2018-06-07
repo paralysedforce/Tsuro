@@ -1,6 +1,5 @@
 package main;
 
-import main.Parser.ParserUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,10 +17,10 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import javafx.util.Pair;
 import main.Parser.ParserException;
+import main.Parser.ParserUtils;
 import main.Players.APlayer;
 import main.Players.MostSymmetricPlayer;
 import main.Players.PlayerHand;
@@ -105,6 +104,7 @@ public class NetworkGame {
     private String forwardRequestToAPlayer(String request) throws IOException {
         try {
             Node root = ParserUtils.nodeFromString(request);
+            System.out.println(root.getNodeName() + " for " + aplayer.getColor());
             switch (root.getNodeName()) {
                 case "get-name":
                     return getNameHandler(root);
@@ -182,6 +182,12 @@ public class NetworkGame {
 
         aplayer.setBoard(board);
 
+        System.out.println("INTERNAL BOARD:");
+        try {
+            System.out.println(ParserUtils.xmlElementToString(board.toXML(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument())));
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
 
         PlayerHand playerHand = new PlayerHand();
         playerHand.fromXML((Element)setOfTilesNode);
@@ -195,6 +201,9 @@ public class NetworkGame {
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element returnedTileElement = tile.toXML(document);
+
+            System.out.println("RESPONSE TILE:");
+            System.out.println(ParserUtils.xmlElementToString(returnedTileElement));
 
             return ParserUtils.xmlElementToString(returnedTileElement);
 
