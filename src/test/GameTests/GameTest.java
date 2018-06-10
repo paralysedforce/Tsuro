@@ -332,4 +332,9 @@ public class GameTest {
     }
 
 
+    @Test
+    public void mainTest(){
+        Game.main(new String[]{"args.dat"});
+    }
+
 }

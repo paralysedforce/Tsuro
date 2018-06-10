@@ -1,5 +1,7 @@
 package main;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,7 +98,7 @@ public class Game {
 
     // Let a player with an empty hand request the TilePile
     public void requestDragonTile(APlayer player){
-        if (dragonTileOwner == null && tilePile.isEmpty()) {
+        if (dragonTileOwner == null && !player.getHand().isFull()) {
             dragonTileOwner = player;
         }
     }
@@ -110,12 +112,14 @@ public class Game {
 
             // Place tile and move players
             Set<Token> failedTokens = board.placeTile(tile, player.getToken());
+
             Set<APlayer> failedPlayers = new HashSet<>();
             for (APlayer possiblyFailedPlayer: remainingPlayers){
                 if (failedTokens.contains(possiblyFailedPlayer.getToken()))
                     failedPlayers.add(possiblyFailedPlayer);
             }
 
+            // The move eliminates everybody on the board
             if (failedPlayers.containsAll(remainingPlayers)) {
                 for (APlayer failedPlayer: failedPlayers){
                     failedPlayer.getHand().returnTilesToDeck();
@@ -128,52 +132,18 @@ public class Game {
 
             // There are still some living players on the board
             else {
-                // Update hands
-                // player.getHand().removeTile(tile);
-                player.getHand().drawFromDeck();
-
                 // Update deck with eliminated players
-                if (!failedPlayers.isEmpty()) {
-                    for (APlayer failedPlayer : failedPlayers)
-                        failedPlayer.getHand().returnTilesToDeck();
-
-                    APlayer playerToDrawFirst = findPlayerToDrawFirst(failedPlayers, player);
-
-                    for (APlayer failedPlayer : failedPlayers)
-                        eliminatePlayer(failedPlayer);
-
-                    drawAfterElimination(playerToDrawFirst);
+                for (APlayer failedPlayer : failedPlayers){
+                    eliminatePlayer(failedPlayer);
                 }
+
+                APlayer playerToDrawFirst = findPlayerToDrawFirst();
+                drawAfterElimination(playerToDrawFirst);
+                moveCurrentPlayerToEnd(player);
+                handleWinningPlayers(failedPlayers);
 
                 return failedPlayers;
             }
-    }
-
-    /**
-     * Matches the return specs of the assignment, calls playTurn as appropriate
-     * @return null if the game is not over, list of winning players if the game is over.
-     */
-    public void handleWinners(Tile tile, APlayer player) throws ContractException {
-        // Cheating occurs here and throws ContractException
-        Set<APlayer> playersEliminatedThisTurn = playTurn(tile, player);
-
-        if (isOver())
-            return;
-
-        // Check for end game conditions that don't result in one winner in addition to one winner.
-        if (playersEliminatedThisTurn.containsAll(remainingPlayers)){
-            winningPlayers = new ArrayList<>(remainingPlayers);
-            return;
-        }
-
-        if(tilePile.isEmpty() && areAllRemainingHandsEmpty()){
-            winningPlayers = new ArrayList<>(remainingPlayers);
-            return;
-        }
-
-        if (remainingPlayers.size() == 1){
-            winningPlayers = new ArrayList<>(remainingPlayers);
-        }
     }
 
     public void initializePlayers(){
@@ -202,7 +172,7 @@ public class Game {
 
             try {
                 // Update winning players
-                handleWinners(tile, playingPlayer);
+                playTurn(tile, playingPlayer);
             } catch (ContractException e) {
                 // Detect cheating
                 remainingPlayers.remove(playingPlayer);
@@ -250,6 +220,7 @@ public class Game {
        return true;
     }
 
+
     private boolean areAllRemainingHandsEmpty() {
         for(APlayer player : remainingPlayers){
             if (!player.getHand().isEmpty())
@@ -261,25 +232,34 @@ public class Game {
     // After a player has been eliminated, go around in a clockwise direction and have
     //   all players draw tiles if necessary
     private void drawAfterElimination(APlayer playerToDrawFirst){
-        int playerToDrawIndex = remainingPlayers.indexOf(playerToDrawFirst);
-        while(!tilePile.isEmpty() && !areAllRemainingHandsFull()){
-            remainingPlayers.get(playerToDrawIndex).getHand().drawFromDeck();
-            playerToDrawIndex = (playerToDrawIndex + 1) % remainingPlayers.size();
-            resetDragonTile();
+
+        for (int playerToDrawIndex = remainingPlayers.indexOf(playerToDrawFirst);
+             !areAllRemainingHandsFull();
+             playerToDrawIndex = (playerToDrawIndex + 1) % remainingPlayers.size()){
+
+            APlayer playerToDraw = remainingPlayers.get(playerToDrawIndex);
+            requestDragonTile(playerToDraw);
+
+            if (tilePile.isEmpty())
+                break;
+            else {
+                playerToDraw.getHand().drawFromDeck();
+                resetDragonTile();
+            }
         }
     }
 
     // Determine which player should draw first after a player has been eliminated
-    private APlayer findPlayerToDrawFirst(Set<APlayer> failedPlayers, APlayer currentPlayer){
-        if (dragonTileOwner != null && !failedPlayers.contains(dragonTileOwner)){
-            return dragonTileOwner;
+    private APlayer findPlayerToDrawFirst(){
+        if (dragonTileOwner == null){
+            for (APlayer player: remainingPlayers){
+                if (!player.getHand().isFull())
+                    return player;
+            }
+            return remainingPlayers.get(0);
         }
         else {
-            int currentIndex = remainingPlayers.indexOf(currentPlayer);
-            while (failedPlayers.contains(remainingPlayers.get(currentIndex))){
-                currentIndex = (currentIndex + 1) % remainingPlayers.size();
-            }
-            return remainingPlayers.get(currentIndex);
+            return dragonTileOwner;
         }
     }
 
@@ -287,10 +267,42 @@ public class Game {
     private void eliminatePlayer(APlayer eliminatedPlayer){
         if (dragonTileOwner == eliminatedPlayer){
             resetDragonTile();
+            passDragonTile(eliminatedPlayer);
         }
         eliminatedPlayer.getHand().returnTilesToDeck();
         remainingPlayers.remove(eliminatedPlayer);
         eliminatedPlayers.add(eliminatedPlayer);
+    }
+
+    private void passDragonTile(APlayer previousDragonTileOwner){
+        int previousDragonTileOwnerIndex = remainingPlayers.indexOf(previousDragonTileOwner);
+
+        for (int i = (previousDragonTileOwnerIndex + 1) % remainingPlayers.size();
+             i != previousDragonTileOwnerIndex;
+             i = (i + 1) % remainingPlayers.size()){
+
+            requestDragonTile(remainingPlayers.get(i));
+        }
+    }
+
+    private void moveCurrentPlayerToEnd(APlayer player){
+        if (player == remainingPlayers.get(0)){
+            remainingPlayers.remove(player); // Remove from front of list
+            remainingPlayers.add(player);    // Add to back of list
+        }
+    }
+
+    private void handleWinningPlayers(Set<APlayer> failedPlayers) {
+        // Check for end game conditions that don't result in one winner in addition to one winner.
+        if (failedPlayers.containsAll(remainingPlayers)) {
+            winningPlayers = new ArrayList<>(remainingPlayers);
+            ;
+        } else if (tilePile.isEmpty() && areAllRemainingHandsEmpty()) {
+            winningPlayers = new ArrayList<>(remainingPlayers);
+            ;
+        } else if (remainingPlayers.size() == 1) {
+            winningPlayers = new ArrayList<>(remainingPlayers);
+        }
     }
 
     private APlayer blamePlayer(APlayer aplayer){
@@ -306,7 +318,22 @@ public class Game {
 
         Game.resetGame();
         game = getGame();
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = null;
+
+        if (args.length == 1){
+            String filename = args[0];
+            File file = new File(filename);
+            try {
+                scanner = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+
+        }
+        else {
+            scanner = new Scanner(System.in);
+        }
         //System.err.println("Welcome to Tsuro!");
 
         while (scanner.hasNextLine()) {
@@ -359,7 +386,7 @@ public class Game {
 
 
             /* Make a move */
-                game.handleWinners(tileToBePlaced, remainingPlayers.get(0));
+                game.playTurn(tileToBePlaced, remainingPlayers.get(0));
 
             /* Send output to stdout */
                 Document document = ParserUtils.newDocument();

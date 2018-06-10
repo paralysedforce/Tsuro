@@ -207,7 +207,7 @@ public class ParserUtils {
         for (Node child = remainingPlayersElement.getFirstChild();
                 child != null;
                 child = child.getNextSibling()){
-            if (child.getTextContent().equals("splayer-dragon")){
+            if (child.getNodeName().equals("splayer-dragon")){
                 return APlayer.fromXML((Element) child).getColor();
             }
         }
