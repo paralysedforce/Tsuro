@@ -2,7 +2,6 @@ package test.PlayerTests;
 
 import main.Parser.ParserUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.w3c.dom.Document;
@@ -23,7 +22,6 @@ import main.Game;
 import main.NetworkMessage;
 import main.Players.APlayer;
 import main.Players.NetworkPlayer;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by William on 5/20/2018.
@@ -59,9 +57,7 @@ public class NetworkPlayerTest {
                 getInitializationRequest());
     }
 
-    private List<Color> getInitializationColors() {
-        return Arrays.asList(Color.BLUE, Color.SIENNA);
-    }
+
 
     private String getInitializationRequest() {
         return "<" + NetworkMessage.INITIALIZE.getTag() + ">" +
@@ -78,14 +74,17 @@ public class NetworkPlayerTest {
     }
 
     private APlayer initializeNetworkPlayer(Reader r, Writer w) {
-        APlayer player = new NetworkPlayer("Testname", Color.BLUE, r, w);
-        player.initialize(getInitializationColors());
+        NetworkPlayer player = new NetworkPlayer("Testname", Color.BLUE, r, w);
+        List<Color> initializationColors =  Arrays.asList(Color.BLUE, Color.SIENNA);
+        player.initialize(initializationColors);
+
         return player;
     }
 
     @Test
     public void testPlacePawn() throws ParserConfigurationException {
-        Reader r = new StringReader(
+
+        Reader reader = new StringReader(
                 getInitializationResponse() +
                         "<pawn-loc>" +
                         "<h></h>" +
@@ -93,12 +92,12 @@ public class NetworkPlayerTest {
                         "<n>2</n>" +
                         "</pawn-loc>\r\n"
         );
-        Writer w = new StringWriter();
-        APlayer player = initializeNetworkPlayer(r, w);
+        Writer writer = new StringWriter();
+        APlayer player = initializeNetworkPlayer(reader, writer);
 
-        Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document document = ParserUtils.newDocument();
         String expectedPlacementRequestBoard =
-                ParserUtils.xmlElementToString(Game.getGame().getBoard().toXML(d));
+                ParserUtils.xmlElementToString(Game.getGame().getBoard().toXML(document));
 
         player.placeToken();
 
@@ -109,7 +108,7 @@ public class NetworkPlayerTest {
 
         // The request should be formed as expected.
         Assert.assertEquals(
-                w.toString(),
+                writer.toString(),
                 getInitializationRequest() +
                         "<" + NetworkMessage.PLACE_PAWN.getTag() + ">" +
                         expectedPlacementRequestBoard +

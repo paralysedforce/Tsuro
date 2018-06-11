@@ -34,6 +34,22 @@ public class BoardSpace implements Parsable {
         fromXML(xmlElement);
     }
 
+    public BoardSpace(BoardSpace otherBoardSpace){
+        this.tile = otherBoardSpace.hasTile() ? new Tile(otherBoardSpace.getTile()): null;
+        this.row = otherBoardSpace.getRow();
+        this.col = otherBoardSpace.getCol();
+        this.tokenSpaces = new HashMap<>();
+        for (Token otherToken: otherBoardSpace.getTokensOnSpace()){
+            // Creating the token also adds it to this.tokenspaces
+            new Token(this, otherToken.getTokenSpace(), otherToken.getColor());
+        }
+
+        if (otherBoardSpace.getTokensOnSpace().size() != getTokensOnSpace().size()){
+            throw new ContractException(ContractViolation.POSTCONDITION,
+                    "Number of tokens on space does not match source");
+        }
+    }
+
 
     //================================================================================
     // Getters
