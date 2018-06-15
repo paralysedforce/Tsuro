@@ -1,6 +1,7 @@
 package main;
 
 import main.Parser.ParserUtils;
+import main.Players.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,9 +23,6 @@ import javax.xml.transform.TransformerException;
 
 import javafx.util.Pair;
 import main.Parser.ParserException;
-import main.Players.APlayer;
-import main.Players.MostSymmetricPlayer;
-import main.Players.PlayerHand;
 
 /**
  * The Player's representation of the Game Server
@@ -238,7 +236,7 @@ public class NetworkGame {
             System.out.println(host);
             int port = Integer.valueOf(args[1]);
 
-            APlayer player = new MostSymmetricPlayer("symmetric", Color.BLUE);
+            APlayer player = new MostSymmetricPlayer("pedant", Color.DARKGREEN);
 
             new NetworkGame(host, port, player).handleInstructions();
         } catch (ArrayIndexOutOfBoundsException e) {

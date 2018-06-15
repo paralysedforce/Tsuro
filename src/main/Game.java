@@ -240,8 +240,9 @@ public class Game {
             APlayer playerToDraw = remainingPlayers.get(playerToDrawIndex);
             requestDragonTile(playerToDraw);
 
-            if (tilePile.isEmpty())
+            if (tilePile.isEmpty()) {
                 break;
+            }
             else {
                 playerToDraw.getHand().drawFromDeck();
                 resetDragonTile();

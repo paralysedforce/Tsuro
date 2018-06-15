@@ -33,6 +33,7 @@ public class Board implements Parsable{
     }
 
     public Board(Board otherBoard){
+        initializeSpaces();
         for (int i = 0; i < BOARD_LENGTH; i++){
             for (int j = 0; j < BOARD_LENGTH; j++){
                 spaces[i][j] = new BoardSpace(otherBoard.getBoardSpace(i, j));
