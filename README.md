@@ -1,6 +1,6 @@
-# team26-working
+# Tsuro
 
-This project was written in Java 8 and includes all of its dependencies.
+This project was a networked implementation of Tsuro for EECS 397 at Northwestern University in Spring 2018. It's no longer being actively maintained, but I'm making this public now. It was written in Java 8 in IntelliJ and includes all of its dependencies.
 
 To compile this project, just run ```make```.
 This will produce the following two files:
